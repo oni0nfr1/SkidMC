@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "skid",
+  "version": "${version}",
+  "name": "SkidMC",
+  "description": "API for KartRider : Minecraft Client Mod Development",
+  "authors": [],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/skid/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "io.github.oni0nfr1.skid.client.SkidClient"
+    ],
+    "main": [
+      "io.github.oni0nfr1.skid.Skid"
+    ]
+  },
+  "mixins": [
+    "skid.mixins.json",
+    {
+      "config": "skid.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-language-kotlin": ">=${kotlin_loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}

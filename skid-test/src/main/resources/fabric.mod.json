@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "skid-test",
+  "version": "${version}",
+
+  "name": "skid-test",
+  "description": "Library for KartRider : Minecraft Client Mod Development",
+  "authors": [],
+  "contact": {},
+
+  "license": "MIT",
+  "icon": "assets/skid-test/icon.png",
+
+  "environment": "client",
+  "entrypoints": {
+    "client": ["io.github.oni0nfr1.skidTest.client.SkidTestClient"],
+    "main": ["io.github.oni0nfr1.skidTest.SkidTest"]
+  },
+
+  "mixins": [
+    "skid-test.mixins.json"
+    ,{
+      "config": "skid-test.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+
+  "depends": {
+    "skid": ">=${skid_version}",
+    "fabricloader": ">=${loader_version}",
+    "fabric-language-kotlin": ">=${kotlin_loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}

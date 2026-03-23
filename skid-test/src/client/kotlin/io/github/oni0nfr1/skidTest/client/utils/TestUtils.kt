@@ -18,7 +18,7 @@ fun GuiGraphics.renderDebugPanel(
     text: String,
     startX: Int,
     startY: Int,
-    colorArgb: Int,
+    colorArgb: Int = 0xFFFFFFFF.toInt(),
     shadow: Boolean = true,
     extraLineSpacing: Int = 0,
     padding: Int = 10

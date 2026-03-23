@@ -2,9 +2,6 @@ package io.github.oni0nfr1.skid.client.api.events
 
 import io.github.oni0nfr1.skid.client.api.attr.AttrModifierSnapshot
 import io.github.oni0nfr1.skid.client.api.attr.KnownAttrModId
-import io.github.oni0nfr1.skid.client.api.kart.KartEntity
-import io.github.oni0nfr1.skid.client.api.kart.KartManager
-import io.github.oni0nfr1.skid.client.api.kart.ridingKart
 import io.github.oni0nfr1.skid.client.internal.utils.createEvent
 import net.fabricmc.fabric.api.event.Event
 import net.minecraft.core.Holder

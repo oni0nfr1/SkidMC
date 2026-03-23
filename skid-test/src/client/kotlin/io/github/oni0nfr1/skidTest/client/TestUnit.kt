@@ -4,7 +4,6 @@ import com.mojang.brigadier.Command
 import io.github.oni0nfr1.korigadier.api.fragment
 import io.github.oni0nfr1.skidTest.client.utils.sendChat
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
-import net.fabricmc.fabric.api.event.Event
 import net.minecraft.client.DeltaTracker
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics

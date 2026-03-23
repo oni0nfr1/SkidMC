@@ -45,12 +45,7 @@ object EngineImplTest: TestUnit() {
             is BoatEngine -> boatEngineInfo(engine)
         }
 
-        guiGraphics.renderDebugPanel(
-            engineData,
-            10, 10,
-            0xFFFFFFFF.toInt(),
-            shadow = false,
-        )
+        guiGraphics.renderDebugPanel(engineData, 10, 10, shadow = false)
     }
 
     private fun nitroEngineInfo(engine: NitroEngine): String {

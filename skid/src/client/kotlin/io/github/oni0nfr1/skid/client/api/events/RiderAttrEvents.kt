@@ -41,6 +41,7 @@ object RiderAttrEvents {
     @JvmField val KART_ENGINE_REAL = attrEvent(KnownAttrModId.KART_ENGINE_REAL)
     @JvmField val ACTIVE_INSTANT_BOOST = attrEvent(KnownAttrModId.ACTIVE_INSTANT_BOOST)
     @JvmField val IS_DRIFTING = attrEvent(KnownAttrModId.IS_DRIFTING)
+    @JvmField val IS_BOOSTING = attrEvent(KnownAttrModId.IS_BOOSTING)
     @JvmField val KART_MAX_BOOST_COUNT = attrEvent(KnownAttrModId.KART_MAX_BOOST_COUNT)
     @JvmField val KART_TIRE = attrEvent(KnownAttrModId.KART_TIRE)
 
@@ -73,7 +74,7 @@ object RiderAttrEvents {
          * [ClientboundUpdateAttributesPacket]을 수신하여 그 안의 [ClientboundUpdateAttributesPacket.AttributeSnapshot]을 읽을 때,
          * 해당 스냅샷이 대상 엔티티에 대해 유효한지가 확인된 상황에서 엔티티에 적용 직전에 호출됩니다.
          *
-         * @see io.github.oni0nfr1.skid.mixin.client.ClientPacketListenerMixin.onHandleUpdateAttributes
+         * @see io.github.oni0nfr1.skid.client.mixin.ClientPacketListenerMixin.onHandleUpdateAttributes
          */
         @JvmStatic
         fun onUpdateAttrPacket(entity: Entity, snapshot: ClientboundUpdateAttributesPacket.AttributeSnapshot) {

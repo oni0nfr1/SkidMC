@@ -2,7 +2,6 @@ package io.github.oni0nfr1.skid.client.api.engine
 
 import io.github.oni0nfr1.skid.client.SkidClient
 import io.github.oni0nfr1.skid.client.api.kart.Kart
-import io.github.oni0nfr1.skid.client.internal.engine.KartEngineInternal
 import io.github.oni0nfr1.skid.client.internal.engine.specific.*
 import io.github.oni0nfr1.skid.client.internal.utils.MCClient
 import net.minecraft.client.Minecraft
@@ -13,7 +12,7 @@ import net.minecraft.world.entity.player.Player
  *
  * 엔진마다 구현이 달라지는 메서드들을 여기서 호출할 수 있으며, 타입 체크를 통해 엔진 종류를 확인할 수 있습니다.
  */
-sealed interface KartEngine : KartEngineInternal {
+sealed interface KartEngine {
 
     companion object {
         protected val client: Minecraft by MCClient

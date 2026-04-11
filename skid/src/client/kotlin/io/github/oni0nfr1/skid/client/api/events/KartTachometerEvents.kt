@@ -3,6 +3,7 @@ package io.github.oni0nfr1.skid.client.api.events
 import io.github.oni0nfr1.skid.client.api.kart.Kart
 import io.github.oni0nfr1.skid.client.api.kart.KartManager
 import io.github.oni0nfr1.skid.client.api.kart.subject
+import io.github.oni0nfr1.skid.client.internal.tachometer.TachometerManager
 import io.github.oni0nfr1.skid.client.internal.utils.createEvent
 import io.github.oni0nfr1.skid.client.internal.utils.MCClient
 import net.minecraft.client.Minecraft
@@ -202,15 +203,25 @@ object KartTachometerEvents {
          *
          * 렌더 스레드에서 호출됩니다.
          *
-         * @see io.github.oni0nfr1.skid.mixin.client.ClientPacketListenerMixin.onSetActionBarText
+         * @see io.github.oni0nfr1.skid.client.mixin.ClientPacketListenerMixin.onSetActionBarText
          */
         @JvmStatic
         fun onSetActionbarPacket(packet: ClientboundSetActionBarTextPacket, ci: CallbackInfo) {
             val text = packet.text
-            val subject = client.player?.subject as? Player ?: return
-            val engine = KartManager.getKart(subject)?.engine ?: return
+            val subject = client.player?.subject as? Player ?: run {
+                TachometerManager.clear()
+                return
+            }
+            val kart = KartManager.getKart(subject)?.handle ?: run {
+                TachometerManager.clear()
+                return
+            }
+            val engine = kart.engine ?: run {
+                TachometerManager.clear()
+                return
+            }
 
-            val result = engine.dispatchTachometerEvents(text)
+            val result = TachometerManager.handleActionbar(kart, engine, text)
             if (result == Result.BLOCK) ci.cancel()
         }
     }

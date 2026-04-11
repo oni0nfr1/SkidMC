@@ -10,6 +10,7 @@ object KnownAttrModId {
     @JvmField val KART_ENGINE_REAL: ResourceLocation = ResourceLocation.withDefaultNamespace("kart-engine-real")
     @JvmField val ACTIVE_INSTANT_BOOST: ResourceLocation = ResourceLocation.withDefaultNamespace("active-instant-boost")
     @JvmField val IS_DRIFTING: ResourceLocation = ResourceLocation.withDefaultNamespace("is-drifting")
+    @JvmField val IS_BOOSTING: ResourceLocation = ResourceLocation.withDefaultNamespace("is-boosting")
     @JvmField val KART_MAX_BOOST_COUNT: ResourceLocation = ResourceLocation.withDefaultNamespace("kartmaxboostcount")
     @JvmField val KART_TIRE: ResourceLocation = ResourceLocation.withDefaultNamespace("kart-tire")
 }

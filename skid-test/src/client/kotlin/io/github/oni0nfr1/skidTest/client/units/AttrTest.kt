@@ -31,31 +31,34 @@ object AttrTest: TestUnit() {
 
     override fun test(): TestResult {
         RiderAttrEvents.KART_ENGINE.register { player, value ->
-            client.sendChat("${player.name}'s kart-engine = $value")
+            client.sendChat("${player.name.string}'s kart-engine = $value")
         }
         RiderAttrEvents.KART_ENGINE_REAL.register { player, value ->
-            client.sendChat("${player.name}'s kart-engine-real = $value")
+            client.sendChat("${player.name.string}'s kart-engine-real = $value")
         }
         RiderAttrEvents.KART_MAX_BOOST_COUNT.register { player, value ->
-            client.sendChat("${player.name}'s kart-max-boost-count = $value")
+            client.sendChat("${player.name.string}'s kart-max-boost-count = $value")
         }
         RiderAttrEvents.IS_DRIFTING.register { player, value ->
-            client.sendChat("${player.name}'s is-drifting = $value")
+            client.sendChat("${player.name.string}'s is-drifting = $value")
+        }
+        RiderAttrEvents.IS_BOOSTING.register { player, value ->
+            client.sendChat("${player.name.string}'s is-boosting = $value")
         }
         RiderAttrEvents.ACTIVE_INSTANT_BOOST.register { player, value ->
-            client.sendChat("${player.name}'s active-instant-boost = $value")
+            client.sendChat("${player.name.string}'s active-instant-boost = $value")
         }
         RiderAttrEvents.DUALBOOST_STATE.register { player, value ->
-            client.sendChat("${player.name}'s dualboost-state = $value")
+            client.sendChat("${player.name.string}'s dualboost-state = $value")
         }
         RiderAttrEvents.MAX_LAP.register { player, value ->
-            client.sendChat("${player.name}'s max-lap = $value")
+            client.sendChat("${player.name.string}'s max-lap = $value")
         }
         RiderAttrEvents.KART_PERFORMANCE_LIMIT_LEVEL.register { player, value ->
-            client.sendChat("${player.name}'s kart-performance-limit-level = $value")
+            client.sendChat("${player.name.string}'s kart-performance-limit-level = $value")
         }
         RiderAttrEvents.KART_TIRE.register { player, value ->
-            client.sendChat("${player.name}'s kart-tire = $value")
+            client.sendChat("${player.name.string}'s kart-tire = $value")
         }
         return TestResult.TESTING
     }

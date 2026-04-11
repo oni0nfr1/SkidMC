@@ -79,7 +79,7 @@ object KartMountEvents {
          *
          * 렌더 스레드에서 호출됩니다.
          *
-         * @see io.github.oni0nfr1.skid.mixin.client.ClientPacketListenerMixin.onHandleSetEntityPassengersPacket
+         * @see io.github.oni0nfr1.skid.client.mixin.ClientPacketListenerMixin.onHandleSetEntityPassengersPacket
          */
         @JvmStatic
         fun onEntityMountPacket(
@@ -118,7 +118,7 @@ object KartMountEvents {
          *
          * 렌더 스레드에서 호출됩니다.
          *
-         * @see io.github.oni0nfr1.skid.mixin.client.ClientPacketListenerMixin.onHandleRemoveEntitiesPacket
+         * @see io.github.oni0nfr1.skid.client.mixin.ClientPacketListenerMixin.onHandleRemoveEntitiesPacket
          */
         @JvmStatic
         fun beforeEntityRemoveByPacket(

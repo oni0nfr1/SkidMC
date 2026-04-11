@@ -1,11 +1,11 @@
-package io.github.oni0nfr1.skid.client.api.schedule
+package io.github.oni0nfr1.skid.client.internal.schedule
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 
-object Ticker {
+internal object Ticker {
 
     interface TaskHandle {
         /** @return 작업 취소가 성공하면 true, 이미 취소되어 있으면 false */

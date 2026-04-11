@@ -1,4 +1,4 @@
-package io.github.oni0nfr1.skid.client.api.mount
+package io.github.oni0nfr1.skid.client.api.kart
 
 import net.minecraft.world.entity.Entity
 

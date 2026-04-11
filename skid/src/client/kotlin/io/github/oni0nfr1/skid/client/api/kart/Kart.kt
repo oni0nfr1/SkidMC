@@ -3,7 +3,15 @@ package io.github.oni0nfr1.skid.client.api.kart
 import io.github.oni0nfr1.skid.client.api.engine.KartEngine
 import net.minecraft.world.phys.Vec3
 
+/**
+ * 주의: Kart 핸들 객체를 사용하는 방식은 멀티스레드 환경에서 예기치 못한 예외가 던져질 수 있습니다.
+ */
 interface Kart {
+
+    /**
+     * 현재 해당 객체가 유효한지를 나타냅니다.
+     */
+    val alive: Boolean
 
     /**
      * 카트에 해당하는 엔티티를 반환합니다.

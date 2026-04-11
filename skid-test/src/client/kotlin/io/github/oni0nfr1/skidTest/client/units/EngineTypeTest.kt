@@ -29,17 +29,20 @@ object EngineTypeTest: TestUnit() {
     override fun test(): TestResult {
         KartMountEvents.MOUNT.register { kartEntity, _ ->
             if (!status.testing) return@register
-            val engine = kartEntity.kart?.engine ?: return@register
+            kartEntity.kart?.access {
+                val engineNotNull = engine ?: return@register
 
-            val engineCategoryName = when (engine) {
-                is NitroEngine -> "kartrider-like"
-                is GearlikeEngine -> "gear-like"
-                is MKEngine -> "mariokart-like"
-                is BoatEngine -> "boat"
+                val engineCategoryName = when (engineNotNull) {
+                    is NitroEngine -> "kartrider-like"
+                    is GearlikeEngine -> "gear-like"
+                    is MKEngine -> "mariokart-like"
+                    is BoatEngine -> "boat"
+                }
+
+                client.sendChat("detected engine: ${engineNotNull.type.engineName}")
+                client.sendChat("detected engine category: $engineCategoryName")
             }
 
-            client.sendChat("detected engine: ${engine.type.engineName}")
-            client.sendChat("detected engine category: $engineCategoryName")
         }
 
         return TestResult.TESTING

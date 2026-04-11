@@ -58,7 +58,7 @@ object KartSummonEvents {
          *
          * 렌더 스레드에서 호출됩니다.
          *
-         * @see io.github.oni0nfr1.skid.mixin.client.ClientPacketListenerMixin.onHandleAddEntityPacket
+         * @see io.github.oni0nfr1.skid.client.mixin.ClientPacketListenerMixin.onHandleAddEntityPacket
          */
         @JvmStatic
         fun onAddEntityPacket(entity: Entity, @Suppress("UNUSED") ci: CallbackInfo) {
@@ -75,13 +75,13 @@ object KartSummonEvents {
          *
          * 렌더 스레드에서 호출됩니다.
          *
-         * @see io.github.oni0nfr1.skid.mixin.client.ClientPacketListenerMixin.onHandleRemoveEntitiesPacket
+         * @see io.github.oni0nfr1.skid.client.mixin.ClientPacketListenerMixin.onHandleRemoveEntitiesPacket
          */
         @JvmStatic
         fun beforeRemoveEntityByPacket(entityId: Int, @Suppress("UNUSED") ci: CallbackInfo) {
             val entity = client.level?.getEntity(entityId) ?: return
             if (entity !is KartEntity) return
-            val kart = KartManager.getKart(entity) ?: return
+            val kart = KartManager.getKartHandle(entity) ?: return
 
             REMOVE.invoker().onRemove(kart)
             KartManager.removeKart(kart)

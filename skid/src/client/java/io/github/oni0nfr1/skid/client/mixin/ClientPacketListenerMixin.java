@@ -1,4 +1,4 @@
-package io.github.oni0nfr1.skid.mixin.client;
+package io.github.oni0nfr1.skid.client.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import io.github.oni0nfr1.skid.client.api.events.KartSummonEvents;

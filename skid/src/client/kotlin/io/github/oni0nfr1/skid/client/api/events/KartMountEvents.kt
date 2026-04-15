@@ -2,12 +2,16 @@ package io.github.oni0nfr1.skid.client.api.events
 
 import io.github.oni0nfr1.skid.client.api.kart.KartEntity
 import io.github.oni0nfr1.skid.client.api.kart.KartManager
+import io.github.oni0nfr1.skid.client.api.kart.MountType
 import io.github.oni0nfr1.skid.client.api.kart.ridingKart
 import io.github.oni0nfr1.skid.client.api.kart.kart
+import io.github.oni0nfr1.skid.client.api.kart.mountStatus
+import io.github.oni0nfr1.skid.client.internal.tachometer.TachometerManager
 import io.github.oni0nfr1.skid.client.internal.utils.createEvent
 import io.github.oni0nfr1.skid.client.internal.utils.MCClient
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientPacketListener
+import net.minecraft.client.player.LocalPlayer
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket
 import net.minecraft.world.entity.Entity
@@ -60,6 +64,33 @@ object KartMountEvents {
         }
     }
 
+    @Suppress("UNUSED") @JvmField
+    val SPECTATE_EARLY = createEvent { listeners ->
+        KartSpectateCallback { kartEntity, rider, target ->
+            for (listener in listeners) {
+                listener.onKartSpectate(kartEntity, rider, target)
+            }
+        }
+    }
+
+    @Suppress("UNUSED") @JvmField
+    val SPECTATE = createEvent { listeners ->
+        KartSpectateCallback { kartEntity, rider, target ->
+            for (listener in listeners) {
+                listener.onKartSpectate(kartEntity, rider, target)
+            }
+        }
+    }
+
+    @Suppress("UNUSED") @JvmField
+    val SPECTATE_END = createEvent { listeners ->
+        KartSpectateEndCallback { kartEntity, rider, target ->
+            for (listener in listeners) {
+                listener.onKartSpectateEnd(kartEntity, rider, target)
+            }
+        }
+    }
+
     fun interface KartMountCallback {
         fun onKartMount(kartEntity: KartEntity, rider: Player)
     }
@@ -68,10 +99,19 @@ object KartMountEvents {
         fun onKartDismount(kartEntity: KartEntity, rider: Player)
     }
 
+    fun interface KartSpectateCallback {
+        fun onKartSpectate(kartEntity: KartEntity, rider: Player, target: Player)
+    }
+
+    fun interface KartSpectateEndCallback {
+        fun onKartSpectateEnd(kartEntity: KartEntity, rider: Player, target: Player)
+    }
+
     internal object MixinHandler {
         private val client: Minecraft by MCClient
 
         private val passengerIdsByKartId = mutableMapOf<Int, IntArray>()
+        private var wasSpectating = false
 
         /**
          * [ClientboundSetPassengersPacket]을 수신한 뒤
@@ -137,18 +177,69 @@ object KartMountEvents {
             }
         }
 
+        /**
+         * 어트리뷰트 갱신 패킷 수신 메서드 [ClientPacketListener.handleUpdateAttributes]가 호출된 직후에 호출됩니다.
+         *
+         * 렌더 스레드에서 호출됩니다.
+         * @see io.github.oni0nfr1.skid.client.mixin.ClientPacketListenerMixin.afterHandleUpdateAttributes
+         */
         @JvmStatic
         fun onFirstAttrUpdateAfterMount(entity: Entity) {
             if (entity !is Player) return
 
             val prevKart = entity.ridingKart
             val vehicle = entity.vehicle
-            val wasRidingKart = prevKart != null
+            val wasRidingKart = prevKart?.access { alive } ?: false
             val isRidingKart = vehicle is KartEntity
 
             if (!wasRidingKart && isRidingKart) {
                 KartManager.onKartMount(vehicle, entity)
                 MOUNT.invoker().onKartMount(vehicle, entity)
+            }
+        }
+
+        /**
+         * [Minecraft.setCameraEntity]가 호출되기 직전에 호출됩니다.
+         *
+         * 렌더 스레드에서 호출됩니다.
+         * @see io.github.oni0nfr1.skid.client.mixin.MinecraftMixin.onSetCameraEntity
+         */
+        @JvmStatic
+        fun onSpectateTargetChange(player: Player, prevCamera: Entity, newCamera: Entity) {
+            if (prevCamera == newCamera) return
+            val kartEntity = newCamera.vehicle as? KartEntity
+
+            if (!player.isSpectator || newCamera !is Player || kartEntity == null) { // 카트 관전으로 넘어가는 게 아님
+                if (prevCamera !is Player) return
+                val kartEntity = prevCamera.vehicle as? KartEntity ?: return
+
+                SPECTATE_END.invoker().onKartSpectateEnd(kartEntity, player, prevCamera)
+                wasSpectating = false
+            } else { // 카트 관전으로 넘어감
+                TachometerManager.clear()
+                SPECTATE_EARLY.invoker().onKartSpectate(kartEntity, player, newCamera)
+            }
+        }
+
+        /**
+         * 어트리뷰트 갱신 패킷 수신 메서드 [ClientPacketListener.handleUpdateAttributes]가 호출된 직후에 호출됩니다.
+         *
+         * 렌더 스레드에서 호출됩니다.
+         * @see io.github.oni0nfr1.skid.client.mixin.ClientPacketListenerMixin.afterHandleUpdateAttributes
+         */
+        @JvmStatic
+        fun onFirstAttrUpdateAfterSpectate(entity: Entity) {
+            if (entity !is LocalPlayer || entity != client.player) return
+
+            val mountStatus = entity.mountStatus
+            val isSpectating = mountStatus is MountType.Spectating
+
+            if (!wasSpectating && isSpectating) {
+                val target = mountStatus.camera as? Player ?: return
+                val kartEntity = target.vehicle as? KartEntity ?: return
+
+                SPECTATE.invoker().onKartSpectate(kartEntity, entity, target)
+                wasSpectating = true
             }
         }
     }

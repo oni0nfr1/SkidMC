@@ -36,18 +36,22 @@ internal object TachometerManager {
 
     fun handleActionbar(kart: Kart, engine: KartEngine, actionBar: Component): KartTachometerEvents.Result {
         val current = _currentTachometer as? TachometerInternal
+        val match: TachometerUpdateResult
+
         if (current != null && current.matches(kart, engine)) {
-            return current.update(actionBar).result
+            match =  current.update(actionBar)
+        } else {
+            clear()
+
+            val tachometer = createTachometer(kart, engine)
+            match = (tachometer as TachometerInternal).update(actionBar)
+            if (match.matched) _currentTachometer = tachometer
         }
 
-        clear()
+        var receiveResult = KartTachometerEvents.Result.SHOW
+        if (match.matched) receiveResult = KartTachometerEvents.RECEIVE.invoker().onActionbarReceive(kart, engine, actionBar)
 
-        val tachometer = createTachometer(kart, engine) ?: return KartTachometerEvents.Result.SHOW
-        val updateResult = (tachometer as TachometerInternal).update(actionBar)
-        if (!updateResult.matched) return KartTachometerEvents.Result.SHOW
-
-        _currentTachometer = tachometer
-        return updateResult.result
+        return KartTachometerEvents.Result.finalize(match.result, receiveResult)
     }
 
     private fun clearIfInvalid() {
@@ -74,7 +78,7 @@ internal object TachometerManager {
         return kart.entity.id == kartId && engine.type == type
     }
 
-    private fun createTachometer(kart: Kart, engine: KartEngine): KartTachometer? {
+    private fun createTachometer(kart: Kart, engine: KartEngine): KartTachometer {
         val kartId = kart.entity.id
         val revision = nextRevision++
 

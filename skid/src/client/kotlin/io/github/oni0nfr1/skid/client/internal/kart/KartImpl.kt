@@ -16,6 +16,7 @@ internal class KartImpl(entity: KartEntity) : Kart {
             field = value
         }
 
+    override val entityId: Int = entity.id
     private var _entity: KartEntity? = entity
     override val entity: KartEntity
         get() = _entity ?: throw StaleKartException()

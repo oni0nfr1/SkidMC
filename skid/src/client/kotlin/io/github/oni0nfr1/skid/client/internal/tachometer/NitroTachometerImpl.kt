@@ -47,7 +47,7 @@ internal abstract class NitroTachometerImpl(
 
     protected open fun parseSpeed(actionBar: Component): Double? {
         val match = speedPattern.find(actionBar.string) ?: return null
-        return match.groupValues[1].toInt().toDouble()
+        return match.groupValues[1].toDouble()
     }
 
     protected open fun parseNitro(actionBar: Component): Int? {

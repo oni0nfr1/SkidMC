@@ -6,8 +6,10 @@ import io.github.oni0nfr1.skid.client.api.tachometer.*
 import io.github.oni0nfr1.skid.client.internal.tachometer.NitroTachometerImpl
 import io.github.oni0nfr1.skid.client.internal.tachometer.TachometerUpdateResult
 import io.github.oni0nfr1.skid.client.api.engine.KartEngine
+import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
+import net.minecraft.network.chat.TextColor
 import java.util.Optional
 
 internal class XTachometerImpl(revision: Long, kartId: Int) :
@@ -92,6 +94,7 @@ internal class RushPlusTachometerImpl(
     private val fusionNitroPattern = Regex("""FUSION x(0|[1-9]\d*)""")
     private val fusionLabelPattern = Regex("""\bFUSION\b""")
     override val speedPattern: Regex = Regex("""// (\d+(?:\.\d)?)km/h \\\\""")
+    override val gaugeColor: TextColor = TextColor.fromLegacyFormat(ChatFormatting.YELLOW) ?: TextColor.fromRgb(0xFFBB00)
 
     override var fusionActive: Boolean = false
         private set

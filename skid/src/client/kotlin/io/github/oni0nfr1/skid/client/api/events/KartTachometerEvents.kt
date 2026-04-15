@@ -1,5 +1,6 @@
 package io.github.oni0nfr1.skid.client.api.events
 
+import io.github.oni0nfr1.skid.client.api.engine.KartEngine
 import io.github.oni0nfr1.skid.client.api.kart.Kart
 import io.github.oni0nfr1.skid.client.api.kart.KartManager
 import io.github.oni0nfr1.skid.client.api.kart.subject
@@ -8,6 +9,7 @@ import io.github.oni0nfr1.skid.client.internal.utils.createEvent
 import io.github.oni0nfr1.skid.client.internal.utils.MCClient
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
+import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket
 import net.minecraft.world.entity.player.Player
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
@@ -19,6 +21,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
  * 따라서 타 클라이언트 모드에서 액션바 출력 메서드를 호출하더라도 SkidMC에서는 그것을 처리하지 않습니다.
  */
 object KartTachometerEvents {
+
+    /**
+     * 클라이언트가 마크라이더 타코미터 텍스트를 수신할 경우 호출됩니다.
+     * 모든 다른 타코미터 이벤트가 호출되고 나서, 결과적으로 알맞는 타코미터라는 결론이 나올 경우 호출됩니다.
+     *
+     * 렌더 스레드에서 호출됩니다.
+     */
+    @Suppress("UNUSED")
+    @JvmField
+    val RECEIVE = createEvent { listeners ->
+        KartTachometerCallback { kart, engine, text ->
+            var result = Result.SHOW
+            for (listener in listeners) {
+                val listenerResult = listener.onActionbarReceive(kart, engine, text)
+                result = if (listenerResult == Result.BLOCK) Result.BLOCK else result
+            }
+            result
+        }
+    }
 
     /**
      * 클라이언트가 마크라이더 타코미터 텍스트를 수신하고, 그곳에서 속도값이 파싱될 경우 호출됩니다.
@@ -149,6 +170,10 @@ object KartTachometerEvents {
         }
     }
 
+    fun interface KartTachometerCallback {
+        fun onActionbarReceive(kart: Kart, engine: KartEngine, text: Component): Result
+    }
+
     fun interface KartSpeedCallback {
         fun onSpeedUpdate(speed: Double): Result
     }
@@ -183,7 +208,8 @@ object KartTachometerEvents {
      * - [BLOCK]: 액션바 메시지가 화면에서 가려집니다. (이후 이벤트 리스너들은 정상적으로 작동합니다.)
      */
     enum class Result {
-        SHOW, BLOCK;
+        SHOW,
+        BLOCK;
 
         companion object {
             fun finalize(vararg results: Result): Result {

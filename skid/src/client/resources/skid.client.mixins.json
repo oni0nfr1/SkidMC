@@ -4,7 +4,8 @@
   "package": "io.github.oni0nfr1.skid.client.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "ClientPacketListenerMixin"
+    "ClientPacketListenerMixin",
+    "MinecraftMixin"
   ],
   "injectors": {
     "defaultRequire": 1

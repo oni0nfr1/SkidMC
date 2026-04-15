@@ -2,6 +2,8 @@ package io.github.oni0nfr1.skid.client.api.kart
 
 import io.github.oni0nfr1.skid.client.internal.kart.KartImpl
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.minecraft.world.entity.player.Player
 
 object KartManager {
@@ -18,13 +20,22 @@ object KartManager {
                 (kart as KartImpl).tick()
             }
         }
+
+        ClientPlayConnectionEvents.INIT.register(this::clear)
+        ClientPlayConnectionEvents.JOIN.register(this::clear)
+        ClientPlayConnectionEvents.DISCONNECT.register(this::clear)
+        ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register(this::clear)
     }
 
+    private fun clear(vararg nothing: Any) {
+        kartByEntityId.clear()
+        kartByRiderId.clear()
+    }
 
     // 카트 엔티티(대구)를 통한 접근
 
     internal fun addKart(kart: Kart) {
-        kartByEntityId[kart.entity.id] = kart
+        kartByEntityId[kart.entityId] = kart
     }
 
     /**
@@ -32,7 +43,7 @@ object KartManager {
      * 이 함수 호출 이후에는 [kart]의 수명주기가 끝나며 접근 시 [StaleKartException]을 던집니다.
      */
     internal fun removeKart(kart: Kart) {
-        val removed = kartByEntityId.remove(kart.entity.id)
+        val removed = kartByEntityId.remove(kart.entityId)
         (removed as? KartImpl)?.alive = false
     }
 
@@ -56,11 +67,21 @@ object KartManager {
     }
 
     internal fun getKartHandleByEntityId(entityId: Int): Kart? {
-        return kartByEntityId[entityId]
+        val handle = kartByEntityId[entityId]
+        if (handle?.alive == false) {
+            removeKart(handle)
+            return null
+        }
+        return handle
     }
 
     internal fun getKartHandle(entity: KartEntity): Kart? {
-        return kartByEntityId[entity.id]
+        val handle = kartByEntityId[entity.id]
+        if (handle?.alive == false) {
+            removeKart(handle)
+            return null
+        }
+        return handle
     }
 
 
@@ -93,7 +114,12 @@ object KartManager {
     }
 
     internal fun getKartHandle(rider: Player): Kart? {
-        return kartByRiderId[rider.id]
+        val handle = kartByRiderId[rider.id]
+        if (handle?.alive == false) {
+            removeKart(handle)
+            return null
+        }
+        return handle
     }
 
     /**
@@ -106,6 +132,11 @@ object KartManager {
     }
 
     internal fun getKartHandleByRiderId(riderId: Int): Kart? {
-        return kartByRiderId[riderId]
+        val handle = kartByRiderId[riderId]
+        if (handle?.alive == false) {
+            removeKart(handle)
+            return null
+        }
+        return handle
     }
 }

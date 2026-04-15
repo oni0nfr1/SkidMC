@@ -10,7 +10,7 @@ import net.minecraft.client.Minecraft
  */
 class KartRef(val kartId: Int) {
     constructor(entity: KartEntity) : this(entity.id)
-    constructor(kart: Kart) : this(kart.entity.id)
+    constructor(kart: Kart) : this(kart.entityId)
 
     /**
      * 이 람다 블록은 카트 원본의 확장 함수로, 이 범위에서는 this가 [Kart] 원본 객체를 가리키게 됩니다.

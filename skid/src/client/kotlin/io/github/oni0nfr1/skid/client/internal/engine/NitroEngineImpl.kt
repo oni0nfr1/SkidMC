@@ -11,7 +11,7 @@ internal abstract class NitroEngineImpl(
 ) : RegularEngineImpl(kart, rider) {
 
     val isBoosting: Boolean
-        get() = rider.getRiderMeta(KnownAttrModId.IS_BOOSTING) == 1.0
+        get() = rider.getRiderMeta(KnownAttrModId.BOOST_STATE) != 0.0
     val maxBoost: Int
         get() = rider.getRiderMeta(KnownAttrModId.KART_MAX_BOOST_COUNT)?.toInt() ?: 0
     val instantBoostReady: Boolean

@@ -34,16 +34,35 @@ object RiderAttrEvents {
         }
     }
 
+    // 엔진 구분
     @JvmField val KART_ENGINE = attrEvent(KnownAttrModId.KART_ENGINE)
-    @JvmField val KART_PERFORMANCE_LIMIT_LEVEL = attrEvent(KnownAttrModId.KART_PERFORMANCE_LIMIT_LEVEL)
-    @JvmField val MAX_LAP = attrEvent(KnownAttrModId.MAX_LAP)
-    @JvmField val DUALBOOST_STATE = attrEvent(KnownAttrModId.DUALBOOST_STATE)
     @JvmField val KART_ENGINE_REAL = attrEvent(KnownAttrModId.KART_ENGINE_REAL)
+
+    // 랩 수 관련
+    @JvmField val MAX_LAP = attrEvent(KnownAttrModId.MAX_LAP)
+    @JvmField val CURRENT_LAP = attrEvent(KnownAttrModId.CURRENT_LAP)
+
+    // 순간부스터 상태
+    @JvmField val FORCE_INSTANT_BOOST = attrEvent(KnownAttrModId.FORCE_INSTANT_BOOST)
     @JvmField val ACTIVE_INSTANT_BOOST = attrEvent(KnownAttrModId.ACTIVE_INSTANT_BOOST)
+
+    // 정규 카트 상태
     @JvmField val IS_DRIFTING = attrEvent(KnownAttrModId.IS_DRIFTING)
-    @JvmField val IS_BOOSTING = attrEvent(KnownAttrModId.IS_BOOSTING)
+    @JvmField val BOOST_STATE = attrEvent(KnownAttrModId.BOOST_STATE)
     @JvmField val KART_MAX_BOOST_COUNT = attrEvent(KnownAttrModId.KART_MAX_BOOST_COUNT)
+    @JvmField val DRAFT_STATE = attrEvent(KnownAttrModId.DRAFT_STATE)
+
+    // 특수 설정
+    @JvmField val KART_PERFORMANCE_LIMIT_LEVEL = attrEvent(KnownAttrModId.KART_PERFORMANCE_LIMIT_LEVEL)
     @JvmField val KART_TIRE = attrEvent(KnownAttrModId.KART_TIRE)
+
+    // deprecated
+    @Deprecated("최신 마크라이더 데이터팩에서 사용되지 않는 값입니다.", replaceWith = ReplaceWith("BOOST_STATE"))
+    @JvmField val DUALBOOST_STATE = attrEvent(KnownAttrModId.DUALBOOST_STATE)
+    @Deprecated("최신 마크라이더 데이터팩에서 사용되지 않는 값입니다.", replaceWith = ReplaceWith("BOOST_STATE"))
+    @JvmField val IS_BOOSTING = attrEvent(KnownAttrModId.IS_BOOSTING)
+
+
 
     fun interface RiderAttrCallback {
         fun onAttrChange(entity: Player, value: Double)

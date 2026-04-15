@@ -17,6 +17,7 @@ object AttrTest: TestUnit() {
         - kart-max-boost-count
         - is-drifting
         - dualboost-state
+        - boost-state
         - active-instant-boost
         - max-lap
         - kart-performance-limit-level
@@ -39,11 +40,20 @@ object AttrTest: TestUnit() {
         RiderAttrEvents.KART_MAX_BOOST_COUNT.register { player, value ->
             client.sendChat("${player.name.string}'s kart-max-boost-count = $value")
         }
+        RiderAttrEvents.DRAFT_STATE.register { player, value ->
+            client.sendChat("${player.name.string}'s draft-state = $value")
+        }
         RiderAttrEvents.IS_DRIFTING.register { player, value ->
             client.sendChat("${player.name.string}'s is-drifting = $value")
         }
+        RiderAttrEvents.BOOST_STATE.register { player, value ->
+            client.sendChat("${player.name.string}'s boost-state = $value")
+        }
         RiderAttrEvents.IS_BOOSTING.register { player, value ->
             client.sendChat("${player.name.string}'s is-boosting = $value")
+        }
+        RiderAttrEvents.FORCE_INSTANT_BOOST.register { player, value ->
+            client.sendChat("${player.name.string}'s force-instant-instant = $value")
         }
         RiderAttrEvents.ACTIVE_INSTANT_BOOST.register { player, value ->
             client.sendChat("${player.name.string}'s active-instant-boost = $value")
@@ -53,6 +63,9 @@ object AttrTest: TestUnit() {
         }
         RiderAttrEvents.MAX_LAP.register { player, value ->
             client.sendChat("${player.name.string}'s max-lap = $value")
+        }
+        RiderAttrEvents.CURRENT_LAP.register { player, value ->
+            client.sendChat("${player.name.string}'s current-lap = $value")
         }
         RiderAttrEvents.KART_PERFORMANCE_LIMIT_LEVEL.register { player, value ->
             client.sendChat("${player.name.string}'s kart-performance-limit-level = $value")

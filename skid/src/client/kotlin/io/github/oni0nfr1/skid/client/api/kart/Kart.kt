@@ -14,6 +14,12 @@ interface Kart {
     val alive: Boolean
 
     /**
+     * 카트에 해당하는 엔티티의 ID를 반환합니다.
+     * 객체가 무효화되어도 안전하게 접근할 수 있습니다.
+     */
+    val entityId: Int
+
+    /**
      * 카트에 해당하는 엔티티를 반환합니다.
      */
     val entity: KartEntity

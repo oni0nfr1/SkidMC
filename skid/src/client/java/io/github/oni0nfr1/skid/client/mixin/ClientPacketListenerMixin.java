@@ -38,6 +38,7 @@ public abstract class ClientPacketListenerMixin {
 
     @Inject(method = "handleAddEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;postAddEntitySoundInstance(Lnet/minecraft/world/entity/Entity;)V", shift = At.Shift.AFTER), require = 1)
     private void onHandleAddEntityPacket(CallbackInfo ci, @Local Entity entity) {
+        if (entity == null) return;
         KartSummonEvents.MixinHandler.onAddEntityPacket(entity, ci);
     }
 
@@ -54,5 +55,6 @@ public abstract class ClientPacketListenerMixin {
         if (entity == null) return;
 
         KartMountEvents.MixinHandler.onFirstAttrUpdateAfterMount(entity);
+        KartMountEvents.MixinHandler.onFirstAttrUpdateAfterSpectate(entity);
     }
 }

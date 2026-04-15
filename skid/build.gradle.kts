@@ -92,17 +92,6 @@ tasks.jar {
     }
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            artifact(tasks.named("remapJar"))
-            artifact(tasks.named("sourcesJar")) {
-                builtBy(tasks.named("remapSourcesJar"))
-            }
-        }
-    }
-}
-
 mavenPublishing {
     publishToMavenCentral()
     signAllPublications()

@@ -40,10 +40,11 @@ sealed interface KartEngine {
         PRO(18, 8, false, "pro", ProEngineImpl::class.java),
         RUSHPLUS(19, 9, false, "rush+", RushPlusEngineImpl::class.java),
         CHARGE(20, 10, false, "charge", ChargeEngineImpl::class.java),
+        SR(21, 11, false, "sr", SREngineImpl::class.java),
 
         // 더미 엔진
         N1(1000, 1000, true, "n1", N1EngineImpl::class.java),
-        // 비어있는 1001번은 RX 엔진, 현재 삭제됨
+        RX(1001, 1001, true, "rx", RXEngineImpl::class.java),
         KEY(1002, 1002, true, "key", KeyEngineImpl::class.java),
         MK(1003, 1003, true, "mk", MKEngineImpl::class.java),
         BOAT(1004, 1004, true, "boat", BoatEngineImpl::class.java),

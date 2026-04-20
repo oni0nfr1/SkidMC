@@ -6,7 +6,7 @@ import io.github.oni0nfr1.skid.client.api.tachometer.GearlikeTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.MKTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.NitroTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.RushPlusTachometer
-import io.github.oni0nfr1.skid.client.api.tachometer.tachometerOrNull
+import io.github.oni0nfr1.skid.client.api.tachometer.tachometer
 import io.github.oni0nfr1.skidTest.annotations.SkidTest
 import io.github.oni0nfr1.skidTest.client.TestUnit
 import io.github.oni0nfr1.skidTest.client.utils.renderDebugPanel
@@ -34,7 +34,7 @@ object TachometerTest: TestUnit() {
         if (!status.testing) return
         var engineData = "[SKIDMC DEBUG PANEL]\n"
 
-        val tachometer = client.tachometerOrNull
+        val tachometer = client.tachometer
         engineData += tachometer?.access {
             engineData += "engine-code: ${type.engineCode}\n"
             engineData += "engine-name: ${type.engineName}\n"

@@ -11,6 +11,7 @@ plugins {
 
 version = project.property("mod_version") as String
 group = project.property("maven_group") as String
+val enableSourcesJar = providers.gradleProperty("release").isPresent
 
 base {
     archivesName.set(project.property("archives_base_name") as String)
@@ -19,10 +20,10 @@ base {
 val targetJavaVersion = 21
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
-    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-    // if it is present.
-    // If you remove this line, sources will not be generated.
-    withSourcesJar()
+    if (enableSourcesJar) {
+        // Only generate/remap sources for release publishing builds.
+        withSourcesJar()
+    }
 }
 
 loom {

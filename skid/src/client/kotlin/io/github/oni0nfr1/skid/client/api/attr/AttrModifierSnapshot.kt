@@ -2,7 +2,7 @@ package io.github.oni0nfr1.skid.client.api.attr
 
 import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket.AttributeSnapshot
 import net.minecraft.resources.ResourceLocation
-import java.util.concurrent.ConcurrentHashMap
+import java.util.TreeMap
 
 /**
  * [HashMap]을 이용하여 어트리뷰트의 modifier들의 키/값 쌍을 저장합니다.
@@ -10,12 +10,12 @@ import java.util.concurrent.ConcurrentHashMap
  * 기존의 Minecraft의 [AttributeSnapshot]은 modifiers가 키/값을 한 번에 담은 Modifier들의 Collection으로,
  * 원하는 키에 대응하는 값을 빠르게 찾아내는 데 적합하지 않습니다.
  *
- * 따라서 SkidMC에서는 modifier들의 ID를 키, 해당하는 실숫값을 값으로 하는 해시맵 기반의 클래스를 제공합니다.
+ * 따라서 SkidMC에서는 modifier들의 ID를 키, 해당하는 실숫값을 값으로 하는 트리맵 기반의 클래스를 제공합니다.
  *
  * **주의: 이 객체는 modifier 값들만 저장하며, base 값은 담지 않습니다.**
  */
 class AttrModifierSnapshot(snapshot: AttributeSnapshot): Map<ResourceLocation, Double> {
-    private val modifiers = ConcurrentHashMap<ResourceLocation, Double>()
+    private val modifiers = TreeMap<ResourceLocation, Double>()
 
     init {
         snapshot.modifiers.forEach {

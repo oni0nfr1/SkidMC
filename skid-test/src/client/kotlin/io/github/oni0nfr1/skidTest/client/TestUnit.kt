@@ -54,6 +54,14 @@ abstract class TestUnit {
         }
     }
 
+    fun autoSuccess() {
+        val msg = Component.literal("test $id success.")
+            .withColor(0xFF00FF00.toInt())
+        client.sendChat(msg)
+
+        status = TestResult.SUCCESS
+    }
+
     fun fail() {
         if (status != TestResult.TESTING) {
             val msg = Component.literal("test $id is not running or is auto-testing.")
@@ -67,6 +75,15 @@ abstract class TestUnit {
 
             status = TestResult.FAIL
         }
+    }
+
+    fun autoFail() {
+        val msg = Component.literal("test $id failed.")
+            .withColor(0xFFFF0000.toInt())
+        client.gui.chat.addMessage(msg)
+        client.narrator.sayNow(msg)
+
+        status = TestResult.FAIL
     }
 
     fun register() {

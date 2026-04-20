@@ -16,14 +16,6 @@ class TachometerRef<T: KartTachometer>(tachometer: T) {
         }
     }
 
-    inline fun <R> forceAccess(block: T.() -> R): R {
-        if (Minecraft.getInstance().isSameThread) {
-            return handle?.block() ?: throw NoTachometerException()
-        } else {
-            error("Tachometer can only be accessed in RenderThread")
-        }
-    }
-
     val handle: T?
         get() {
             val current = TachometerManager.currentTachometerOrNull ?: return null

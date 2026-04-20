@@ -49,8 +49,16 @@ internal class ChargeEngineImpl(kart: Kart, rider: Player) : NitroEngineImpl(kar
     override val type = KartEngine.Type.CHARGE
 }
 
+internal class SREngineImpl(kart: Kart, rider: Player) : NitroEngineImpl(kart, rider), SREngine {
+    override val type = KartEngine.Type.SR
+}
+
 internal class N1EngineImpl(kart: Kart, rider: Player) : NitroEngineImpl(kart, rider), N1Engine {
     override val type = KartEngine.Type.N1
+}
+
+internal class RXEngineImpl(kart: Kart, rider: Player) : NitroEngineImpl(kart, rider), RXEngine {
+    override val type = KartEngine.Type.RX
 }
 
 internal class KeyEngineImpl(kart: Kart, rider: Player) : NitroEngineImpl(kart, rider), KeyEngine {

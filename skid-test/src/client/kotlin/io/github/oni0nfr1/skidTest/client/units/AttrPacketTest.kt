@@ -2,6 +2,7 @@ package io.github.oni0nfr1.skidTest.client.units
 
 import io.github.oni0nfr1.skid.client.api.attr.AttrModifierSnapshot
 import io.github.oni0nfr1.skid.client.api.events.RiderAttrEvents
+import io.github.oni0nfr1.skid.client.api.kart.subject
 import io.github.oni0nfr1.skidTest.annotations.SkidTest
 import io.github.oni0nfr1.skidTest.client.TestUnit
 import io.github.oni0nfr1.skidTest.client.utils.renderDebugPanel
@@ -35,7 +36,7 @@ object AttrPacketTest: TestUnit() {
 
     override fun test(): TestResult {
         RiderAttrEvents.RIDER_META_ATTR.register { player, _, modifiers ->
-            if (player == client.player) this.modifiers = modifiers
+            if (player == client.player?.subject) this.modifiers = modifiers
         }
 
         return TestResult.TESTING

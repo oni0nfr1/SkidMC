@@ -12,8 +12,10 @@ interface LegacyEngine : NitroEngine
 interface ProEngine : NitroEngine
 interface RushPlusEngine : NitroEngine
 interface ChargeEngine : NitroEngine
+interface SREngine : NitroEngine
 // 니트로 엔진 (더미)
 interface N1Engine : NitroEngine
+interface RXEngine : NitroEngine
 interface KeyEngine : NitroEngine
 
 // 기어류 엔진 (더미)

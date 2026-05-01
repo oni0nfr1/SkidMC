@@ -1,28 +1,29 @@
 package io.github.oni0nfr1.skid.client.api.kart
 
 import io.github.oni0nfr1.skid.client.api.engine.KartEngine
+import io.github.oni0nfr1.skid.client.internal.kart.KartManager
 import net.minecraft.client.Minecraft
 
 /**
  * [Kart] 객체에 안전하게 접근하기 위한 참조 래퍼입니다.
  *
  * 이 객체는 [Kart] 원본을 직접 보관하지 않고, 카트의 엔티티 ID만 보관합니다.
- * 실제 [Kart] 객체는 접근 시점마다 [KartManager]를 통해 다시 조회됩니다.
+ * 실제 [Kart] 객체는 접근 시점마다 [io.github.oni0nfr1.skid.client.internal.kart.KartManager]를 통해 다시 조회됩니다.
  *
  * 따라서 라이브러리 사용자 측에서 [Kart] 또는 [KartEngine] 원본 객체를 장기간 보관하다가
  * 카트의 수명 주기가 끝난 뒤에도 계속 접근하는 일을 줄이고,
  * 항상 현재 시점에 유효한 객체에 대해서만 접근하도록 만들기 위한 용도로 사용됩니다.
  */
-open class KartRef(val kartId: Int) {
-    constructor(entity: KartEntity) : this(entity.id)
-    constructor(kart: Kart) : this(kart.entityId)
+open class KartRef(val saddleId: Int) {
+    constructor(entity: KartSaddleEntity) : this(entity.id)
+    constructor(kart: Kart) : this(kart.saddleId)
 
     /**
      * 현재 시점에 유효한 [Kart] 객체가 존재할 경우에만 [block]을 실행합니다.
      *
      * [block]은 [Kart]의 확장 함수 형태로 호출되므로, 블록 내부의 `this`는 조회된 원본 [Kart]를 가리킵니다.
      *
-     * - 현재 [kartId]에 대응하는 [Kart]가 존재하면 [block]을 실행한 결과를 반환합니다.
+     * - 현재 [saddleId]에 대응하는 [Kart]가 존재하면 [block]을 실행한 결과를 반환합니다.
      * - 카트가 이미 폐기되었거나 더 이상 유효하지 않으면 [block]을 실행하지 않고 `null`을 반환합니다.
      *
      * @throws IllegalStateException 렌더 스레드가 아닌 곳에서 접근하려고 했을 경우
@@ -33,12 +34,15 @@ open class KartRef(val kartId: Int) {
     }
 
     /**
-     * 현재 [kartId]에 대응하는 [Kart] 원본 객체를 반환합니다.
+     * 현재 [saddleId]에 대응하는 [Kart] 원본 객체를 반환합니다.
      *
      * 대응하는 카트가 존재하지 않거나 이미 유효하지 않은 경우 `null`을 반환합니다.
+     *
+     * Java에서는 [access]를 이용할 경우 람다 함수 인라이닝이 되지 않아 성능상 비효율이 발생할 수 있으므로 필요할 경우 이 프로퍼티 이용을 추천하나,
+     * 코틀린에서는 실수 방지를 위해 [access]를 사용하는 것을 권장합니다.
      */
     val handle: Kart?
-        get() = KartManager.getKartHandleByEntityId(kartId)
+        get() = KartManager.getBySaddleId(saddleId)
 
     companion object {
         /**

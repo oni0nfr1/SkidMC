@@ -1,6 +1,6 @@
-package io.github.oni0nfr1.skid.client.mixin;
+package io.github.oni0nfr1.skid.client.internal.mixin;
 
-import io.github.oni0nfr1.skid.client.api.events.KartMountEvents;
+import io.github.oni0nfr1.skid.client.internal.events.KartMountMixinHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Minecraft.class)
-public class MinecraftMixin {
+public abstract class MinecraftMixin {
     @Shadow
     @Nullable
     public LocalPlayer player;
@@ -23,6 +23,6 @@ public class MinecraftMixin {
         @Nullable LocalPlayer player = this.player;
         @Nullable Entity prevCamera = this.cameraEntity;
         if (player == null || newCamera == null || prevCamera == null) return;
-        KartMountEvents.MixinHandler.onSpectateTargetChange(player, prevCamera, newCamera);
+        KartMountMixinHandler.onSpectateTargetChange(player, prevCamera, newCamera);
     }
 }

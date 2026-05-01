@@ -3,7 +3,7 @@ package io.github.oni0nfr1.skidTest.client.units
 import io.github.oni0nfr1.skid.client.api.engine.KartEngine
 import io.github.oni0nfr1.skid.client.api.engine.XEngine
 import io.github.oni0nfr1.skid.client.api.events.KartMountEvents
-import io.github.oni0nfr1.skid.client.api.kart.KartEntity
+import io.github.oni0nfr1.skid.client.api.kart.KartSaddleEntity
 import io.github.oni0nfr1.skid.client.api.kart.KartRef
 import io.github.oni0nfr1.skid.client.api.kart.kart
 import io.github.oni0nfr1.skidTest.annotations.SkidTest
@@ -42,7 +42,7 @@ object KartRefTest : TestUnit() {
         }
     }
 
-    fun onMount(kartEntity: KartEntity, player: Player) {
+    fun onMount(kartEntity: KartSaddleEntity, player: Player) {
         if (!status.testing || hudRenderer != null) return
         if (player != client.player) return
 
@@ -58,7 +58,7 @@ object KartRefTest : TestUnit() {
         }
     }
 
-    fun onDismount(kartEntity: KartEntity?, player: Player?) {
+    fun onDismount(kartEntity: KartSaddleEntity?, player: Player?) {
         if (!status.testing || hudRenderer == null) return
 
         val clientPlayer = client.player ?: return
@@ -90,8 +90,28 @@ object KartRefTest : TestUnit() {
             val engineData = kart.accessEngine { engine ->
                 buildString {
                     appendLine("[SKIDMC DEBUG PANEL]")
+                    appendLine("CURRENT ENGINE: X")
+                    appendLine("current_lap: ${engine.currentLap}")
+                    appendLine("maxBoost: ${engine.maxBoost}")
                     appendLine("is_boosting: ${engine.isBoosting}")
-                    // 등등...
+                    appendLine("is_drifting: ${engine.isDrifting}")
+                    if (engine.draftActive) {
+                        appendLine("draft: ACTIVE")
+                    } else if (engine.draftCharging) {
+                        appendLine("draft: CHARGING")
+                    } else {
+                        appendLine("draft: INACTIVE")
+                    }
+                    if (engine.dualBoostActive) {
+                        appendLine("dual_boost: ACTIVE")
+                    } else if (engine.dualBoostCharging) {
+                        appendLine("dual_boost: CHARGING")
+                    } else {
+                        appendLine("dual_boost: INACTIVE")
+                    }
+                    if (engine.instantBoostEnabled) {
+                        appendLine("instant_boost: ${if (engine.instantBoostReady) "READY" else "NOT_READY"}")
+                    }
                 }
             } ?: return false
 

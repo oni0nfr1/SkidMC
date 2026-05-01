@@ -49,6 +49,13 @@ internal class MKTachometerImpl(
         val result = KartTachometerEvents.MK_GAUGE.invoker().onGaugeUpdate(parsedGauge)
         return TachometerUpdateResult.matched(result)
     }
+
+    override fun update(
+        additionalMatched: Boolean,
+        actionBar: Component
+    ): TachometerUpdateResult {
+        return update(actionBar)
+    }
 }
 
 internal class BoatTachometerImpl(
@@ -58,5 +65,12 @@ internal class BoatTachometerImpl(
     override fun update(actionBar: Component): TachometerUpdateResult {
         commit(actionBar)
         return TachometerUpdateResult.matched(KartTachometerEvents.Result.SHOW)
+    }
+
+    override fun update(
+        additionalMatched: Boolean,
+        actionBar: Component
+    ): TachometerUpdateResult {
+        return update(actionBar)
     }
 }

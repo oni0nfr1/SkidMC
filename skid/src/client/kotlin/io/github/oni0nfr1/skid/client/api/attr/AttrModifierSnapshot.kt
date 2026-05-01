@@ -5,7 +5,7 @@ import net.minecraft.resources.ResourceLocation
 import java.util.TreeMap
 
 /**
- * [HashMap]을 이용하여 어트리뷰트의 modifier들의 키/값 쌍을 저장합니다.
+ * [TreeMap]을 이용하여 어트리뷰트의 modifier들의 키/값 쌍을 저장합니다.
  *
  * 기존의 Minecraft의 [AttributeSnapshot]은 modifiers가 키/값을 한 번에 담은 Modifier들의 Collection으로,
  * 원하는 키에 대응하는 값을 빠르게 찾아내는 데 적합하지 않습니다.
@@ -14,31 +14,22 @@ import java.util.TreeMap
  *
  * **주의: 이 객체는 modifier 값들만 저장하며, base 값은 담지 않습니다.**
  */
-class AttrModifierSnapshot(snapshot: AttributeSnapshot): Map<ResourceLocation, Double> {
-    private val modifiers = TreeMap<ResourceLocation, Double>()
-
-    init {
-        snapshot.modifiers.forEach {
-            modifiers[it.id] = it.amount
+class AttrModifierSnapshot(snapshot: AttributeSnapshot)
+    : Map<ResourceLocation, Double> by createDelegate(snapshot)
+{
+    private companion object {
+        fun createDelegate(snapshot: AttributeSnapshot): TreeMap<ResourceLocation, Double> {
+            return TreeMap<ResourceLocation, Double>().apply {
+                snapshot.modifiers.forEach { this[it.id] = it.amount }
+            }
         }
     }
-
-    override val size get() = modifiers.size
-    override val keys get() = modifiers.keys
-    override val values get() = modifiers.values
-    override val entries get() = modifiers.entries
-
-    override fun isEmpty() = modifiers.isEmpty()
-
-    override fun containsKey(key: ResourceLocation): Boolean = modifiers.containsKey(key)
-
-    override fun containsValue(value: Double): Boolean = modifiers.containsValue(value)
 
     /**
      * 주어진 [ResourceLocation]에 대한 modifier 값을 가져옵니다.
      * @param key modifier의 ID 값
      */
-    override fun get(key: ResourceLocation): Double? = modifiers[key]
+    override fun get(key: ResourceLocation): Double? = this[key]
 
     /**
      * 해당하는 네임스페이스와 키에 대한 modifier 값을 가져옵니다.
@@ -47,7 +38,7 @@ class AttrModifierSnapshot(snapshot: AttributeSnapshot): Map<ResourceLocation, D
      */
     fun get(namespace: String, path: String): Double? {
         val key = ResourceLocation.fromNamespaceAndPath(namespace, path)
-        return modifiers[key]
+        return this[key]
     }
 
     /**
@@ -56,6 +47,6 @@ class AttrModifierSnapshot(snapshot: AttributeSnapshot): Map<ResourceLocation, D
      */
     fun get(path: String): Double? {
         val key = ResourceLocation.withDefaultNamespace(path)
-        return modifiers[key]
+        return this[key]
     }
 }

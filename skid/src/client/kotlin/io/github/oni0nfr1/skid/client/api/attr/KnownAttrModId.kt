@@ -12,7 +12,7 @@ object KnownAttrModId {
     @JvmField val CURRENT_LAP: ResourceLocation = ResourceLocation.withDefaultNamespace("current-lap")
 
     // 순간부스터 상태
-    @JvmField val FORCE_INSTANT_BOOST: ResourceLocation = ResourceLocation.withDefaultNamespace("force-instant-boot")
+    @JvmField val FORCE_INSTANT_BOOST: ResourceLocation = ResourceLocation.withDefaultNamespace("force-instant-boost")
     @JvmField val ACTIVE_INSTANT_BOOST: ResourceLocation = ResourceLocation.withDefaultNamespace("active-instant-boost")
 
     // 정규 카트 상태

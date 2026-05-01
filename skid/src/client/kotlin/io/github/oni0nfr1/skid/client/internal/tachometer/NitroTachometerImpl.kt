@@ -1,7 +1,6 @@
 package io.github.oni0nfr1.skid.client.internal.tachometer
 
 import io.github.oni0nfr1.skid.client.internal.utils.visit
-import net.minecraft.ChatFormatting
 import io.github.oni0nfr1.skid.client.api.events.KartTachometerEvents
 import io.github.oni0nfr1.skid.client.api.engine.KartEngine
 import net.minecraft.network.chat.Component
@@ -23,8 +22,7 @@ internal abstract class NitroTachometerImpl(
         protected set
 
     protected open val gaugeText: Char = '|'
-    protected open val gaugeColor: TextColor =
-        TextColor.fromLegacyFormat(ChatFormatting.GOLD) ?: TextColor.fromRgb(0xFFAA00)
+    protected open val emptyGaugeColor: TextColor = TextColor.fromRgb(0x959595)
     protected open val speedPattern = Regex("""// (\d+)km/h \\\\""")
     protected open val nitroPattern = Regex("""NITRO x(0|[1-9]\d*)""")
 
@@ -34,7 +32,7 @@ internal abstract class NitroTachometerImpl(
         actionBar.visit(Style.EMPTY) { style, string ->
             val gaugeCount = string.count { it == gaugeText }
             totalGaugeCount += gaugeCount
-            if (style.color == gaugeColor) {
+            if (style.color != emptyGaugeColor) {
                 filledGaugeCount += gaugeCount
             }
             Optional.empty<Unit>()
@@ -55,33 +53,29 @@ internal abstract class NitroTachometerImpl(
         return match.groupValues[1].toInt()
     }
 
-    override fun update(actionBar: Component): TachometerUpdateResult {
+    override fun update(additionalMatched: Boolean, actionBar: Component): TachometerUpdateResult {
         val parsedSpeed = parseSpeed(actionBar)
         val parsedGauge = parseGauge(actionBar)
         val parsedNitro = parseNitro(actionBar)
-        if (parsedSpeed == null && parsedGauge == null && parsedNitro == null) {
+        if (!additionalMatched || parsedSpeed == null || parsedGauge == null || parsedNitro == null) {
             return TachometerUpdateResult.notMatched()
         }
 
         commit(actionBar)
 
-        val speedResult = parsedSpeed?.let { value ->
-            speed = value
-            KartTachometerEvents.SPEED.invoker().onSpeedUpdate(value)
-        } ?: KartTachometerEvents.Result.SHOW
-
-        val nitroResult = parsedNitro?.let { value ->
-            nitro = value
-            KartTachometerEvents.NITRO.invoker().onNitroUpdate(value)
-        } ?: KartTachometerEvents.Result.SHOW
-
-        val gaugeResult = parsedGauge?.let { value ->
-            gauge = value
-            KartTachometerEvents.GAUGE.invoker().onGaugeUpdate(value)
-        } ?: KartTachometerEvents.Result.SHOW
+        speed = parsedSpeed
+        val speedResult = KartTachometerEvents.SPEED.invoker().onSpeedUpdate(parsedSpeed)
+        nitro = parsedNitro
+        val nitroResult = KartTachometerEvents.NITRO.invoker().onNitroUpdate(parsedNitro)
+        gauge = parsedGauge
+        val gaugeResult = KartTachometerEvents.GAUGE.invoker().onGaugeUpdate(parsedGauge)
 
         return TachometerUpdateResult.matched(
             KartTachometerEvents.Result.finalize(speedResult, nitroResult, gaugeResult)
         )
+    }
+
+    override fun update(actionBar: Component): TachometerUpdateResult {
+        return update(true, actionBar)
     }
 }

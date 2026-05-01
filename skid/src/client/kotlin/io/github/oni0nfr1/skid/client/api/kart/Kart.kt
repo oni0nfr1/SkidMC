@@ -14,15 +14,25 @@ interface Kart {
     val alive: Boolean
 
     /**
-     * 카트에 해당하는 엔티티의 ID를 반환합니다.
+     * 카트에 해당하는 대구 엔티티의 ID를 반환합니다.
      * 객체가 무효화되어도 안전하게 접근할 수 있습니다.
      */
-    val entityId: Int
+    val saddleId: Int
 
     /**
-     * 카트에 해당하는 엔티티를 반환합니다.
+     * 플레이어가 탑승하는 카트의 대구 엔티티를 반환합니다.
      */
-    val entity: KartEntity
+    val saddle: KartSaddleEntity
+
+    /**
+     * 카트의 물리 연산 메인이 되는 텍스트 디스플레이 엔티티를 반환합니다.
+     */
+    val entity: KartMainEntity
+
+    /**
+     * 카트의 모델링 엔티티 메인이 되는 아이템 디스플레이 엔티티를 반환합니다.
+     */
+    val model: KartModelRoot
 
     /**
      * 카트 엔티티의 현재 위치입니다.

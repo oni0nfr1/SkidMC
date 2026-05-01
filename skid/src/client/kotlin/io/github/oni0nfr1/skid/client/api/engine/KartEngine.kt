@@ -2,6 +2,7 @@ package io.github.oni0nfr1.skid.client.api.engine
 
 import io.github.oni0nfr1.skid.client.SkidClient
 import io.github.oni0nfr1.skid.client.api.kart.Kart
+import io.github.oni0nfr1.skid.client.api.tachometer.KartTachometer
 import io.github.oni0nfr1.skid.client.internal.engine.specific.*
 import io.github.oni0nfr1.skid.client.internal.utils.MCClient
 import net.minecraft.client.Minecraft
@@ -26,6 +27,9 @@ sealed interface KartEngine {
     val kart: Kart
     val rider: Player
     val type: Type
+    val tachometer: KartTachometer?
+
+    val currentLap: Int
 
     enum class Type(val engineCode: Int, val attrEngineCode: Int, val isDummy: Boolean, val engineName: String, internal val clazz: Class<out KartEngine>) {
         // 공식 엔진

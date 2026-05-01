@@ -99,7 +99,7 @@ mavenPublishing {
 
     coordinates(
         groupId = project.group.toString(),
-        artifactId = "skidmc",
+        artifactId = "skid-api",
         version = project.version.toString()
     )
 

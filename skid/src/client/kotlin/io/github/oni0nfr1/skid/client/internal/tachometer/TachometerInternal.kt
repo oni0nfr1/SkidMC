@@ -20,4 +20,7 @@ internal interface TachometerInternal {
     val type: KartEngine.Type
 
     fun update(actionBar: Component): TachometerUpdateResult
+    fun update(additionalMatched: Boolean, actionBar: Component): TachometerUpdateResult
+
+    fun tick() { }
 }

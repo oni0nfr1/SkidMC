@@ -3,10 +3,9 @@ package io.github.oni0nfr1.skid.client.internal.tachometer
 import io.github.oni0nfr1.skid.client.api.engine.KartEngine
 import io.github.oni0nfr1.skid.client.api.events.KartTachometerEvents
 import io.github.oni0nfr1.skid.client.api.kart.Kart
-import io.github.oni0nfr1.skid.client.api.kart.KartManager
 import io.github.oni0nfr1.skid.client.api.kart.subject
 import io.github.oni0nfr1.skid.client.api.tachometer.KartTachometer
-import io.github.oni0nfr1.skid.client.api.tachometer.NoTachometerException
+import io.github.oni0nfr1.skid.client.internal.kart.KartManager
 import io.github.oni0nfr1.skid.client.internal.tachometer.specific.*
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.minecraft.client.Minecraft
@@ -21,14 +20,13 @@ internal object TachometerManager {
         _currentTachometer = null
         ClientTickEvents.END_CLIENT_TICK.register {
             clearIfInvalid()
+            val current = _currentTachometer as? TachometerInternal
+            current?.tick()
         }
     }
 
     val currentTachometerOrNull: KartTachometer?
         get() = _currentTachometer
-
-    val currentTachometer: KartTachometer
-        get() = currentTachometerOrNull ?: throw NoTachometerException()
 
     fun clear() {
         _currentTachometer = null
@@ -60,7 +58,7 @@ internal object TachometerManager {
             clear()
             return
         }
-        val kart = KartManager.getKartHandle(subject) ?: run {
+        val kart = KartManager.getByRiderId(subject.id) ?: run {
             clear()
             return
         }
@@ -75,11 +73,11 @@ internal object TachometerManager {
     }
 
     private fun TachometerInternal.matches(kart: Kart, engine: KartEngine): Boolean {
-        return kart.entity.id == kartId && engine.type == type
+        return kart.saddle.id == kartId && engine.type == type
     }
 
     private fun createTachometer(kart: Kart, engine: KartEngine): KartTachometer {
-        val kartId = kart.entity.id
+        val kartId = kart.saddle.id
         val revision = nextRevision++
 
         return when (engine.type) {
@@ -94,7 +92,9 @@ internal object TachometerManager {
             KartEngine.Type.PRO -> ProTachometerImpl(revision, kartId)
             KartEngine.Type.RUSHPLUS -> RushPlusTachometerImpl(revision, kartId)
             KartEngine.Type.CHARGE -> ChargeTachometerImpl(revision, kartId)
+            KartEngine.Type.SR -> SRTachometerImpl(revision, kartId)
             KartEngine.Type.N1 -> N1TachometerImpl(revision, kartId)
+            KartEngine.Type.RX -> RXTachometerImpl(revision, kartId)
             KartEngine.Type.KEY -> KeyTachometerImpl(revision, kartId)
             KartEngine.Type.GEAR -> GearTachometerImpl(revision, kartId)
             KartEngine.Type.F1 -> F1TachometerImpl(revision, kartId)

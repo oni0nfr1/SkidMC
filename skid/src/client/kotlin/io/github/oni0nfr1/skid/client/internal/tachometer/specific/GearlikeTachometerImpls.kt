@@ -33,23 +33,19 @@ internal class F1TachometerImpl(
     }
 
     override fun update(actionBar: Component): TachometerUpdateResult {
-        val baseResult = super.update(actionBar)
         val parsedErs = parseErs(actionBar)
-        if (!baseResult.matched && parsedErs == null) {
-            return baseResult
-        }
 
-        commit(actionBar)
+        val baseResult = super.update(parsedErs != null, actionBar)
 
-        val ersResult = parsedErs?.let { value ->
-            ers = value
-            KartTachometerEvents.ERS.invoker().onErsUpdate(value)
-        } ?: KartTachometerEvents.Result.SHOW
+        if (baseResult.matched && parsedErs != null) {
+            ers = parsedErs
+            val ersResult = KartTachometerEvents.ERS.invoker().onErsUpdate(parsedErs)
 
-        return if (baseResult.matched) {
-            TachometerUpdateResult.matched(KartTachometerEvents.Result.finalize(baseResult.result, ersResult))
+            return TachometerUpdateResult.matched(
+                KartTachometerEvents.Result.finalize(baseResult.result, ersResult)
+            )
         } else {
-            TachometerUpdateResult.matched(ersResult)
+            return TachometerUpdateResult.notMatched()
         }
     }
 }

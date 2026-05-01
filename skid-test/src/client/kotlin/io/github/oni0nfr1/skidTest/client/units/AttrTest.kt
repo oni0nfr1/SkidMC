@@ -49,6 +49,7 @@ object AttrTest: TestUnit() {
         RiderAttrEvents.BOOST_STATE.register { player, value ->
             client.sendChat("${player.name.string}'s boost-state = $value")
         }
+        @Suppress("DEPRECATION")
         RiderAttrEvents.IS_BOOSTING.register { player, value ->
             client.sendChat("${player.name.string}'s is-boosting = $value")
         }
@@ -58,6 +59,7 @@ object AttrTest: TestUnit() {
         RiderAttrEvents.ACTIVE_INSTANT_BOOST.register { player, value ->
             client.sendChat("${player.name.string}'s active-instant-boost = $value")
         }
+        @Suppress("DEPRECATION")
         RiderAttrEvents.DUALBOOST_STATE.register { player, value ->
             client.sendChat("${player.name.string}'s dualboost-state = $value")
         }

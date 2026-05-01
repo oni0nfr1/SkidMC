@@ -5,6 +5,7 @@ import io.github.oni0nfr1.skid.client.api.engine.GearlikeEngine
 import io.github.oni0nfr1.skid.client.api.engine.MKEngine
 import io.github.oni0nfr1.skid.client.api.engine.NitroEngine
 import io.github.oni0nfr1.skid.client.api.events.KartMountEvents
+import io.github.oni0nfr1.skid.client.api.kart.KartSaddleEntity
 import io.github.oni0nfr1.skid.client.api.kart.kart
 import io.github.oni0nfr1.skidTest.annotations.SkidTest
 import io.github.oni0nfr1.skidTest.client.TestUnit
@@ -26,23 +27,31 @@ object EngineTypeTest: TestUnit() {
 
     init { register() }
 
+    fun showKartEngineCategory(kartEntity: KartSaddleEntity) {
+        kartEntity.kart?.access {
+            val engineNotNull = engine ?: return
+
+            val engineCategoryName = when (engineNotNull) {
+                is NitroEngine -> "kartrider-like"
+                is GearlikeEngine -> "gear-like"
+                is MKEngine -> "mariokart"
+                is BoatEngine -> "boat"
+            }
+
+            client.sendChat("detected engine: ${engineNotNull.type.engineName}")
+            client.sendChat("detected engine category: $engineCategoryName")
+        }
+    }
+
     override fun test(): TestResult {
         KartMountEvents.MOUNT.register { kartEntity, _ ->
             if (!status.testing) return@register
-            kartEntity.kart?.access {
-                val engineNotNull = engine ?: return@register
+            showKartEngineCategory(kartEntity)
+        }
 
-                val engineCategoryName = when (engineNotNull) {
-                    is NitroEngine -> "kartrider-like"
-                    is GearlikeEngine -> "gear-like"
-                    is MKEngine -> "mariokart-like"
-                    is BoatEngine -> "boat"
-                }
-
-                client.sendChat("detected engine: ${engineNotNull.type.engineName}")
-                client.sendChat("detected engine category: $engineCategoryName")
-            }
-
+        KartMountEvents.SPECTATE.register { kartEntity, _, _ ->
+            if (!status.testing) return@register
+            showKartEngineCategory(kartEntity)
         }
 
         return TestResult.TESTING

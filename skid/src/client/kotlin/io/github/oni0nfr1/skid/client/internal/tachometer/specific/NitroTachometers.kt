@@ -6,10 +6,9 @@ import io.github.oni0nfr1.skid.client.api.tachometer.*
 import io.github.oni0nfr1.skid.client.internal.tachometer.NitroTachometerImpl
 import io.github.oni0nfr1.skid.client.internal.tachometer.TachometerUpdateResult
 import io.github.oni0nfr1.skid.client.api.engine.KartEngine
-import net.minecraft.ChatFormatting
+import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
-import net.minecraft.network.chat.TextColor
 import java.util.Optional
 
 internal class XTachometerImpl(revision: Long, kartId: Int) :
@@ -28,7 +27,16 @@ internal class Z7TachometerImpl(revision: Long, kartId: Int) :
     NitroTachometerImpl(revision, kartId, KartEngine.Type.Z7), Z7Tachometer
 
 internal class V1TachometerImpl(revision: Long, kartId: Int) :
-    NitroTachometerImpl(revision, kartId, KartEngine.Type.V1), V1Tachometer
+    NitroTachometerImpl(revision, kartId, KartEngine.Type.V1), V1Tachometer {
+
+    override var exceedGauge: Float = 0f
+
+    override fun tick() {
+        super.tick()
+        val client = Minecraft.getInstance()
+        exceedGauge = client.player?.experienceProgress ?: return
+    }
+}
 
 internal class A2TachometerImpl(revision: Long, kartId: Int) :
     NitroTachometerImpl(revision, kartId, KartEngine.Type.A2), A2Tachometer
@@ -78,7 +86,16 @@ internal class ProTachometerImpl(revision: Long, kartId: Int) :
     NitroTachometerImpl(revision, kartId, KartEngine.Type.PRO), ProTachometer
 
 internal class ChargeTachometerImpl(revision: Long, kartId: Int) :
-    NitroTachometerImpl(revision, kartId, KartEngine.Type.CHARGE), ChargeTachometer
+    NitroTachometerImpl(revision, kartId, KartEngine.Type.CHARGE), ChargeTachometer {
+
+    override var chargerGauge: Float = 0f
+
+    override fun tick() {
+        super.tick()
+        val client = Minecraft.getInstance()
+        chargerGauge = client.player?.experienceProgress ?: return
+    }
+}
 
 internal class N1TachometerImpl(revision: Long, kartId: Int) :
     NitroTachometerImpl(revision, kartId, KartEngine.Type.N1), N1Tachometer
@@ -94,7 +111,6 @@ internal class RushPlusTachometerImpl(
     private val fusionNitroPattern = Regex("""FUSION x(0|[1-9]\d*)""")
     private val fusionLabelPattern = Regex("""\bFUSION\b""")
     override val speedPattern: Regex = Regex("""// (\d+(?:\.\d)?)km/h \\\\""")
-    override val gaugeColor: TextColor = TextColor.fromLegacyFormat(ChatFormatting.YELLOW) ?: TextColor.fromRgb(0xFFBB00)
 
     override var fusionActive: Boolean = false
         private set
@@ -106,14 +122,19 @@ internal class RushPlusTachometerImpl(
     }
 
     override fun update(actionBar: Component): TachometerUpdateResult {
-        val baseResult = super.update(actionBar)
         val fusionActive = fusionLabelPattern.containsMatchIn(actionBar.string)
-        if (!baseResult.matched && !fusionActive) {
-            return baseResult
-        }
 
-        this.fusionActive = fusionActive
-        commit(actionBar)
-        return if (baseResult.matched) baseResult else TachometerUpdateResult.matched(baseResult.result)
+        val baseResult = super.update(actionBar)
+
+        if (baseResult.matched) {
+            this.fusionActive = fusionActive
+        }
+        return baseResult
     }
 }
+
+internal class SRTachometerImpl(revision: Long, kartId: Int) :
+    NitroTachometerImpl(revision, kartId, KartEngine.Type.SR), SRTachometer
+
+internal class RXTachometerImpl(revision: Long, kartId: Int) :
+    NitroTachometerImpl(revision, kartId, KartEngine.Type.RX), RXTachometer

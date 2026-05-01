@@ -23,7 +23,7 @@ fun Player.getRiderMeta(id: String): Double? {
  */
 fun Player.getRiderMeta(key: ResourceLocation): Double? {
     return try {
-        this.attributes.getModifierValue(RiderAttrEvents.MixinHandler.RIDER_META_ATTR_KEY, key)
+        this.attributes.getModifierValue(RiderAttrEvents.RIDER_META_ATTR_KEY, key)
     } catch (e: Exception) {
         null
     }

@@ -58,33 +58,30 @@ internal abstract class GearlikeTachometerImpl(
         return match.groupValues[1].toInt()
     }
 
-    override fun update(actionBar: Component): TachometerUpdateResult {
+    override fun update(additionalMatched: Boolean, actionBar: Component): TachometerUpdateResult {
         val parsedSpeed = parseSpeed(actionBar)
         val parsedRpm = parseRpm(actionBar)
         val parsedGear = parseGear(actionBar)
-        if (parsedSpeed == null && parsedRpm == null && parsedGear == null) {
+
+        if (!additionalMatched || parsedSpeed == null || parsedRpm == null || parsedGear == null) {
             return TachometerUpdateResult.notMatched()
         }
 
         commit(actionBar)
 
-        val speedResult = parsedSpeed?.let { value ->
-            speed = value
-            KartTachometerEvents.SPEED.invoker().onSpeedUpdate(value)
-        } ?: KartTachometerEvents.Result.SHOW
-
-        val rpmResult = parsedRpm?.let { value ->
-            rpm = value
-            KartTachometerEvents.RPM.invoker().onRpmUpdate(value)
-        } ?: KartTachometerEvents.Result.SHOW
-
-        val gearResult = parsedGear?.let { value ->
-            gear = value
-            KartTachometerEvents.GEAR.invoker().onGearUpdate(value)
-        } ?: KartTachometerEvents.Result.SHOW
+        speed = parsedSpeed
+        val speedResult = KartTachometerEvents.SPEED.invoker().onSpeedUpdate(parsedSpeed)
+        rpm = parsedRpm
+        val rpmResult = KartTachometerEvents.RPM.invoker().onRpmUpdate(parsedRpm)
+        gear = parsedGear
+        val gearResult = KartTachometerEvents.GEAR.invoker().onGearUpdate(parsedGear)
 
         return TachometerUpdateResult.matched(
             KartTachometerEvents.Result.finalize(speedResult, rpmResult, gearResult)
         )
+    }
+
+    override fun update(actionBar: Component): TachometerUpdateResult {
+        return update(true, actionBar)
     }
 }

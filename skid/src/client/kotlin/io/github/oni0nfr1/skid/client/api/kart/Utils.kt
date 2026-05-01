@@ -3,13 +3,18 @@
 package io.github.oni0nfr1.skid.client.api.kart
 
 import io.github.oni0nfr1.skid.client.api.engine.KartEngine
+import io.github.oni0nfr1.skid.client.internal.kart.KartManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
+import net.minecraft.world.entity.Display
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.animal.Cod
 import net.minecraft.world.entity.player.Player
 
-typealias KartEntity = Cod
+typealias KartSaddleEntity = Cod
+typealias KartMainEntity = Display.TextDisplay
+typealias KartModelRoot = Display.ItemDisplay
+typealias KartDirection = Display.ItemDisplay
 
 val LocalPlayer.subject: Entity?
     get() {
@@ -30,11 +35,11 @@ val LocalPlayer.mountStatus: MountType
         }
     }
 
-val KartEntity.kart: KartRef?
-    get() = KartManager.getKart(this)
+val KartSaddleEntity.kart: KartRef?
+    get() = KartRef(KartManager.getBySaddleId(this.id) ?: return null)
 
 val Player.ridingKart: KartRef?
-    get() = KartManager.getKart(this)
+    get() = KartRef(KartManager.getByRiderId(this.id) ?: return null)
 
 val Minecraft.kartEngineType: KartEngine.Type?
     get() = (this.player?.subject as? Player)?.ridingKart?.access { engine?.type }

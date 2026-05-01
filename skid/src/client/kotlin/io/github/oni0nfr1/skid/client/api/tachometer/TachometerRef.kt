@@ -9,11 +9,8 @@ class TachometerRef<T: KartTachometer>(tachometer: T) {
     private val revision = (tachometer as TachometerInternal).revision
 
     inline fun <R> access(block: T.() -> R): R? {
-        if (Minecraft.getInstance().isSameThread) {
-            return handle?.block()
-        } else {
-            error("Tachometer can only be accessed in Render Thread")
-        }
+        if (!Minecraft.getInstance().isSameThread) error("Tachometer can only be accessed in Render Thread")
+        return handle?.block()
     }
 
     val handle: T?

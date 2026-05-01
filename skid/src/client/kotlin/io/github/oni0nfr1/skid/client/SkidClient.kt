@@ -1,6 +1,6 @@
 package io.github.oni0nfr1.skid.client
 
-import io.github.oni0nfr1.skid.client.api.kart.KartManager
+import io.github.oni0nfr1.skid.client.internal.kart.KartManager
 import io.github.oni0nfr1.skid.client.internal.schedule.Ticker
 import io.github.oni0nfr1.skid.client.internal.tachometer.TachometerManager
 import net.fabricmc.api.ClientModInitializer

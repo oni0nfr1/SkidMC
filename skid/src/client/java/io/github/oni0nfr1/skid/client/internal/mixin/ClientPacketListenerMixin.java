@@ -1,10 +1,10 @@
-package io.github.oni0nfr1.skid.client.mixin;
+package io.github.oni0nfr1.skid.client.internal.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import io.github.oni0nfr1.skid.client.api.events.KartSummonEvents;
-import io.github.oni0nfr1.skid.client.api.events.KartTachometerEvents;
-import io.github.oni0nfr1.skid.client.api.events.KartMountEvents;
-import io.github.oni0nfr1.skid.client.api.events.RiderAttrEvents;
+import io.github.oni0nfr1.skid.client.internal.events.KartMountMixinHandler;
+import io.github.oni0nfr1.skid.client.internal.events.KartSummonMixinHandler;
+import io.github.oni0nfr1.skid.client.internal.events.KartTachometerMixinHandler;
+import io.github.oni0nfr1.skid.client.internal.events.RiderAttrMixinHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -22,29 +22,29 @@ public abstract class ClientPacketListenerMixin {
 
     @Inject(method = "handleSetEntityPassengersPacket", at = @At("TAIL"))
     private void onHandleSetEntityPassengersPacket(ClientboundSetPassengersPacket packet, CallbackInfo ci) {
-        KartMountEvents.MixinHandler.onEntityMountPacket(packet, ci);
+        KartMountMixinHandler.onEntityMountPacket(packet, ci);
     }
 
     @Inject(method = "method_64896", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;removeEntity(ILnet/minecraft/world/entity/Entity$RemovalReason;)V"), require = 1)
     private void onHandleRemoveEntitiesPacket(int entityId, CallbackInfo ci) {
-        KartMountEvents.MixinHandler.beforeEntityRemoveByPacket(entityId, ci);
-        KartSummonEvents.MixinHandler.beforeRemoveEntityByPacket(entityId, ci);
+        KartMountMixinHandler.beforeEntityRemoveByPacket(entityId, ci);
+        KartSummonMixinHandler.beforeRemoveEntityByPacket(entityId, ci);
     }
 
     @Inject(method = "setActionBarText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;setOverlayMessage(Lnet/minecraft/network/chat/Component;Z)V"), require = 1, cancellable = true)
     private void onSetActionBarText(ClientboundSetActionBarTextPacket packet, CallbackInfo ci) {
-        KartTachometerEvents.MixinHandler.onSetActionbarPacket(packet, ci);
+        KartTachometerMixinHandler.onSetActionbarPacket(packet, ci);
     }
 
     @Inject(method = "handleAddEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;postAddEntitySoundInstance(Lnet/minecraft/world/entity/Entity;)V", shift = At.Shift.AFTER), require = 1)
     private void onHandleAddEntityPacket(CallbackInfo ci, @Local Entity entity) {
         if (entity == null) return;
-        KartSummonEvents.MixinHandler.onAddEntityPacket(entity, ci);
+        KartSummonMixinHandler.onAddEntityPacket(entity, ci);
     }
 
     @Inject(method = "handleUpdateAttributes", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/attributes/AttributeInstance;setBaseValue(D)V"))
     private void onHandleUpdateAttributes(CallbackInfo ci, @Local ClientboundUpdateAttributesPacket.AttributeSnapshot attributeSnapshot, @Local Entity entity) {
-        RiderAttrEvents.MixinHandler.onUpdateAttrPacket(entity, attributeSnapshot);
+        RiderAttrMixinHandler.onUpdateAttrPacket(entity, attributeSnapshot);
     }
 
     @Inject(method = "handleUpdateAttributes", at = @At("TAIL"))
@@ -54,7 +54,7 @@ public abstract class ClientPacketListenerMixin {
         Entity entity = level.getEntity(packet.getEntityId());
         if (entity == null) return;
 
-        KartMountEvents.MixinHandler.onFirstAttrUpdateAfterMount(entity);
-        KartMountEvents.MixinHandler.onFirstAttrUpdateAfterSpectate(entity);
+        KartMountMixinHandler.onFirstAttrUpdateAfterMount(entity);
+        KartMountMixinHandler.onFirstAttrUpdateAfterSpectate(entity);
     }
 }

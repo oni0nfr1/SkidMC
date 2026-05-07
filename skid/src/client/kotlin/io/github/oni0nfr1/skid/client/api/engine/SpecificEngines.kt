@@ -8,11 +8,11 @@ interface EXEngine : NitroEngine, InstantBoostEngine, DualBoostEngine, DraftEngi
 interface JiuEngine : NitroEngine, InstantBoostEngine, DraftEngine { override val tachometer: JiuTachometer? }
 interface NewEngine : NitroEngine, InstantBoostEngine, DraftEngine { override val tachometer: NewTachometer? }
 interface Z7Engine : NitroEngine, InstantBoostEngine, DraftEngine { override val tachometer: Z7Tachometer? }
-interface V1Engine : NitroEngine, InstantBoostEngine, DualBoostEngine, DraftEngine { override val tachometer: V1Tachometer? }
+interface V1Engine : NitroEngine, InstantBoostEngine, DualBoostEngine, DraftEngine, ExceedEngine { override val tachometer: V1Tachometer? }
 interface A2Engine : NitroEngine, InstantBoostEngine, DraftEngine { override val tachometer: A2Tachometer? }
 interface LegacyEngine : NitroEngine, InstantBoostEngine, DualBoostEngine, DraftEngine { override val tachometer: LegacyTachometer? }
 interface ProEngine : NitroEngine, InstantBoostEngine, DraftEngine { override val tachometer: ProTachometer? }
-interface RushPlusEngine : NitroEngine, InstantBoostEngine, DraftEngine { override val tachometer: RushPlusTachometer? }
+interface RushPlusEngine : NitroEngine, InstantBoostEngine, DraftEngine, ExceedEngine { override val tachometer: RushPlusTachometer? }
 interface ChargeEngine : NitroEngine, InstantBoostEngine, DraftEngine { override val tachometer: ChargeTachometer? }
 interface SREngine : NitroEngine, InstantBoostEngine, DraftEngine { override val tachometer: SRTachometer? }
 // 니트로 엔진 (더미)

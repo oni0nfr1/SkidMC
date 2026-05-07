@@ -68,7 +68,7 @@ open class KartRef(val saddleId: Int) {
      * 즉, 카트의 수명 주기가 끝났거나 엔진 타입이 기대와 달라진 경우에는
      * 내부 객체에 접근하지 않고 `null`을 반환합니다.
      */
-    class Specific<E: KartEngine>(engine: E, val clazz: Class<E>) : KartRef(engine.kart) {
+    class Specific<out E: KartEngine>(engine: E, val clazz: Class<out E>) : KartRef(engine.kart) {
 
         /**
          * 현재 시점에 유효한 [Kart]가 존재하고,

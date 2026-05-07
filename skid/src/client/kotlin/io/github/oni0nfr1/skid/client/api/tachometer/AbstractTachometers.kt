@@ -13,3 +13,7 @@ sealed interface GearlikeTachometer : SpeedTachometer {
     val rpm: Double
     val gear: Int
 }
+
+sealed interface ExceedTachometer : KartTachometer {
+    val exceedGauge: Float
+}

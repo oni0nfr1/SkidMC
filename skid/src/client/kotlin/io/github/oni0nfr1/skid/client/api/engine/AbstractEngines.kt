@@ -1,5 +1,6 @@
 package io.github.oni0nfr1.skid.client.api.engine
 
+import io.github.oni0nfr1.skid.client.api.tachometer.ExceedTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.GearlikeTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.NitroTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.SpeedTachometer
@@ -85,4 +86,8 @@ sealed interface DraftEngine : KartEngine {
      * @return 충전 중인 경우 `true`, 아니면 `false`
      */
     val draftCharging: Boolean
+}
+
+sealed interface ExceedEngine : KartEngine {
+    override val tachometer: ExceedTachometer?
 }

@@ -114,6 +114,7 @@ internal class RushPlusTachometerImpl(
 
     override var fusionActive: Boolean = false
         private set
+    override var exceedGauge: Float = 0f
 
     override fun parseNitro(actionBar: Component): Int? {
         val raw = actionBar.string
@@ -130,6 +131,12 @@ internal class RushPlusTachometerImpl(
             this.fusionActive = fusionActive
         }
         return baseResult
+    }
+
+    override fun tick() {
+        super.tick()
+        val client = Minecraft.getInstance()
+        exceedGauge = client.player?.experienceProgress ?: return
     }
 }
 

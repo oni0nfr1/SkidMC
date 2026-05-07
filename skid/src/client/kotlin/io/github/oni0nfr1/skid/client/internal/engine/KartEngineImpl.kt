@@ -3,6 +3,7 @@ package io.github.oni0nfr1.skid.client.internal.engine
 import io.github.oni0nfr1.skid.client.api.attr.KnownAttrModId
 import io.github.oni0nfr1.skid.client.api.attr.getRiderMeta
 import io.github.oni0nfr1.skid.client.api.kart.Kart
+import io.github.oni0nfr1.skid.client.api.kart.subject
 import io.github.oni0nfr1.skid.client.api.tachometer.KartTachometer
 import io.github.oni0nfr1.skid.client.internal.kart.KartImpl
 import io.github.oni0nfr1.skid.client.internal.tachometer.TachometerManager
@@ -20,14 +21,14 @@ internal abstract class KartEngineImpl(
     open val tachometer: KartTachometer?
         get() {
             val client = Minecraft.getInstance()
-            return if (rider == client.player) TachometerManager.currentTachometerOrNull else null
+            return if (rider == client.player?.subject) TachometerManager.currentTachometerOrNull else null
         }
 
     // implementation of RegularEngine
     val isDrifting: Boolean
         get() {
             // TODO: 드리프트가 끊기는 순간도 틱 수준에서 정확하도록 만들기
-            return rider.getRiderMeta(KnownAttrModId.IS_DRIFTING) == 1.0 || accurateDriftState
+            return attrDriftState || accurateDriftState
         }
 
     // implementation of NitroEngine

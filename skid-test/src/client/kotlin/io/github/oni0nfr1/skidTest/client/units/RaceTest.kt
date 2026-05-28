@@ -22,9 +22,9 @@ object RaceTest: TestUnit() {
             client.sendChat("race started!")
         }
 
-        KartRaceEvents.END.register { _, _ ->
+        KartRaceEvents.END.register { _, _, reason ->
             if (!status.testing) return@register
-            client.sendChat("race ended!")
+            client.sendChat("race ended! (reason: $reason)")
         }
 
         KartRaceEvents.LAP.register { _, lap, maxLap, lapTime, _ ->

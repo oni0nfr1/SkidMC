@@ -57,4 +57,15 @@ public abstract class ClientPacketListenerMixin {
         KartMountMixinHandler.onFirstAttrUpdateAfterMount(entity);
         KartMountMixinHandler.onFirstAttrUpdateAfterSpectate(entity);
     }
+
+    /*
+    TODO
+    믹스인 1:
+        패킷 감지 후 메인 스레드에서 objective 주입 직전에 레이스 종료 조건 확인
+        레이스 종료 판정이 나면 적절한 처리 후 종료 이벤트 호출
+
+    믹스인 2:
+        패킷 감지 후 메인 스레드에서 objective 주입 직후 레이스 시작 조건 확인
+        레이스 시작 판정이 나면 적절한 처리 후 시작 이벤트 호출
+     */
 }

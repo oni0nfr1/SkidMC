@@ -16,8 +16,8 @@ object KartRaceEvents {
 
     @JvmField
     val END = createEvent { listeners ->
-        KartRaceEndCallback { race, endNanos ->
-            listeners.forEach { it.onKartRaceEnd(race, endNanos) }
+        KartRaceEndCallback { race, endNanos, reason ->
+            listeners.forEach { it.onKartRaceEnd(race, endNanos, reason) }
         }
     }
 
@@ -35,12 +35,18 @@ object KartRaceEvents {
         }
     }
 
+    enum class RaceEndReason {
+        DISCONNECT,
+        FINISH,
+        OTHER,
+    }
+
     fun interface KartRaceStartCallback {
         fun onKartRaceStart(race: KartRace, startNanos: Long)
     }
 
     fun interface KartRaceEndCallback {
-        fun onKartRaceEnd(race: KartRace, endNanos: Long)
+        fun onKartRaceEnd(race: KartRace, endNanos: Long, reason: RaceEndReason)
     }
 
     fun interface KartRaceLapFinishCallback {

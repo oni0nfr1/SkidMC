@@ -58,7 +58,7 @@ internal class KartImpl(saddle: KartSaddleEntity) : Kart {
         private set
 
     fun mountPlayer(player: Player) {
-        val engineType = player.realKartEngine
+        val engineType = saddle.realKartEngine
         engine = engineType?.let { KartEngine.withType(it, this, player) }
     }
 

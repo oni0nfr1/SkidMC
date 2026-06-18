@@ -1,9 +1,14 @@
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SourcesJar
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier
+import java.net.URI
 
 plugins {
     kotlin("jvm")
     id("fabric-loom")
+    id("org.jetbrains.dokka")
 
     id("com.vanniktech.maven.publish")
     `maven-publish`
@@ -87,6 +92,45 @@ tasks.withType<KotlinCompile>().configureEach {
     compilerOptions.jvmTarget.set(JvmTarget.fromTarget(targetJavaVersion.toString()))
 }
 
+dokka {
+    dokkaPublications.html {
+        moduleName.set("SkidMC API")
+        moduleVersion.set(project.version.toString())
+        outputDirectory.set(layout.buildDirectory.dir("dokka/html"))
+        suppressObviousFunctions.set(true)
+    }
+
+    dokkaSourceSets.configureEach {
+        documentedVisibilities.set(setOf(VisibilityModifier.Public))
+        jdkVersion.set(targetJavaVersion)
+        reportUndocumented.set(false)
+        skipDeprecated.set(false)
+
+        perPackageOption {
+            matchingRegex.set("io\\.github\\.oni0nfr1\\.skid\\.client\\.internal(\\..*)?")
+            suppress.set(true)
+        }
+    }
+
+    dokkaSourceSets.named("main") {
+        sourceLink {
+            localDirectory.set(file("src/main/kotlin"))
+            remoteUrl.set(URI("https://github.com/oni0nfr1/SkidMC/tree/main/skid/src/main/kotlin"))
+            remoteLineSuffix.set("#L")
+        }
+    }
+
+    dokkaSourceSets.named("client") {
+        suppress.set(false)
+
+        sourceLink {
+            localDirectory.set(file("src/client/kotlin"))
+            remoteUrl.set(URI("https://github.com/oni0nfr1/SkidMC/tree/main/skid/src/client/kotlin"))
+            remoteLineSuffix.set("#L")
+        }
+    }
+}
+
 tasks.jar {
     from("LICENSE") {
         rename { "${it}_${project.base.archivesName.get()}" }
@@ -94,6 +138,11 @@ tasks.jar {
 }
 
 mavenPublishing {
+    configureBasedOnAppliedPlugins(
+        javadocJar = JavadocJar.Dokka("dokkaGeneratePublicationHtml"),
+        sourcesJar = SourcesJar.Sources()
+    )
+
     publishToMavenCentral()
     signAllPublications()
 

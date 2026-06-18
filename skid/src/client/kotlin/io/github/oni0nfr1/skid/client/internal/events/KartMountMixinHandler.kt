@@ -4,13 +4,12 @@ import io.github.oni0nfr1.skid.client.api.events.KartMountEvents
 import io.github.oni0nfr1.skid.client.api.kart.KartSaddleEntity
 import io.github.oni0nfr1.skid.client.api.kart.MountType
 import io.github.oni0nfr1.skid.client.api.kart.mountStatus
-import io.github.oni0nfr1.skid.client.api.kart.ridingKart
 import io.github.oni0nfr1.skid.client.internal.kart.KartManager
 import io.github.oni0nfr1.skid.client.internal.tachometer.TachometerManager
 import io.github.oni0nfr1.skid.client.internal.utils.MCClient
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientPacketListener
-import net.minecraft.client.player.LocalPlayer
+import net.minecraft.client.player.RemotePlayer
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket
 import net.minecraft.world.entity.Entity
@@ -20,6 +19,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 internal object KartMountMixinHandler {
     private val client: Minecraft by MCClient
 
+    internal val pendingFirstAttrSaddles = mutableSetOf<Int>()
+    internal val attrReadySaddles = mutableSetOf<Int>()
     private val passengerIdsByKartId = mutableMapOf<Int, IntArray>()
     private var wasSpectating = false
 
@@ -103,16 +104,14 @@ internal object KartMountMixinHandler {
      */
     @JvmStatic
     fun onFirstAttrUpdateAfterMount(entity: Entity) {
-        if (entity !is Player) return
+        if (entity !is KartSaddleEntity) return
+        if (!pendingFirstAttrSaddles.remove(entity.id)) return
+        attrReadySaddles.add(entity.id)
 
-        val prevKart = entity.ridingKart
-        val vehicle = entity.vehicle
-        val wasRidingKart = prevKart?.access { alive } ?: false
-        val isRidingKart = vehicle is KartSaddleEntity
-
-        if (!wasRidingKart && isRidingKart) {
-            val mounted = KartManager.mountRider(entity.id, vehicle.id)
-            if (mounted) KartMountEvents.MOUNT.invoker().onKartMount(vehicle, entity)
+        entity.passengers.forEach { passenger ->
+            if (passenger !is Player) return@forEach
+            val mounted = KartManager.mountRider(passenger.id, entity.id)
+            if (mounted) KartMountEvents.MOUNT.invoker().onKartMount(entity, passenger)
         }
     }
 
@@ -125,17 +124,22 @@ internal object KartMountMixinHandler {
     @JvmStatic
     fun onSpectateTargetChange(player: Player, prevCamera: Entity, newCamera: Entity) {
         if (prevCamera == newCamera) return
-        val kartSaddleEntity = newCamera.vehicle as? KartSaddleEntity
+        val prevSaddleEntity = prevCamera.vehicle as? KartSaddleEntity
+        val newSaddleEntity = newCamera.vehicle as? KartSaddleEntity
 
-        if (!player.isSpectator || newCamera !is Player || kartSaddleEntity == null) { // 카트 관전으로 넘어가는 게 아님
-            if (prevCamera !is Player) return
-            val kartSaddleEntity = prevCamera.vehicle as? KartSaddleEntity ?: return
-
-            KartMountEvents.SPECTATE_END.invoker().onKartSpectateEnd(kartSaddleEntity, player, prevCamera)
+        if (prevCamera is RemotePlayer && prevSaddleEntity != null) {
+            KartMountEvents.SPECTATE_END.invoker().onKartSpectateEnd(prevSaddleEntity, player, prevCamera)
             wasSpectating = false
-        } else { // 카트 관전으로 넘어감
+        }
+
+        if (player.isSpectator && newCamera is RemotePlayer && newSaddleEntity != null) {
             TachometerManager.clear()
-            KartMountEvents.SPECTATE_EARLY.invoker().onKartSpectate(kartSaddleEntity, player, newCamera)
+            KartMountEvents.SPECTATE_EARLY.invoker().onKartSpectate(newSaddleEntity, player, newCamera)
+
+            if (newSaddleEntity.id in attrReadySaddles) {
+                KartMountEvents.SPECTATE.invoker().onKartSpectate(newSaddleEntity, player, newCamera)
+                wasSpectating = true
+            }
         }
     }
 
@@ -147,17 +151,20 @@ internal object KartMountMixinHandler {
      */
     @JvmStatic
     fun onFirstAttrUpdateAfterSpectate(entity: Entity) {
-        if (entity !is LocalPlayer || entity != client.player) return
+        val player = client.player ?: return
+        val camera = client.cameraEntity as? RemotePlayer ?: return
+        if (entity !is KartSaddleEntity) return
+        if (camera !in entity.passengers) return
 
-        val mountStatus = entity.mountStatus
+        val mountStatus = player.mountStatus
         val isSpectating = mountStatus is MountType.Spectating
 
         if (!wasSpectating && isSpectating) {
-            val target = mountStatus.camera as? Player ?: return
-            val kartSaddleEntity = target.vehicle as? KartSaddleEntity ?: return
+            val target = mountStatus.camera as? RemotePlayer ?: return
 
-            KartMountEvents.SPECTATE.invoker().onKartSpectate(kartSaddleEntity, entity, target)
+            KartMountEvents.SPECTATE.invoker().onKartSpectate(entity, player, target)
             wasSpectating = true
         }
+
     }
 }

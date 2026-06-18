@@ -29,6 +29,8 @@ internal object KartSummonMixinHandler {
         if (entity !is KartSaddleEntity) return
         val kart = KartImpl(entity)
 
+        KartMountMixinHandler.attrReadySaddles.remove(entity.id)
+        KartMountMixinHandler.pendingFirstAttrSaddles.add(entity.id)
         KartManager.addKart(kart)
         KartSummonEvents.SUMMON.invoker().onSummon(kart)
     }
@@ -43,6 +45,9 @@ internal object KartSummonMixinHandler {
      */
     @JvmStatic
     fun beforeRemoveEntityByPacket(entityId: Int, @Suppress("UNUSED") ci: CallbackInfo) {
+        KartMountMixinHandler.pendingFirstAttrSaddles.remove(entityId)
+        KartMountMixinHandler.attrReadySaddles.remove(entityId)
+
         val entity = client.level?.getEntity(entityId) ?: return
         if (entity !is KartSaddleEntity) return
         val kart = KartManager.getBySaddleId(entity.id) ?: return

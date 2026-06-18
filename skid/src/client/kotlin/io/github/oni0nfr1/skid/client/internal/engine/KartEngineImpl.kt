@@ -26,9 +26,13 @@ internal abstract class KartEngineImpl(
 
     // implementation of RegularEngine
     val isDrifting: Boolean
+        get() = rider.getRiderMeta(KnownAttrModId.IS_DRIFTING) == 1.0
+    val accurateDriftState: Boolean
         get() {
-            // TODO: 드리프트가 끊기는 순간도 틱 수준에서 정확하도록 만들기
-            return attrDriftState || accurateDriftState
+            val internalKart = kart as? KartImpl ?: return false
+            return internalKart.internalModelOrNull?.passengers?.flatMap { it.passengers }?.any {
+                it.customName?.string == "mcrider-drift-effect" && it is Display && it.viewRange > 0
+            } ?: false
         }
 
     // implementation of NitroEngine
@@ -54,16 +58,5 @@ internal abstract class KartEngineImpl(
         get() = rider.getRiderMeta(KnownAttrModId.DRAFT_STATE) == 2.0
     val draftCharging: Boolean
         get() = rider.getRiderMeta(KnownAttrModId.DRAFT_STATE) == 1.0
-
-    private val accurateDriftState: Boolean
-        get() {
-            val internalKart = kart as? KartImpl ?: return false
-            return internalKart.internalModelOrNull?.passengers?.flatMap { it.passengers }?.any {
-                it.customName?.string == "mcrider-drift-effect" && it is Display && it.viewRange > 0
-            } ?: false
-        }
-
-    private val attrDriftState: Boolean
-        get() = rider.getRiderMeta(KnownAttrModId.IS_DRIFTING) == 1.0
 
 }

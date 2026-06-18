@@ -11,8 +11,19 @@ sealed interface DriftEngine : KartEngine {
      * 해당하는 카트의 드리프트 상태를 나타냅니다.
      *
      * 드리프트 중일 경우 `true`, 아니면 `false`를 반환합니다.
+     *
+     * 상황에 따라서 감지가 1틱씩 밀릴 수 있습니다.
+     * 틱 단위 정확성이 필요하면 [accurateDriftState]를 사용해 주세요.
      */
     val isDrifting: Boolean
+
+    /**
+     * 해당하는 카트의 드리프트 상태를 나타냅니다.
+     *
+     * [isDrifting]과는 다르게, 공중에 떠 있는 상황에서는 `false`이며,
+     * 어트리뷰트 기반 방식으로 동작하지 않기 때문에 완전한 틱 단위 정확도를 제공합니다.
+     */
+    val accurateDriftState: Boolean
 }
 
 sealed interface SpeedEngine : KartEngine {

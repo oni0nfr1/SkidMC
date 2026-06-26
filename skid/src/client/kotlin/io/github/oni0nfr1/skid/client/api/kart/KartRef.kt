@@ -13,6 +13,8 @@ import net.minecraft.client.Minecraft
  * 따라서 라이브러리 사용자 측에서 [Kart] 또는 [KartEngine] 원본 객체를 장기간 보관하다가
  * 카트의 수명 주기가 끝난 뒤에도 계속 접근하는 일을 줄이고,
  * 항상 현재 시점에 유효한 객체에 대해서만 접근하도록 만들기 위한 용도로 사용됩니다.
+ *
+ * @property saddleId 참조할 카트의 대구 엔티티 ID
  */
 open class KartRef(val saddleId: Int) {
     constructor(entity: KartSaddleEntity) : this(entity.id)
@@ -44,12 +46,16 @@ open class KartRef(val saddleId: Int) {
     val handle: Kart?
         get() = KartManager.getBySaddleId(saddleId)
 
+    /** 타입이 지정된 카트 참조를 생성합니다. */
     companion object {
         /**
          * 주어진 [engine]의 현재 카트에 대한 타입 지정 참조를 생성합니다.
          *
          * 반환된 [Specific]은 카트의 유효성뿐 아니라,
          * 접근 시점의 현재 엔진이 타입 [E]인지도 함께 검사할 수 있습니다.
+         *
+         * @param engine 참조할 현재 엔진
+         * @return 엔진 타입 정보가 포함된 카트 참조
          */
         inline fun <reified E: KartEngine> specify(engine: E): Specific<E> {
             return Specific(engine, E::class.java)
@@ -67,6 +73,9 @@ open class KartRef(val saddleId: Int) {
      *
      * 즉, 카트의 수명 주기가 끝났거나 엔진 타입이 기대와 달라진 경우에는
      * 내부 객체에 접근하지 않고 `null`을 반환합니다.
+     *
+     * @param engine 참조를 생성할 현재 엔진
+     * @property clazz 접근 시 확인할 엔진 클래스
      */
     class Specific<out E: KartEngine>(engine: E, val clazz: Class<out E>) : KartRef(engine.kart) {
 

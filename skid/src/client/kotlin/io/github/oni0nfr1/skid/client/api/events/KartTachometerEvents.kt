@@ -6,7 +6,9 @@ import io.github.oni0nfr1.skid.client.internal.utils.createEvent
 import net.minecraft.network.chat.Component
 
 /**
- * # NOTE
+ * 카트 타코미터 액션바의 파싱 결과를 단계별로 제공합니다.
+ *
+ * ## 참고
  * SkidMC의 액션바 처리 파이프라인은 **서버**로부터 액션바 패킷이 도착했을 때만 작동합니다.
  *
  * 따라서 타 클라이언트 모드에서 액션바 출력 메서드를 호출하더라도 SkidMC에서는 그것을 처리하지 않습니다.
@@ -161,35 +163,77 @@ object KartTachometerEvents {
         }
     }
 
+    /** 정상 파싱된 타코미터 액션바를 처리합니다. */
     fun interface KartTachometerCallback {
+        /**
+         * @param kart 액션바와 연결된 현재 카트
+         * @param engine 액션바와 연결된 현재 엔진
+         * @param text 수신한 원본 액션바 컴포넌트
+         * @return 액션바 표시 여부
+         */
         fun onActionbarReceive(kart: Kart, engine: KartEngine, text: Component): Result
     }
 
+    /** 파싱된 속도 값을 처리합니다. */
     fun interface KartSpeedCallback {
+        /**
+         * @param speed 액션바에 표시된 속도(`km/h`)
+         * @return 액션바 표시 여부
+         */
         fun onSpeedUpdate(speed: Double): Result
     }
 
+    /** 파싱된 부스터 개수를 처리합니다. */
     fun interface KartNitroCallback {
+        /**
+         * @param nitro 현재 보유한 부스터 개수
+         * @return 액션바 표시 여부
+         */
         fun onNitroUpdate(nitro: Int): Result
     }
 
+    /** 파싱된 부스터 게이지를 처리합니다. */
     fun interface KartGaugeCallback {
+        /**
+         * @param gauge `0.0..1.0` 범위의 부스터 게이지 진행도
+         * @return 액션바 표시 여부
+         */
         fun onGaugeUpdate(gauge: Double): Result
     }
 
+    /** 파싱된 MK 터보 게이지를 처리합니다. */
     fun interface MarioKartGaugeCallback {
+        /**
+         * @param gauge `0.0..1.0` 범위의 터보 게이지 진행도
+         * @return 액션바 표시 여부
+         */
         fun onGaugeUpdate(gauge: Double): Result
     }
 
+    /** 파싱된 RPM 게이지를 처리합니다. */
     fun interface KartRpmCallback {
+        /**
+         * @param rpm `0.0..1.0` 범위의 RPM 게이지 진행도
+         * @return 액션바 표시 여부
+         */
         fun onRpmUpdate(rpm: Double): Result
     }
 
+    /** 파싱된 기어 단수를 처리합니다. */
     fun interface KartGearCallback {
+        /**
+         * @param gear 현재 기어 단수
+         * @return 액션바 표시 여부
+         */
         fun onGearUpdate(gear: Int): Result
     }
 
+    /** 파싱된 F1 ERS 값을 처리합니다. */
     fun interface KartErsCallback {
+        /**
+         * @param ers 액션바에 표시된 ERS 충전량
+         * @return 액션바 표시 여부
+         */
         fun onErsUpdate(ers: Int): Result
     }
 
@@ -202,7 +246,16 @@ object KartTachometerEvents {
         SHOW,
         BLOCK;
 
+        /** 여러 이벤트 결과를 병합하는 함수를 제공합니다. */
         companion object {
+            /**
+             * 여러 이벤트 결과를 하나의 최종 결과로 병합합니다.
+             *
+             * 하나라도 [BLOCK]이면 [BLOCK], 모두 [SHOW]이면 [SHOW]를 반환합니다.
+             *
+             * @param results 병합할 이벤트 결과
+             * @return 병합된 최종 결과
+             */
             fun finalize(vararg results: Result): Result {
                 results.forEach {
                     if (it == BLOCK) return BLOCK

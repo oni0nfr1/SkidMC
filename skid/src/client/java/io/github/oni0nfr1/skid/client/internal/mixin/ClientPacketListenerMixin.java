@@ -4,7 +4,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import io.github.oni0nfr1.skid.client.internal.events.KartMountMixinHandler;
 import io.github.oni0nfr1.skid.client.internal.events.KartSummonMixinHandler;
 import io.github.oni0nfr1.skid.client.internal.events.KartTachometerMixinHandler;
-import io.github.oni0nfr1.skid.client.internal.events.RiderAttrMixinHandler;
+import io.github.oni0nfr1.skid.client.internal.events.KartAttrMixinHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -44,7 +44,7 @@ public abstract class ClientPacketListenerMixin {
 
     @Inject(method = "handleUpdateAttributes", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/attributes/AttributeInstance;setBaseValue(D)V"))
     private void onHandleUpdateAttributes(CallbackInfo ci, @Local ClientboundUpdateAttributesPacket.AttributeSnapshot attributeSnapshot, @Local Entity entity) {
-        RiderAttrMixinHandler.onUpdateAttrPacket(entity, attributeSnapshot);
+        KartAttrMixinHandler.onUpdateAttrPacket(entity, attributeSnapshot);
     }
 
     @Inject(method = "handleUpdateAttributes", at = @At("TAIL"))

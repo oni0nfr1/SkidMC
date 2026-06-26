@@ -2,65 +2,114 @@
 package io.github.oni0nfr1.skid.client.api.attr
 
 import io.github.oni0nfr1.skid.client.api.engine.KartEngine
-import io.github.oni0nfr1.skid.client.api.events.RiderAttrEvents
+import io.github.oni0nfr1.skid.client.api.events.KartAttrEvents
+import io.github.oni0nfr1.skid.client.api.kart.KartSaddleEntity
+import io.github.oni0nfr1.skid.client.api.kart.ridingKart
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.player.Player
 
 /**
- * @return id 값에 해당하는 마크라이더 어트리뷰트 수신값을 반환합니다.
+ * `minecraft` 네임스페이스의 [id]에 해당하는 카트 메타데이터 값을 반환합니다.
  *
- * 네임스페이스는 minecraft로 고정됩니다.
+ * @param id 조회할 modifier ID의 경로
+ * @return 수신된 modifier 값, 해당 값이 없거나 조회에 실패하면 `null`
  */
-fun Player.getRiderMeta(id: String): Double? {
+fun KartSaddleEntity.getKartMeta(id: String): Double? {
     val key = ResourceLocation.withDefaultNamespace(id)
-    return this.getRiderMeta(key)
+    return getKartMeta(key)
 }
 
 /**
- * @return 키에 해당하는 마크라이더 어트리뷰트 프로토콜 수신값을 반환합니다.
+ * [key]에 해당하는 카트 메타데이터 값을 반환합니다.
+ *
+ * @param key 조회할 modifier ID
+ * @return 수신된 modifier 값, 해당 값이 없거나 조회에 실패하면 `null`
  */
-fun Player.getRiderMeta(key: ResourceLocation): Double? {
+fun KartSaddleEntity.getKartMeta(key: ResourceLocation): Double? {
     return try {
-        this.attributes.getModifierValue(RiderAttrEvents.RIDER_META_ATTR_KEY, key)
+        attributes.getModifierValue(KartAttrEvents.KART_META_ATTR_KEY, key)
     } catch (e: Exception) {
         null
     }
 }
 
 /**
- * @return 플레이어가 타고 있는 엔진 종류를 반환합니다.
+ * 현재 탑승한 카트에서 `minecraft` 네임스페이스의 [id]에 해당하는 메타데이터 값을 반환합니다.
  *
- * 유효하지 않은 값이 읽힐 경우 null을 반환합니다.
+ * @param id 조회할 modifier ID의 경로
+ * @return 현재 카트의 modifier 값, 카트에 탑승하지 않았거나 값이 없으면 `null`
+ */
+@Deprecated("카트 메타데이터의 주체가 플레이어에서 카트 엔티티로 변경되었습니다. getKartMeta를 사용하세요.")
+fun Player.getRiderMeta(id: String): Double? {
+    val key = ResourceLocation.withDefaultNamespace(id)
+    return ridingKart?.access { saddle.getKartMeta(key) }
+}
+
+/**
+ * 현재 탑승한 카트에서 [key]에 해당하는 메타데이터 값을 반환합니다.
+ *
+ * @param key 조회할 modifier ID
+ * @return 현재 카트의 modifier 값, 카트에 탑승하지 않았거나 값이 없으면 `null`
+ */
+@Deprecated("카트 메타데이터의 주체가 플레이어에서 카트 엔티티로 변경되었습니다. getKartMeta를 사용하세요.")
+fun Player.getRiderMeta(key: ResourceLocation): Double? {
+    return ridingKart?.access { saddle.getKartMeta(key) }
+}
+
+/**
+ * 카트의 실제 엔진 종류를 반환합니다.
+ *
+ * @return 실제 엔진 종류, 값이 없거나 알려지지 않은 코드이면 `null`
+ */
+val KartSaddleEntity.realKartEngine: KartEngine.Type?
+    get() {
+        val modifier = getKartMeta(KnownAttrModId.ID_ENGINE_REAL) ?: return null
+        return KartEngine.Type.getByRawModifier(modifier)
+    }
+
+/**
+ * 카트에 설정된 엔진 종류를 반환합니다.
+ *
+ * @return 설정된 엔진 종류, 값이 없거나 알려지지 않은 코드이면 `null`
+ */
+val KartSaddleEntity.selectedKartEngine: KartEngine.Type?
+    get() {
+        val modifier = getKartMeta(KnownAttrModId.ID_ENGINE) ?: return null
+        return KartEngine.Type.getByRawModifier(modifier)
+    }
+
+/**
+ * 플레이어가 현재 탑승한 카트의 실제 엔진 종류를 반환합니다.
+ *
+ * @return 실제 엔진 종류, 값이 없거나 알려지지 않은 코드이면 `null`
  */
 val Player.realKartEngine: KartEngine.Type?
-    get() {
-        val modifier = this.getRiderMeta(KnownAttrModId.KART_ENGINE_REAL) ?: return null
-        return KartEngine.Type.getByRawModifier(modifier)
-    }
+    get() = ridingKart?.access { saddle.realKartEngine }
 
 /**
- * @return 플레이어가 선택한 엔진 종류를 반환합니다.
+ * 플레이어가 선택한 엔진 종류를 반환합니다.
  *
- * 유효하지 않은 값이 읽힐 경우 null을 반환합니다.
+ * @return 선택한 엔진 종류, 값이 없거나 알려지지 않은 코드이면 `null`
  */
 val Player.selectedKartEngine: KartEngine.Type?
-    get() {
-        val modifier = this.getRiderMeta(KnownAttrModId.KART_ENGINE) ?: return null
-        return KartEngine.Type.getByRawModifier(modifier)
-    }
+    get() = ridingKart?.access { saddle.selectedKartEngine }
 
 /**
- * @return 현재 있는 트랙의 최대 랩 수를 반환합니다.
+ * 현재 트랙의 최대 랩 수를 반환합니다.
  *
- * 인게임 상태가 아니거나 잘못된 값(0바퀴)가 읽힐 경우 null을 반환합니다.
+ * 이 프로퍼티의 receiver는 API 탐색 편의를 위한 것으로, 실제 조회에는 현재 클라이언트 플레이어가 사용됩니다.
+ *
+ * @return 양수인 최대 랩 수, 플레이어가 없거나 값이 0 이하이면 `null`
  */
 @Suppress("UnusedReceiverParameter")
 val ClientLevel.maxLap: Int?
     get() {
         val client = Minecraft.getInstance()
         val player = client.player ?: return null
-        val readValue =  player.getRiderMeta(KnownAttrModId.MAX_LAP)?.toInt() ?: return null
+        val readValue = player.ridingKart?.access {
+            saddle.getKartMeta(KnownAttrModId.CTX_MAX_LAP)
+        }?.toInt() ?: return null
         return if (readValue > 0) readValue else null
     }

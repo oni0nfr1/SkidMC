@@ -1,7 +1,7 @@
 package io.github.oni0nfr1.skid.client.internal.engine
 
 import io.github.oni0nfr1.skid.client.api.attr.KnownAttrModId
-import io.github.oni0nfr1.skid.client.api.attr.getRiderMeta
+import io.github.oni0nfr1.skid.client.api.attr.getKartMeta
 import io.github.oni0nfr1.skid.client.api.kart.Kart
 import io.github.oni0nfr1.skid.client.api.kart.subject
 import io.github.oni0nfr1.skid.client.api.tachometer.KartTachometer
@@ -17,7 +17,7 @@ internal abstract class KartEngineImpl(
 ) {
     // implementation of KartEngine
     val currentLap: Int
-        get() = rider.getRiderMeta(KnownAttrModId.CURRENT_LAP)?.toInt() ?: 0
+        get() = kart.saddle.getKartMeta(KnownAttrModId.CTX_CURRENT_LAP)?.toInt() ?: 0
     open val tachometer: KartTachometer?
         get() {
             val client = Minecraft.getInstance()
@@ -26,7 +26,7 @@ internal abstract class KartEngineImpl(
 
     // implementation of RegularEngine
     val isDrifting: Boolean
-        get() = rider.getRiderMeta(KnownAttrModId.IS_DRIFTING) == 1.0
+        get() = kart.saddle.getKartMeta(KnownAttrModId.STATE_DRIFTING) == 1.0
     val accurateDriftState: Boolean
         get() {
             val internalKart = kart as? KartImpl ?: return false
@@ -37,26 +37,26 @@ internal abstract class KartEngineImpl(
 
     // implementation of NitroEngine
     val isBoosting: Boolean
-        get() = rider.getRiderMeta(KnownAttrModId.BOOST_STATE) != 0.0
+        get() = kart.saddle.getKartMeta(KnownAttrModId.STATE_NITRO) != 0.0
     val maxBoost: Int
-        get() = rider.getRiderMeta(KnownAttrModId.KART_MAX_BOOST_COUNT)?.toInt() ?: 0
+        get() = kart.saddle.getKartMeta(KnownAttrModId.CAP_NITRO_COUNT)?.toInt() ?: 0
 
     // implementation of InstantBoostEngine
     val instantBoostReady: Boolean
-        get() = rider.getRiderMeta(KnownAttrModId.ACTIVE_INSTANT_BOOST) != 0.0
+        get() = kart.saddle.getKartMeta(KnownAttrModId.STATE_IBOOST) != 0.0
     val instantBoostEnabled: Boolean
-        get() = rider.getRiderMeta(KnownAttrModId.FORCE_INSTANT_BOOST) != 0.0
+        get() = kart.saddle.getKartMeta(KnownAttrModId.CAN_IBOOST) != 0.0
 
     // implementation of DualBoostEngine
     val dualBoostActive: Boolean
-        get() = rider.getRiderMeta(KnownAttrModId.BOOST_STATE) == 3.0
+        get() = kart.saddle.getKartMeta(KnownAttrModId.STATE_NITRO) == 3.0
     val dualBoostCharging: Boolean
-        get() = rider.getRiderMeta(KnownAttrModId.BOOST_STATE) == 2.0
+        get() = kart.saddle.getKartMeta(KnownAttrModId.STATE_NITRO) == 2.0
 
     // implementation of DraftEngine
     val draftActive: Boolean
-        get() = rider.getRiderMeta(KnownAttrModId.DRAFT_STATE) == 2.0
+        get() = kart.saddle.getKartMeta(KnownAttrModId.STATE_DRAFT_ACCEL) == 2.0
     val draftCharging: Boolean
-        get() = rider.getRiderMeta(KnownAttrModId.DRAFT_STATE) == 1.0
+        get() = kart.saddle.getKartMeta(KnownAttrModId.STATE_DRAFT_ACCEL) == 1.0
 
 }

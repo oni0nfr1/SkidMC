@@ -4,12 +4,17 @@ import io.github.oni0nfr1.skid.client.api.engine.KartEngine
 import net.minecraft.world.phys.Vec3
 
 /**
- * 주의: Kart 핸들 객체를 사용하는 방식은 멀티스레드 환경에서 예기치 못한 예외가 던져질 수 있습니다.
+ * 클라이언트에서 추적 중인 마크라이더 카트와 관련 엔티티를 제공합니다.
+ *
+ * 카트가 제거되면 이 객체는 무효화되며, [alive]와 [saddleId]를 제외한 프로퍼티 접근은
+ * [StaleKartException]을 던질 수 있습니다. 장기간 참조해야 할 때는 [KartRef]를 사용하세요.
+ *
+ * 이 객체와 관련 참조는 렌더 스레드에서 사용해야 합니다.
  */
 interface Kart {
 
     /**
-     * 현재 해당 객체가 유효한지를 나타냅니다.
+     * 이 객체가 현재 유효한지 여부입니다.
      */
     val alive: Boolean
 
@@ -35,7 +40,7 @@ interface Kart {
     val model: KartModelRoot
 
     /**
-     * 카트 엔티티의 현재 위치입니다.
+     * 카트 메인 엔티티의 현재 위치입니다.
      */
     val position: Vec3
 
@@ -55,7 +60,7 @@ interface Kart {
     /**
      * 틱에 기반하여 카트의 속도를 제공합니다.
      *
-     * 단위는 **block/tick**입니다.
+     * 단위는 `block/tick`입니다.
      *
      * 마크라이더 카트는 텔레포트 방식으로 이동하기 때문에, 카트의 속도를 측정할 때 엔티티 속도값이 아닌 Skid에서 계산한 속도값을 써주세요.
      */
@@ -68,4 +73,3 @@ interface Kart {
      */
     val engine: KartEngine?
 }
-

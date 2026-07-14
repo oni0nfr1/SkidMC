@@ -57,7 +57,7 @@ object KartMountEvents {
     /**
      * 로컬 플레이어가 카트 탑승자를 관전하기 시작할 때 호출됩니다.
      *
-     * 카메라 대상이 바뀐 직후, 대상 플레이어의 라이더 메타데이터가 적용되기 전에 렌더 스레드에서 호출됩니다.
+     * 카메라 대상 변경이 실제로 반영된 직후, 대상 카트의 메타데이터가 준비되기 전에 렌더 스레드에서 호출됩니다.
      */
     @Suppress("UNUSED") @JvmField
     val SPECTATE_EARLY = createEvent { listeners ->
@@ -71,6 +71,7 @@ object KartMountEvents {
     /**
      * 로컬 플레이어가 카트 탑승자를 관전하기 시작한 후 첫 라이더 메타데이터를 수신하면 호출됩니다.
      *
+     * 대상 카트의 메타데이터가 이미 준비된 경우에는 카메라 대상 변경이 실제로 반영된 직후 호출됩니다.
      * 렌더 스레드에서 호출됩니다.
      */
     @Suppress("UNUSED") @JvmField
@@ -85,7 +86,7 @@ object KartMountEvents {
     /**
      * 로컬 플레이어가 카트 탑승자 관전을 종료할 때 호출됩니다.
      *
-     * 카메라 대상이 바뀌기 직전에 렌더 스레드에서 호출됩니다.
+     * 카메라 대상 변경이 실제로 반영된 직후 렌더 스레드에서 호출됩니다.
      */
     @Suppress("UNUSED") @JvmField
     val SPECTATE_END = createEvent { listeners ->

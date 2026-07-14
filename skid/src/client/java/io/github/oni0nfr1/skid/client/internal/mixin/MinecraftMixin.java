@@ -1,5 +1,7 @@
 package io.github.oni0nfr1.skid.client.internal.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import io.github.oni0nfr1.skid.client.internal.events.KartMountMixinHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -7,9 +9,6 @@ import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Minecraft.class)
 public abstract class MinecraftMixin {
@@ -18,11 +17,14 @@ public abstract class MinecraftMixin {
     public LocalPlayer player;
     @Shadow @Nullable public Entity cameraEntity;
 
-    @Inject(method = "setCameraEntity", at = @At(value = "HEAD"))
-    private void onSetCameraEntity(Entity newCamera, CallbackInfo ci) {
+    @WrapMethod(method = "setCameraEntity")
+    private void onSetCameraEntity(Entity newCamera, Operation<Void> original) {
         @Nullable LocalPlayer player = this.player;
         @Nullable Entity prevCamera = this.cameraEntity;
-        if (player == null || newCamera == null || prevCamera == null) return;
-        KartMountMixinHandler.onSpectateTargetChange(player, prevCamera, newCamera);
+        original.call(newCamera);
+
+        @Nullable Entity currentCamera = this.cameraEntity;
+        if (player == null || prevCamera == null || currentCamera == null) return;
+        KartMountMixinHandler.afterSpectateTargetChange(player, prevCamera, currentCamera);
     }
 }

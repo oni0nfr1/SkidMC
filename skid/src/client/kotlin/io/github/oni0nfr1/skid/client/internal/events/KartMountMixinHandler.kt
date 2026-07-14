@@ -116,14 +116,14 @@ internal object KartMountMixinHandler {
     }
 
     /**
-     * [Minecraft.setCameraEntity]가 호출되기 직전에 호출됩니다.
+     * [Minecraft.setCameraEntity]가 호출된 직후, 실제 카메라 대상이 변경된 경우 호출됩니다.
      *
      * 렌더 스레드에서 호출됩니다.
      * @see io.github.oni0nfr1.skid.client.internal.mixin.MinecraftMixin.onSetCameraEntity
      */
     @JvmStatic
-    fun onSpectateTargetChange(player: Player, prevCamera: Entity, newCamera: Entity) {
-        if (prevCamera == newCamera) return
+    fun afterSpectateTargetChange(player: Player, prevCamera: Entity, newCamera: Entity) {
+        if (prevCamera === newCamera) return
         val prevSaddleEntity = prevCamera.vehicle as? KartSaddleEntity
         val newSaddleEntity = newCamera.vehicle as? KartSaddleEntity
 

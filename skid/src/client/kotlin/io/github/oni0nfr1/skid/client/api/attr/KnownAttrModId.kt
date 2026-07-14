@@ -34,6 +34,14 @@ object KnownAttrModId {
     @JvmField val STATE_IBOOST: ResourceLocation = ResourceLocation.withDefaultNamespace("state-instant-boost")
 
     // 정규 카트 상태
+    /**
+     * 플레이어의 조작을 통해 카트바디의 모델링이 회전하게 되는지 여부를 담는 modifier ID입니다.
+     *
+     * 이 값이 1일 경우 공식 모드 MCRider에서는 클라이언트 측에서 카트 모델을 플레이어 시선으로 강제 정렬하게 됩니다.
+     */
+    @JvmField val STATE_MODEL_ROTATION_ALLOWED = ResourceLocation.withDefaultNamespace("state-allow-model-rotation")
+    /** 카트 바디 종류를 담는 modifier ID입니다. */
+    @JvmField val ID_BODY_TYPE: ResourceLocation = ResourceLocation.withDefaultNamespace("data-is-bike")
     /** 드리프트 상태를 담는 modifier ID입니다. */
     @JvmField val STATE_DRIFTING: ResourceLocation = ResourceLocation.withDefaultNamespace("state-drift")
     /** 일반·듀얼 부스터 상태를 담는 modifier ID입니다. */
@@ -50,12 +58,4 @@ object KnownAttrModId {
     @JvmField val CTX_PERF_LIMIT: ResourceLocation = ResourceLocation.withDefaultNamespace("data-performance-limit-level")
     /** 카트 타이어 설정을 담는 modifier ID입니다. */
     @JvmField val ID_TIRE: ResourceLocation = ResourceLocation.withDefaultNamespace("data-tire")
-    /**
-     * 플레이어의 조작을 통해 카트바디의 모델링이 회전하게 되는지 여부를 담는 modifier ID입니다.
-     *
-     * 이 값이 1일 경우 공식 모드 MCRider에서는 클라이언트 측에서 카트 모델을 플레이어 시선으로 강제 정렬하게 됩니다.
-     */
-    @JvmField val STATE_MODEL_ROTATION_ALLOWED = ResourceLocation.withDefaultNamespace("state-allow-model-rotation")
-    /** 카트 바디 종류를 담는 modifier ID입니다. */
-    @JvmField val ID_BODY_TYPE: ResourceLocation = ResourceLocation.withDefaultNamespace("data-is-bike")
 }

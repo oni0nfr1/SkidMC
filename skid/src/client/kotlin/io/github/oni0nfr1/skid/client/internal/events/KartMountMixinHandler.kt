@@ -60,7 +60,15 @@ internal object KartMountMixinHandler {
         added.forEach { riderId ->
             val rider = level.getEntity(riderId) as? Player ?: return@forEach
             KartMountEvents.MOUNT_EARLY.invoker().onKartMount(kart, rider)
+            completeMountIfReady(kart, rider)
         }
+    }
+
+    private fun completeMountIfReady(kart: KartSaddleEntity, rider: Player) {
+        if (kart.id !in attrReadySaddles) return
+
+        val mounted = KartManager.mountRider(rider.id, kart.id)
+        if (mounted) KartMountEvents.MOUNT.invoker().onKartMount(kart, rider)
     }
 
     /**
@@ -110,8 +118,7 @@ internal object KartMountMixinHandler {
 
         entity.passengers.forEach { passenger ->
             if (passenger !is Player) return@forEach
-            val mounted = KartManager.mountRider(passenger.id, entity.id)
-            if (mounted) KartMountEvents.MOUNT.invoker().onKartMount(entity, passenger)
+            completeMountIfReady(entity, passenger)
         }
     }
 

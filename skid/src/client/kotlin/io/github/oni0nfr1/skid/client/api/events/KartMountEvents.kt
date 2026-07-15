@@ -28,7 +28,7 @@ object KartMountEvents {
 
     /**
      * 엔티티가 카트 엔티티에 탑승할 때 호출됩니다.
-     * - 플레이어가 카트에 탑승한 직후 첫 어트리뷰트 갱신을 받는 시점에 호출됩니다.
+     * - 플레이어의 탑승 정보와 카트의 첫 어트리뷰트 갱신이 모두 적용된 시점에 호출됩니다.
      */
     @Suppress("UNUSED") @JvmField
     val MOUNT = createEvent { listeners ->

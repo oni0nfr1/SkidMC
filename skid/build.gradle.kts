@@ -138,6 +138,7 @@ tasks.jar {
 }
 
 mavenPublishing {
+    @Suppress("UnstableApiUsage")
     configureBasedOnAppliedPlugins(
         javadocJar = JavadocJar.Dokka("dokkaGeneratePublicationHtml"),
         sourcesJar = SourcesJar.Sources()

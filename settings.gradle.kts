@@ -11,6 +11,7 @@ plugins {
 }
 
 include(":skid")
+include(":skid-api")
 include(":skid-test")
 
 include("skid-test-annotations")

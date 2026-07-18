@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "skid-api",
+  "version": "${version}",
+  "name": "SkidMC API",
+  "description": "Public API contracts for SkidMC",
+  "authors": [],
+  "contact": {},
+  "license": "MIT",
+  "environment": "client",
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-language-kotlin": ">=${kotlin_loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}

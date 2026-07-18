@@ -176,6 +176,7 @@ data object X : KartType<XEngine, XTachometer>(
 
 ### 6. 새 엔티티 동기화와 탑승 관계 추적
 
+- [x] 소환된 카트를 pending으로 추적하고 `KartType` 해석 후 ready로 전환
 - [ ] 새 엔티티 동기화 패킷에서 카트 생성뿐 아니라 기존 탑승 관계도 추적
 - [ ] 별도 passenger 패킷이 오지 않는 초기 동기화 경로 테스트 추가
 - [ ] 어트리뷰트와 탑승 관계의 도착 순서별 상태 전이 테스트 추가

@@ -19,8 +19,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 internal object KartMountMixinHandler {
     private val client: Minecraft by MCClient
 
-    internal val pendingFirstAttrSaddles = mutableSetOf<Int>()
-    internal val attrReadySaddles = mutableSetOf<Int>()
     private val passengerIdsByKartId = mutableMapOf<Int, IntArray>()
     private var wasSpectating = false
 
@@ -65,7 +63,7 @@ internal object KartMountMixinHandler {
     }
 
     private fun completeMountIfReady(kart: KartSaddleEntity, rider: Player) {
-        if (kart.id !in attrReadySaddles) return
+        if (!KartManager.isReady(kart.id)) return
 
         val mounted = KartManager.mountRider(rider.id, kart.id)
         if (mounted) KartMountEvents.MOUNT.invoker().onKartMount(kart, rider)
@@ -113,8 +111,7 @@ internal object KartMountMixinHandler {
     @JvmStatic
     fun onFirstAttrUpdateAfterMount(entity: Entity) {
         if (entity !is KartSaddleEntity) return
-        if (!pendingFirstAttrSaddles.remove(entity.id)) return
-        attrReadySaddles.add(entity.id)
+        if (KartManager.prepareKart(entity) == null) return
 
         entity.passengers.forEach { passenger ->
             if (passenger !is Player) return@forEach
@@ -143,7 +140,7 @@ internal object KartMountMixinHandler {
             TachometerManager.clear()
             KartMountEvents.SPECTATE_EARLY.invoker().onKartSpectate(newSaddleEntity, player, newCamera)
 
-            if (newSaddleEntity.id in attrReadySaddles) {
+            if (KartManager.isReady(newSaddleEntity.id)) {
                 KartMountEvents.SPECTATE.invoker().onKartSpectate(newSaddleEntity, player, newCamera)
                 wasSpectating = true
             }

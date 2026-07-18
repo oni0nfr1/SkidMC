@@ -1,5 +1,8 @@
 package io.github.oni0nfr1.skid.client.internal.kart
 
+import io.github.oni0nfr1.skid.client.api.kart.KartSaddle
+import io.github.oni0nfr1.skid.client.api.utils.KartType
+import io.github.oni0nfr1.skid.client.internal.attr.KartTypeResolver
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
@@ -12,6 +15,8 @@ internal object KartManager {
     private val level: ClientLevel?
         get() = Minecraft.getInstance().level
     private val saddleIdToKart: MutableMap<Int, KartImpl> = mutableMapOf()
+    private val pendingKartIds: MutableSet<Int> = mutableSetOf()
+    private val saddleIdToType: MutableMap<Int, KartType<*, *>> = mutableMapOf()
     private val riderIdToSaddleId: MutableMap<Int, Int> = mutableMapOf()
 
     fun init() {
@@ -27,12 +32,32 @@ internal object KartManager {
 
     fun clear(vararg nothing: Any) {
         saddleIdToKart.clear()
+        pendingKartIds.clear()
+        saddleIdToType.clear()
         riderIdToSaddleId.clear()
     }
 
     fun addKart(kart: KartImpl) {
         saddleIdToKart[kart.saddleId] = kart
+        saddleIdToType.remove(kart.saddleId)
+        pendingKartIds.add(kart.saddleId)
     }
+
+    fun prepareKart(saddle: KartSaddle): KartType<*, *>? {
+        val saddleId = saddle.id
+        if (saddleId !in saddleIdToKart) return null
+        if (saddleId !in pendingKartIds) return null
+        val type = KartTypeResolver.resolve(saddle) ?: return null
+
+        saddleIdToType[saddleId] = type
+        pendingKartIds.remove(saddleId)
+        return type
+    }
+
+    fun isReady(saddleId: Int): Boolean =
+        saddleId in saddleIdToType && saddleId !in pendingKartIds
+
+    fun getKartType(saddleId: Int): KartType<*, *>? = saddleIdToType[saddleId]
 
     fun mountRider(riderId: Int, saddleId: Int): Boolean {
         val kart = getBySaddleId(saddleId) ?: return false
@@ -47,6 +72,8 @@ internal object KartManager {
         val removed = saddleIdToKart.remove(saddleId) ?: return false
 
         riderIdToSaddleId.entries.removeIf { it.value == saddleId }
+        pendingKartIds.remove(saddleId)
+        saddleIdToType.remove(saddleId)
         removed.alive = false
         return true
     }

@@ -39,6 +39,7 @@
 - [x] `skid-api`를 client 전용 Fabric 모듈로 구성
 - [x] 루트 프로젝트에 `:skid-api` 포함
 - [x] `skid-api`의 독립 client Kotlin 컴파일 확인
+- [x] client API용 `clientTest` 소스셋을 구성하고 `check`에 연결
 - [ ] `skid` 구현체 모듈에서 `skid-api` 의존성 연결
 - [ ] 최종 배포 JAR에 API 모듈 포함
 - [ ] API만 사용하는 모드의 권장 의존성 구성 확정
@@ -109,7 +110,7 @@ interface XEngine : NitroEngine, InstantBoostEngine, DualBoostEngine, DraftEngin
 - [x] `attrEngineCode` 조회 함수 제공
 - [x] 알 수 없는 코드는 API에서 로그를 남기지 않고 `null`로 반환
 - [ ] 구현체에서 알 수 없는 엔진 코드를 로깅할지 결정
-- [ ] Java에서 각 타입에 접근하는 형태 확인
+- [x] Java에서 각 타입에 접근하는 형태 확인
 
 예정 형태:
 
@@ -128,8 +129,9 @@ data object X : KartType<XEngine, XTachometer>(
 - [x] saddle entity ID를 안정적인 참조 키로 유지
 - [x] `get()` 호출 시 렌더 스레드 및 카트 유효성 검사
 - [x] `KartRef.specify(KartType.X)` 형태로 타입이 지정된 참조 제공
-- [ ] `specify()` 결과의 `access` 블록에서 `Kart<XEngine, XTachometer>` 추론 확인
-- [ ] Java 사용성을 위한 `Optional` 기반 접근 예제 및 테스트 추가
+- [x] `specify()` 결과의 `access` 블록에서 `Kart<XEngine, XTachometer>` 추론 확인
+- [x] Java의 `Optional` 및 제네릭 API 컴파일 테스트 추가
+- [ ] Java 사용 예제 추가
 - [ ] 기존 `handle`, `Specific`, `accessEngine` 제거 또는 마이그레이션
 - [ ] `StaleKartException` 제거 여부 확정
   - 현재 계획에서는 유효하지 않은 참조를 `Optional.empty()`로 표현한다.
@@ -220,10 +222,10 @@ data object X : KartType<XEngine, XTachometer>(
 - [ ] `skid-api` 전체 빌드 및 API JAR 내용 검증
 - [ ] `skid`가 새 API만 사용하도록 전환
 - [ ] `skid-test`를 새 API 계약으로 이전
-- [ ] Kotlin 타입 추론 테스트 추가
+- [x] Kotlin 타입 추론 테스트 추가
   - `KartRef.specify(KartType.X).access { ... }`
   - 중간 엔진 타입에서 대응 타코미터 타입 추론
-- [ ] Java API 사용 테스트 추가
+- [x] Java API 사용 테스트 추가
 - [ ] 엔티티 패킷 순서 조합별 mount/spectate 테스트 추가
 - [ ] 기존 `skid` 모듈의 중복 API 소스 제거
 - [ ] 배포 JAR에 `skid-api`가 정확히 한 번 포함되는지 확인

@@ -31,12 +31,36 @@ loom {
     }
 }
 
+val clientSourceSet = sourceSets.named("client")
+val clientTestSourceSet = sourceSets.create("clientTest") {
+    compileClasspath += clientSourceSet.get().output + clientSourceSet.get().compileClasspath
+    runtimeClasspath += output + compileClasspath + clientSourceSet.get().runtimeClasspath
+}
+
 dependencies {
     minecraft("com.mojang:minecraft:${project.property("minecraft_version")}")
     mappings(loom.officialMojangMappings())
     modImplementation("net.fabricmc:fabric-loader:${project.property("loader_version")}")
     modImplementation("net.fabricmc:fabric-language-kotlin:${project.property("kotlin_loader_version")}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_version")}")
+
+    add(clientTestSourceSet.implementationConfigurationName, kotlin("test-junit5"))
+    add(
+        clientTestSourceSet.runtimeOnlyConfigurationName,
+        "org.junit.platform:junit-platform-launcher",
+    )
+}
+
+val clientTest by tasks.registering(Test::class) {
+    description = "Runs tests for the client API source set."
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    testClassesDirs = clientTestSourceSet.output.classesDirs
+    classpath = clientTestSourceSet.runtimeClasspath
+    useJUnitPlatform()
+}
+
+tasks.check {
+    dependsOn(clientTest)
 }
 
 tasks.processResources {

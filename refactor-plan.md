@@ -150,6 +150,7 @@ data object X : KartType<XEngine, XTachometer>(
 
 ### 4. 구현체를 카트 중심 수명 주기로 전환
 
+- [x] 카트의 실제 엔진 어트리뷰트를 `KartType`으로 변환하는 internal resolver 추가
 - [ ] 엔진 생성 시점을 플레이어 탑승 시점에서 카트의 첫 어트리뷰트 준비 시점으로 이동
 - [ ] `KartEngine.rider`를 제거하고 `Kart.rider: Player?`로 이전
 - [ ] `KartEngine.tachometer`를 제거하고 `Kart.tachometer: T?`로 이전

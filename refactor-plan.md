@@ -40,7 +40,8 @@
 - [x] 루트 프로젝트에 `:skid-api` 포함
 - [x] `skid-api`의 독립 client Kotlin 컴파일 확인
 - [x] client API용 `clientTest` 소스셋을 구성하고 `check`에 연결
-- [ ] `skid` 구현체 모듈에서 `skid-api` 의존성 연결
+- [x] `skid` 구현체 모듈에서 `skid-api`를 임시 `compileOnly` 의존성으로 연결
+- [ ] 기존 0.x 중복 계약 제거 후 `modImplementation`으로 전환
 - [ ] 최종 배포 JAR에 API 모듈 포함
 - [ ] API만 사용하는 모드의 권장 의존성 구성 확정
   - 컴파일: `modCompileOnly(project(":skid-api"))`

@@ -124,10 +124,10 @@ data object X : KartType<XEngine, XTachometer>(
 
 ### 2. KartRef 재설계
 
-- [ ] `KartRef`를 `Ref<Kart<*, *>>` 기반 계약으로 정의
-- [ ] saddle entity ID를 안정적인 참조 키로 유지
-- [ ] `get()` 호출 시 렌더 스레드 및 카트 유효성 검사
-- [ ] `KartRef.specify(KartType.X)` 형태로 타입이 지정된 참조 제공
+- [x] `KartRef`를 `Ref<Kart<*, *>>` 기반 계약으로 정의
+- [x] saddle entity ID를 안정적인 참조 키로 유지
+- [x] `get()` 호출 시 렌더 스레드 및 카트 유효성 검사
+- [x] `KartRef.specify(KartType.X)` 형태로 타입이 지정된 참조 제공
 - [ ] `specify()` 결과의 `access` 블록에서 `Kart<XEngine, XTachometer>` 추론 확인
 - [ ] Java 사용성을 위한 `Optional` 기반 접근 예제 및 테스트 추가
 - [ ] 기존 `handle`, `Specific`, `accessEngine` 제거 또는 마이그레이션
@@ -136,11 +136,12 @@ data object X : KartType<XEngine, XTachometer>(
 
 ### 3. API provider와 구현체 연결
 
-- [ ] API가 구현체를 찾기 위한 custom Fabric entrypoint 계약 정의
-- [ ] entrypoint 이름을 `skid-api-provider`로 확정하고 메타데이터에 등록
-- [ ] `SkidApiProvider`가 카트 조회 등 최소 기능만 제공하도록 설계
-- [ ] 구현체가 없는 경우의 동작 정의
-- [ ] provider 중복 등록 시 처리 방식 정의
+- [x] API가 구현체를 찾기 위한 custom Fabric entrypoint 계약 정의
+- [x] entrypoint 이름을 `skid-api-provider`로 확정
+- [ ] 구현체 Fabric 메타데이터에 `skid-api-provider` 등록
+- [x] `SkidApiProvider`가 카트 조회 최소 기능만 제공하도록 설계
+- [x] provider가 없으면 첫 API 접근 시 명확한 오류로 실패
+- [x] provider가 둘 이상이면 첫 API 접근 시 명확한 오류로 실패
 - [ ] `skid` 모듈에 provider 구현 추가
 - [ ] API 코드에서 구현체의 `internal` 패키지를 직접 import하지 않도록 정리
 

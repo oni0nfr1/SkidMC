@@ -59,6 +59,9 @@ dependencies {
     modImplementation("net.fabricmc:fabric-language-kotlin:${project.property("kotlin_loader_version")}")
 
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_version")}")
+
+    // Keep the new API off the runtime classpath until the duplicated 0.x contracts are removed.
+    compileOnly(project(path = ":skid-api", configuration = "namedElements"))
 }
 
 tasks.processResources {

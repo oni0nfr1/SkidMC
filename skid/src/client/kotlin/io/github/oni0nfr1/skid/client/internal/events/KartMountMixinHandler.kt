@@ -1,6 +1,7 @@
 package io.github.oni0nfr1.skid.client.internal.events
 
 import io.github.oni0nfr1.skid.client.api.events.KartMountEvents
+import io.github.oni0nfr1.skid.client.api.events.KartSummonEvents
 import io.github.oni0nfr1.skid.client.api.kart.KartSaddleEntity
 import io.github.oni0nfr1.skid.client.api.kart.MountType
 import io.github.oni0nfr1.skid.client.api.kart.mountStatus
@@ -111,7 +112,8 @@ internal object KartMountMixinHandler {
     @JvmStatic
     fun onFirstAttrUpdateAfterMount(entity: Entity) {
         if (entity !is KartSaddleEntity) return
-        if (KartManager.prepareKart(entity) == null) return
+        val kart = KartManager.prepareKart(entity) ?: return
+        KartSummonEvents.SUMMON.invoker().onSummon(kart)
 
         entity.passengers.forEach { passenger ->
             if (passenger !is Player) return@forEach

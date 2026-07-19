@@ -3,7 +3,6 @@ package io.github.oni0nfr1.skid.client.internal.events
 import io.github.oni0nfr1.skid.client.api.events.KartSummonEvents
 import io.github.oni0nfr1.skid.client.internal.kart.KartManager
 import io.github.oni0nfr1.skid.client.api.kart.KartSaddleEntity
-import io.github.oni0nfr1.skid.client.internal.kart.KartImpl
 import io.github.oni0nfr1.skid.client.internal.utils.MCClient
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
@@ -27,10 +26,7 @@ internal object KartSummonMixinHandler {
     @JvmStatic
     fun onAddEntityPacket(entity: Entity, @Suppress("UNUSED") ci: CallbackInfo) {
         if (entity !is KartSaddleEntity) return
-        val kart = KartImpl(entity)
-
-        KartManager.addKart(kart)
-        KartSummonEvents.SUMMON.invoker().onSummon(kart)
+        KartManager.trackKart(entity)
     }
 
     /**
@@ -45,9 +41,8 @@ internal object KartSummonMixinHandler {
     fun beforeRemoveEntityByPacket(entityId: Int, @Suppress("UNUSED") ci: CallbackInfo) {
         val entity = client.level?.getEntity(entityId) ?: return
         if (entity !is KartSaddleEntity) return
-        val kart = KartManager.getBySaddleId(entity.id) ?: return
-
-        KartSummonEvents.REMOVE.invoker().onRemove(kart)
-        KartManager.removeKart(kart.saddleId)
+        val kart = KartManager.getBySaddleId(entity.id)
+        if (kart != null) KartSummonEvents.REMOVE.invoker().onRemove(kart)
+        KartManager.removeKart(entity.id)
     }
 }

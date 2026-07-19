@@ -68,6 +68,7 @@ dependencies {
     add("kspClient", project(":skid-test-processor"))
 
     compileOnly(project(path = ":skid", configuration = "namedElements"))
+    implementation(project(path = ":skid-api", configuration = "namedElements"))
 }
 
 tasks.processResources {

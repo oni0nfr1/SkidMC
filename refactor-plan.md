@@ -41,8 +41,8 @@
 - [x] `skid-api`의 독립 client Kotlin 컴파일 확인
 - [x] client API용 `clientTest` 소스셋을 구성하고 `check`에 연결
 - [x] `skid` 구현체 모듈에서 `skid-api`를 임시 `compileOnly` 의존성으로 연결
-- [ ] 기존 0.x 중복 계약 제거 후 `modImplementation`으로 전환
-- [ ] 최종 배포 JAR에 API 모듈 포함
+- [x] 기존 0.x 중복 계약 제거 후 `modImplementation`으로 전환
+- [x] 최종 배포 JAR에 API 모듈 포함
 - [ ] API만 사용하는 모드의 권장 의존성 구성 확정
   - 컴파일: `modCompileOnly(project(":skid-api"))`
   - 개발 런타임: 구현체 모드 추가
@@ -141,22 +141,22 @@ data object X : KartType<XEngine, XTachometer>(
 
 - [x] API가 구현체를 찾기 위한 custom Fabric entrypoint 계약 정의
 - [x] entrypoint 이름을 `skid-api-provider`로 확정
-- [ ] 구현체 Fabric 메타데이터에 `skid-api-provider` 등록
+- [x] 구현체 Fabric 메타데이터에 `skid-api-provider` 등록
 - [x] `SkidApiProvider`가 카트 조회 최소 기능만 제공하도록 설계
 - [x] provider가 없으면 첫 API 접근 시 명확한 오류로 실패
 - [x] provider가 둘 이상이면 첫 API 접근 시 명확한 오류로 실패
-- [ ] `skid` 모듈에 provider 구현 추가
+- [x] `skid` 모듈에 provider 구현 추가
 - [ ] API 코드에서 구현체의 `internal` 패키지를 직접 import하지 않도록 정리
 
 ### 4. 구현체를 카트 중심 수명 주기로 전환
 
 - [x] 카트의 실제 엔진 어트리뷰트를 `KartType`으로 변환하는 internal resolver 추가
-- [ ] 엔진 생성 시점을 플레이어 탑승 시점에서 카트의 첫 어트리뷰트 준비 시점으로 이동
-- [ ] `KartEngine.rider`를 제거하고 `Kart.rider: Player?`로 이전
-- [ ] `KartEngine.tachometer`를 제거하고 `Kart.tachometer: T?`로 이전
-- [ ] 기존 구현 엔진이 새 API 엔진 인터페이스를 구현하도록 변경
-- [ ] 기존 카트 구현이 `Kart<E, T>`와 `KartType<E, T>` 관계를 보장하도록 변경
-- [ ] 엔진 리플렉션 생성 로직과 구현 클래스 정보는 구현체 모듈에 유지
+- [x] 엔진 생성 시점을 플레이어 탑승 시점에서 카트의 첫 어트리뷰트 준비 시점으로 이동
+- [x] `KartEngine.rider`를 제거하고 `Kart.rider: Player?`로 이전
+- [x] `KartEngine.tachometer`를 제거하고 `Kart.tachometer: T?`로 이전
+- [x] 기존 구현 엔진이 새 API 엔진 인터페이스를 구현하도록 변경
+- [x] 기존 카트 구현이 `Kart<E, T>`와 `KartType<E, T>` 관계를 보장하도록 변경
+- [x] 엔진 생성 매핑과 구현 클래스 정보는 구현체 모듈의 factory에 유지
 - [ ] `currentLap`의 새 소유 위치 결정
   - 엔진 공통 계약에서는 제거
   - 카트 메타데이터 또는 별도 레이스 상태 API 후보
@@ -230,8 +230,8 @@ data object X : KartType<XEngine, XTachometer>(
   - 중간 엔진 타입에서 대응 타코미터 타입 추론
 - [x] Java API 사용 테스트 추가
 - [ ] 엔티티 패킷 순서 조합별 mount/spectate 테스트 추가
-- [ ] 기존 `skid` 모듈의 중복 API 소스 제거
-- [ ] 배포 JAR에 `skid-api`가 정확히 한 번 포함되는지 확인
+- [x] 기존 `skid` 모듈의 중복 API 소스 제거
+- [x] 배포 JAR에 `skid-api`가 정확히 한 번 포함되는지 확인
 - [ ] 버전을 `1.0.0-beta.1`로 갱신
 - [ ] 0.x → 1.0.0 마이그레이션 문서 작성
 - [ ] refactor/fix/test 커밋을 목적별로 분리

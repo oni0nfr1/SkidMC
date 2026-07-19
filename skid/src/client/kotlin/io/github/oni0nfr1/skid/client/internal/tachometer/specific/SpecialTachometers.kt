@@ -1,7 +1,7 @@
 package io.github.oni0nfr1.skid.client.internal.tachometer.specific
 
 import io.github.oni0nfr1.skid.client.api.events.KartTachometerEvents
-import io.github.oni0nfr1.skid.client.api.engine.KartEngine
+import io.github.oni0nfr1.skid.client.api.utils.KartType
 import io.github.oni0nfr1.skid.client.api.tachometer.BoatTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.MKTachometer
 import io.github.oni0nfr1.skid.client.internal.utils.visit
@@ -15,7 +15,7 @@ import java.util.Optional
 internal class MKTachometerImpl(
     revision: Long,
     kartId: Int,
-) : KartTachometerImpl(revision, kartId, KartEngine.Type.MK), MKTachometer {
+) : KartTachometerImpl(revision, kartId, KartType.MK), MKTachometer {
 
     private val turboGaugeText = '■'
     private val emptyGaugeColor: TextColor = TextColor.fromRgb(0x959595)
@@ -61,7 +61,7 @@ internal class MKTachometerImpl(
 internal class BoatTachometerImpl(
     revision: Long,
     kartId: Int,
-) : KartTachometerImpl(revision, kartId, KartEngine.Type.BOAT), BoatTachometer {
+) : KartTachometerImpl(revision, kartId, KartType.BOAT), BoatTachometer {
     override fun update(actionBar: Component): TachometerUpdateResult {
         commit(actionBar)
         return TachometerUpdateResult.matched(KartTachometerEvents.Result.SHOW)

@@ -6,12 +6,15 @@ import io.github.oni0nfr1.skid.client.api.tachometer.GearlikeTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.MKTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.NitroTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.RushPlusTachometer
-import io.github.oni0nfr1.skid.client.api.tachometer.tachometer
+import io.github.oni0nfr1.skid.client.api.kart.ridingKart
+import io.github.oni0nfr1.skid.client.api.kart.subject
+import io.github.oni0nfr1.skid.client.api.utils.access
 import io.github.oni0nfr1.skidTest.annotations.SkidTest
 import io.github.oni0nfr1.skidTest.client.TestUnit
 import io.github.oni0nfr1.skidTest.client.utils.renderDebugPanel
 import net.minecraft.client.DeltaTracker
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.world.entity.player.Player
 
 @SkidTest
 object TachometerTest: TestUnit() {
@@ -34,17 +37,22 @@ object TachometerTest: TestUnit() {
         if (!status.testing) return
         var engineData = "[SKIDMC DEBUG PANEL]\n"
 
-        val tachometer = client.tachometer
-        engineData += tachometer?.access {
-            engineData += "engine-code: ${type.engineCode}\n"
-            engineData += "engine-name: ${type.engineName}\n"
-            engineData += "isDummy: ${type.isDummy}\n"
-
-            when (this) {
-                is NitroTachometer -> nitroEngineInfo(this)
-                is GearlikeTachometer -> gearlikeEngineInfo(this)
-                is MKTachometer -> marioEngineInfo(this)
-                is BoatTachometer -> boatEngineInfo(this)
+        val kart = (client.player?.subject as? Player)?.ridingKart
+        engineData += kart?.access {
+            val currentTachometer = tachometer ?: return@access "tachometer: null\n"
+            buildString {
+                appendLine("engine-code: ${type.engineCode}")
+                appendLine("engine-name: ${type.engineName}")
+                appendLine("engine-kind: ${type.engineKind}")
+                append(
+                    when (currentTachometer) {
+                        is NitroTachometer -> nitroEngineInfo(currentTachometer)
+                        is GearlikeTachometer -> gearlikeEngineInfo(currentTachometer)
+                        is MKTachometer -> marioEngineInfo(currentTachometer)
+                        is BoatTachometer -> boatEngineInfo(currentTachometer)
+                        else -> "unknown tachometer\n"
+                    }
+                )
             }
         } ?: "tachometer: null\n"
 

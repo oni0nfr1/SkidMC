@@ -32,10 +32,7 @@ object KartTachometerMixinHandler {
             TachometerManager.clear()
             return
         }
-        val engine = kart.engine ?: run {
-            TachometerManager.clear()
-            return
-        }
+        val engine = kart.engine
 
         val result = TachometerManager.handleActionbar(kart, engine, text)
         if (result == KartTachometerEvents.Result.BLOCK) ci.cancel()

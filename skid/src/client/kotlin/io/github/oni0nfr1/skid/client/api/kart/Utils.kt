@@ -2,7 +2,8 @@
 
 package io.github.oni0nfr1.skid.client.api.kart
 
-import io.github.oni0nfr1.skid.client.api.engine.KartEngine
+import io.github.oni0nfr1.skid.client.api.utils.KartType
+import io.github.oni0nfr1.skid.client.api.utils.access
 import io.github.oni0nfr1.skid.client.internal.kart.KartManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
@@ -51,7 +52,7 @@ val LocalPlayer.mountStatus: MountType
  * @return 유효한 카트 참조, SkidMC가 추적 중인 카트가 아니면 `null`
  */
 val KartSaddleEntity.kart: KartRef?
-    get() = KartRef(KartManager.getBySaddleId(this.id) ?: return null)
+    get() = KartManager.getBySaddleId(this.id)?.let { KartRef(this.id) }
 
 /**
  * 이 플레이어가 탑승 중인 카트 참조를 반환합니다.
@@ -59,12 +60,12 @@ val KartSaddleEntity.kart: KartRef?
  * @return 유효한 카트 참조, 카트에 탑승하지 않았으면 `null`
  */
 val Player.ridingKart: KartRef?
-    get() = KartRef(KartManager.getByRiderId(this.id) ?: return null)
+    get() = KartManager.getByRiderId(this.id)?.let { KartRef(it.saddleId) }
 
 /**
  * 현재 로컬 플레이어 또는 관전 대상이 탑승한 카트의 엔진 타입을 반환합니다.
  *
  * @return 현재 엔진 타입, 대상이나 카트 또는 엔진을 확인할 수 없으면 `null`
  */
-val Minecraft.kartEngineType: KartEngine.Type?
-    get() = (this.player?.subject as? Player)?.ridingKart?.access { engine?.type }
+val Minecraft.kartEngineType: KartType<*, *>?
+    get() = (this.player?.subject as? Player)?.ridingKart?.access { type }

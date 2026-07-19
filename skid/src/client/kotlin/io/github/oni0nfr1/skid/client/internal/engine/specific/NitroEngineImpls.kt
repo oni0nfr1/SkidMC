@@ -4,94 +4,48 @@ import io.github.oni0nfr1.skid.client.api.engine.*
 import io.github.oni0nfr1.skid.client.api.kart.Kart
 import io.github.oni0nfr1.skid.client.api.tachometer.*
 import io.github.oni0nfr1.skid.client.internal.engine.KartEngineImpl
-import net.minecraft.world.entity.player.Player
 
-internal class XEngineImpl(kart: Kart, rider: Player) : KartEngineImpl(kart, rider), XEngine {
-    override val type = KartEngine.Type.X
-    override val tachometer: XTachometer?
-        get() = super.tachometer as? XTachometer
-}
+internal class XEngineImpl(kart: Kart<XEngine, XTachometer>) :
+    KartEngineImpl<XEngine, XTachometer>(kart), XEngine
 
-internal class EXEngineImpl(kart: Kart, rider: Player) : KartEngineImpl(kart, rider), EXEngine {
-    override val type = KartEngine.Type.EX
-    override val tachometer: EXTachometer?
-        get() = super.tachometer as? EXTachometer
-}
+internal class EXEngineImpl(kart: Kart<EXEngine, EXTachometer>) :
+    KartEngineImpl<EXEngine, EXTachometer>(kart), EXEngine
 
-internal class JiuEngineImpl(kart: Kart, rider: Player) : KartEngineImpl(kart, rider), JiuEngine {
-    override val type = KartEngine.Type.JIU
-    override val tachometer: JiuTachometer?
-        get() = super.tachometer as? JiuTachometer
-}
+internal class JiuEngineImpl(kart: Kart<JiuEngine, JiuTachometer>) :
+    KartEngineImpl<JiuEngine, JiuTachometer>(kart), JiuEngine
 
-internal class NewEngineImpl(kart: Kart, rider: Player) : KartEngineImpl(kart, rider), NewEngine {
-    override val type = KartEngine.Type.NEW
-    override val tachometer: NewTachometer?
-        get() = super.tachometer as? NewTachometer
-}
+internal class NewEngineImpl(kart: Kart<NewEngine, NewTachometer>) :
+    KartEngineImpl<NewEngine, NewTachometer>(kart), NewEngine
 
-internal class Z7EngineImpl(kart: Kart, rider: Player) : KartEngineImpl(kart, rider), Z7Engine {
-    override val type = KartEngine.Type.Z7
-    override val tachometer: Z7Tachometer?
-        get() = super.tachometer as? Z7Tachometer
-}
+internal class Z7EngineImpl(kart: Kart<Z7Engine, Z7Tachometer>) :
+    KartEngineImpl<Z7Engine, Z7Tachometer>(kart), Z7Engine
 
-internal class V1EngineImpl(kart: Kart, rider: Player) : KartEngineImpl(kart, rider), V1Engine {
-    override val type = KartEngine.Type.V1
-    override val tachometer: V1Tachometer?
-        get() = super.tachometer as? V1Tachometer
-}
+internal class V1EngineImpl(kart: Kart<V1Engine, V1Tachometer>) :
+    KartEngineImpl<V1Engine, V1Tachometer>(kart), V1Engine
 
-internal class A2EngineImpl(kart: Kart, rider: Player) : KartEngineImpl(kart, rider), A2Engine {
-    override val type = KartEngine.Type.A2
-    override val tachometer: A2Tachometer?
-        get() = super.tachometer as? A2Tachometer
-}
+internal class A2EngineImpl(kart: Kart<A2Engine, A2Tachometer>) :
+    KartEngineImpl<A2Engine, A2Tachometer>(kart), A2Engine
 
-internal class LegacyEngineImpl(kart: Kart, rider: Player) : KartEngineImpl(kart, rider), LegacyEngine {
-    override val type = KartEngine.Type.LEGACY
-    override val tachometer: LegacyTachometer?
-        get() = super.tachometer as? LegacyTachometer
-}
+internal class LegacyEngineImpl(kart: Kart<LegacyEngine, LegacyTachometer>) :
+    KartEngineImpl<LegacyEngine, LegacyTachometer>(kart), LegacyEngine
 
-internal class ProEngineImpl(kart: Kart, rider: Player) : KartEngineImpl(kart, rider), ProEngine {
-    override val type = KartEngine.Type.PRO
-    override val tachometer: ProTachometer?
-        get() = super.tachometer as? ProTachometer
-}
+internal class ProEngineImpl(kart: Kart<ProEngine, ProTachometer>) :
+    KartEngineImpl<ProEngine, ProTachometer>(kart), ProEngine
 
-internal class RushPlusEngineImpl(kart: Kart, rider: Player) : KartEngineImpl(kart, rider), RushPlusEngine {
-    override val type = KartEngine.Type.RUSHPLUS
-    override val tachometer: RushPlusTachometer?
-        get() = super.tachometer as? RushPlusTachometer
-}
+internal class RushPlusEngineImpl(kart: Kart<RushPlusEngine, RushPlusTachometer>) :
+    KartEngineImpl<RushPlusEngine, RushPlusTachometer>(kart), RushPlusEngine
 
-internal class ChargeEngineImpl(kart: Kart, rider: Player) : KartEngineImpl(kart, rider), ChargeEngine {
-    override val type = KartEngine.Type.CHARGE
-    override val tachometer: ChargeTachometer?
-        get() = super.tachometer as? ChargeTachometer
-}
+internal class ChargeEngineImpl(kart: Kart<ChargeEngine, ChargeTachometer>) :
+    KartEngineImpl<ChargeEngine, ChargeTachometer>(kart), ChargeEngine
 
-internal class SREngineImpl(kart: Kart, rider: Player) : KartEngineImpl(kart, rider), SREngine {
-    override val type = KartEngine.Type.SR
-    override val tachometer: SRTachometer?
-        get() = super.tachometer as? SRTachometer
-}
+internal class SREngineImpl(kart: Kart<SREngine, SRTachometer>) :
+    KartEngineImpl<SREngine, SRTachometer>(kart), SREngine
 
-internal class N1EngineImpl(kart: Kart, rider: Player) : KartEngineImpl(kart, rider), N1Engine {
-    override val type = KartEngine.Type.N1
-    override val tachometer: N1Tachometer?
-        get() = super.tachometer as? N1Tachometer
-}
+internal class N1EngineImpl(kart: Kart<N1Engine, N1Tachometer>) :
+    KartEngineImpl<N1Engine, N1Tachometer>(kart), N1Engine
 
-internal class RXEngineImpl(kart: Kart, rider: Player) : KartEngineImpl(kart, rider), RXEngine {
-    override val type = KartEngine.Type.RX
-    override val tachometer: RXTachometer?
-        get() = super.tachometer as? RXTachometer
-}
+internal class RXEngineImpl(kart: Kart<RXEngine, RXTachometer>) :
+    KartEngineImpl<RXEngine, RXTachometer>(kart), RXEngine
 
-internal class KeyEngineImpl(kart: Kart, rider: Player) : KartEngineImpl(kart, rider), KeyEngine {
-    override val type = KartEngine.Type.KEY
-    override val tachometer: KeyTachometer?
-        get() = super.tachometer as? KeyTachometer
-}
+internal class KeyEngineImpl(kart: Kart<KeyEngine, KeyTachometer>) :
+    KartEngineImpl<KeyEngine, KeyTachometer>(kart), KeyEngine

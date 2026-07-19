@@ -171,7 +171,7 @@ object KartTachometerEvents {
          * @param text 수신한 원본 액션바 컴포넌트
          * @return 액션바 표시 여부
          */
-        fun onActionbarReceive(kart: Kart, engine: KartEngine, text: Component): Result
+        fun onActionbarReceive(kart: Kart<*, *>, engine: KartEngine, text: Component): Result
     }
 
     /** 파싱된 속도 값을 처리합니다. */

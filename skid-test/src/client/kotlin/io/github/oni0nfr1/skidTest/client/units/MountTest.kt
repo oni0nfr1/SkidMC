@@ -3,6 +3,7 @@ package io.github.oni0nfr1.skidTest.client.units
 import io.github.oni0nfr1.skid.client.api.events.KartMountEvents
 import io.github.oni0nfr1.skid.client.api.kart.KartSaddleEntity
 import io.github.oni0nfr1.skid.client.api.kart.kart
+import io.github.oni0nfr1.skid.client.api.utils.access
 import io.github.oni0nfr1.skidTest.annotations.SkidTest
 import io.github.oni0nfr1.skidTest.client.TestUnit
 import io.github.oni0nfr1.skidTest.client.utils.sendChat
@@ -33,7 +34,7 @@ object MountTest: TestUnit() {
             autoFail()
             return null
         }
-        val engineType = kart.access { engine?.type } ?: run {
+        val engineType = kart.access { type } ?: run {
             client.sendChat("[$event] engine is missing for kart#${kartEntity.id}!")
             autoFail()
             return null

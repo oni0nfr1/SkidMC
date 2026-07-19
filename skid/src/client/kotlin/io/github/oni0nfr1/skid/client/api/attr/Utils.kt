@@ -1,10 +1,11 @@
 @file:JvmName("RiderAttrUtils")
 package io.github.oni0nfr1.skid.client.api.attr
 
-import io.github.oni0nfr1.skid.client.api.engine.KartEngine
 import io.github.oni0nfr1.skid.client.api.events.KartAttrEvents
 import io.github.oni0nfr1.skid.client.api.kart.KartSaddleEntity
 import io.github.oni0nfr1.skid.client.api.kart.ridingKart
+import io.github.oni0nfr1.skid.client.api.utils.KartType
+import io.github.oni0nfr1.skid.client.api.utils.access
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.resources.ResourceLocation
@@ -63,10 +64,10 @@ fun Player.getRiderMeta(key: ResourceLocation): Double? {
  *
  * @return 실제 엔진 종류, 값이 없거나 알려지지 않은 코드이면 `null`
  */
-val KartSaddleEntity.realKartEngine: KartEngine.Type?
+val KartSaddleEntity.realKartEngine: KartType<*, *>?
     get() {
         val modifier = getKartMeta(KnownAttrModId.ID_ENGINE_REAL) ?: return null
-        return KartEngine.Type.getByRawModifier(modifier)
+        return KartType.fromAttrEngineCode(modifier.toInt())
     }
 
 /**
@@ -74,10 +75,10 @@ val KartSaddleEntity.realKartEngine: KartEngine.Type?
  *
  * @return 설정된 엔진 종류, 값이 없거나 알려지지 않은 코드이면 `null`
  */
-val KartSaddleEntity.selectedKartEngine: KartEngine.Type?
+val KartSaddleEntity.selectedKartEngine: KartType<*, *>?
     get() {
         val modifier = getKartMeta(KnownAttrModId.ID_ENGINE) ?: return null
-        return KartEngine.Type.getByRawModifier(modifier)
+        return KartType.fromAttrEngineCode(modifier.toInt())
     }
 
 /**
@@ -85,7 +86,7 @@ val KartSaddleEntity.selectedKartEngine: KartEngine.Type?
  *
  * @return 실제 엔진 종류, 값이 없거나 알려지지 않은 코드이면 `null`
  */
-val Player.realKartEngine: KartEngine.Type?
+val Player.realKartEngine: KartType<*, *>?
     get() = ridingKart?.access { saddle.realKartEngine }
 
 /**
@@ -93,7 +94,7 @@ val Player.realKartEngine: KartEngine.Type?
  *
  * @return 선택한 엔진 종류, 값이 없거나 알려지지 않은 코드이면 `null`
  */
-val Player.selectedKartEngine: KartEngine.Type?
+val Player.selectedKartEngine: KartType<*, *>?
     get() = ridingKart?.access { saddle.selectedKartEngine }
 
 /**

@@ -7,6 +7,7 @@ import io.github.oni0nfr1.skid.client.api.engine.NitroEngine
 import io.github.oni0nfr1.skid.client.api.events.KartMountEvents
 import io.github.oni0nfr1.skid.client.api.kart.KartSaddleEntity
 import io.github.oni0nfr1.skid.client.api.kart.kart
+import io.github.oni0nfr1.skid.client.api.utils.access
 import io.github.oni0nfr1.skidTest.annotations.SkidTest
 import io.github.oni0nfr1.skidTest.client.TestUnit
 import io.github.oni0nfr1.skidTest.client.utils.sendChat
@@ -29,16 +30,15 @@ object EngineTypeTest: TestUnit() {
 
     fun showKartEngineCategory(kartEntity: KartSaddleEntity) {
         kartEntity.kart?.access {
-            val engineNotNull = engine ?: return
-
-            val engineCategoryName = when (engineNotNull) {
+            val engineCategoryName = when (engine) {
                 is NitroEngine -> "kartrider-like"
                 is GearlikeEngine -> "gear-like"
                 is MKEngine -> "mariokart"
                 is BoatEngine -> "boat"
+                else -> "unknown"
             }
 
-            client.sendChat("detected engine: ${engineNotNull.type.engineName}")
+            client.sendChat("detected engine: ${type.engineName}")
             client.sendChat("detected engine category: $engineCategoryName")
         }
     }

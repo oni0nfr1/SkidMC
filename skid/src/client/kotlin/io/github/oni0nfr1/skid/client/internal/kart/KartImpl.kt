@@ -1,29 +1,38 @@
 package io.github.oni0nfr1.skid.client.internal.kart
 
-import io.github.oni0nfr1.skid.client.api.attr.realKartEngine
-import io.github.oni0nfr1.skid.client.api.kart.KartSaddleEntity
 import io.github.oni0nfr1.skid.client.api.engine.KartEngine
 import io.github.oni0nfr1.skid.client.api.kart.Kart
-import io.github.oni0nfr1.skid.client.api.kart.KartMainEntity
+import io.github.oni0nfr1.skid.client.api.kart.KartMain
 import io.github.oni0nfr1.skid.client.api.kart.KartModelRoot
+import io.github.oni0nfr1.skid.client.api.kart.KartSaddle
 import io.github.oni0nfr1.skid.client.api.kart.StaleKartException
+import io.github.oni0nfr1.skid.client.api.tachometer.KartTachometer
+import io.github.oni0nfr1.skid.client.api.utils.KartType
+import io.github.oni0nfr1.skid.client.internal.tachometer.TachometerManager
 import net.minecraft.client.Minecraft
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.phys.Vec3
 
-internal class KartImpl(saddle: KartSaddleEntity) : Kart {
+internal class KartImpl<ENGINE, TACHOMETER>(
+    saddle: KartSaddle,
+    override val type: KartType<ENGINE, TACHOMETER>,
+) : Kart<ENGINE, TACHOMETER>
+    where
+        ENGINE : KartEngine,
+        TACHOMETER : KartTachometer
+{
 
     override var alive = true
 
-    override val saddleId: Int = saddle.id
-    internal val internalSaddleOrNull: KartSaddleEntity?
+    val saddleId: Int = saddle.id
+    internal val internalSaddleOrNull: KartSaddle?
         get() =
             if (!alive) null
-            else Minecraft.getInstance().level?.getEntity(saddleId) as? KartSaddleEntity
-    internal val internalEntityOrNull: KartMainEntity?
+            else Minecraft.getInstance().level?.getEntity(saddleId) as? KartSaddle
+    internal val internalEntityOrNull: KartMain?
         get() =
             if (!alive) null
-            else internalSaddleOrNull?.vehicle as? KartMainEntity
+            else internalSaddleOrNull?.vehicle as? KartMain
     internal val internalModelOrNull: KartModelRoot?
         get() {
             if (!alive) return null
@@ -32,9 +41,9 @@ internal class KartImpl(saddle: KartSaddleEntity) : Kart {
             } as KartModelRoot?
         }
 
-    override val saddle: KartSaddleEntity
+    override val saddle: KartSaddle
         get() = internalSaddleOrNull ?: throw StaleKartException()
-    override val entity: KartMainEntity
+    override val entity: KartMain
         get() = internalEntityOrNull ?: throw StaleKartException()
     override val model: KartModelRoot
         get() = internalModelOrNull ?: throw StaleKartException()
@@ -43,28 +52,38 @@ internal class KartImpl(saddle: KartSaddleEntity) : Kart {
     override val position: Vec3
         get() = internalEntityOrNull?.position() ?: throw StaleKartException()
 
-    override var currentPosition: Vec3 = saddle.position()
+    internal var currentPosition: Vec3 = saddle.position()
         get() = if (alive) field else throw StaleKartException()
         private set
-    override var prevPosition: Vec3 = saddle.position()
+    internal var prevPosition: Vec3 = saddle.position()
         get() = if (alive) field else throw StaleKartException()
         private set
     override var velocity: Vec3 = Vec3.ZERO
         get() = if (alive) field else throw StaleKartException()
         private set
 
-    override var engine: KartEngine? = null
-        get() = if (alive) field else throw StaleKartException()
+    private lateinit var internalEngine: ENGINE
+    override val engine: ENGINE
+        get() = if (alive && ::internalEngine.isInitialized) internalEngine else throw StaleKartException()
+
+    override var rider: Player? = null
         private set
 
-    fun mountPlayer(player: Player) {
-        val engineType = saddle.realKartEngine
-        engine = engineType?.let { KartEngine.withType(it, this, player) }
+    override val tachometer: TACHOMETER?
+        get() {
+            if (!alive) throw StaleKartException()
+            @Suppress("UNCHECKED_CAST")
+            return TachometerManager.getForKart(saddleId, type) as? TACHOMETER
+        }
+
+    fun initializeEngine(engine: ENGINE) {
+        check(!::internalEngine.isInitialized) { "kart engine is already initialized" }
+        internalEngine = engine
     }
 
-    fun dismountPlayer() {
-        engine = null
-    }
+    fun mountPlayer(player: Player) { rider = player }
+
+    fun dismountPlayer() { rider = null }
 
     // 틱 종료시 호출
     fun tick() {

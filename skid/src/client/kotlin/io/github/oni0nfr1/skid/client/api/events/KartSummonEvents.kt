@@ -35,12 +35,12 @@ object KartSummonEvents {
     /** 카트 생성 이벤트를 처리합니다. */
     fun interface KartSummonCallback {
         /** @param kart 생성되어 추적이 시작된 카트 */
-        fun onSummon(kart: Kart)
+        fun onSummon(kart: Kart<*, *>)
     }
 
     /** 카트 제거 이벤트를 처리합니다. */
     fun interface KartRemoveCallback {
         /** @param kart 제거 직전의 유효한 카트 */
-        fun onRemove(kart: Kart)
+        fun onRemove(kart: Kart<*, *>)
     }
 }

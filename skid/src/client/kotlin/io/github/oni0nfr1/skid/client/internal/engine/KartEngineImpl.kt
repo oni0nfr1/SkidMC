@@ -2,34 +2,28 @@ package io.github.oni0nfr1.skid.client.internal.engine
 
 import io.github.oni0nfr1.skid.client.api.attr.KnownAttrModId
 import io.github.oni0nfr1.skid.client.api.attr.getKartMeta
+import io.github.oni0nfr1.skid.client.api.engine.KartEngine
 import io.github.oni0nfr1.skid.client.api.kart.Kart
-import io.github.oni0nfr1.skid.client.api.kart.subject
 import io.github.oni0nfr1.skid.client.api.tachometer.KartTachometer
 import io.github.oni0nfr1.skid.client.internal.kart.KartImpl
-import io.github.oni0nfr1.skid.client.internal.tachometer.TachometerManager
-import net.minecraft.client.Minecraft
 import net.minecraft.world.entity.Display
-import net.minecraft.world.entity.player.Player
 
-internal abstract class KartEngineImpl(
-    val kart: Kart,
-    val rider: Player,
-) {
-    // implementation of KartEngine
+internal abstract class KartEngineImpl<ENGINE, TACHOMETER>(
+    override val kart: Kart<ENGINE, TACHOMETER>,
+) : KartEngine
+    where
+        ENGINE : KartEngine,
+        TACHOMETER : KartTachometer
+{
     val currentLap: Int
         get() = kart.saddle.getKartMeta(KnownAttrModId.CTX_CURRENT_LAP)?.toInt() ?: 0
-    open val tachometer: KartTachometer?
-        get() {
-            val client = Minecraft.getInstance()
-            return if (rider == client.player?.subject) TachometerManager.currentTachometerOrNull else null
-        }
 
     // implementation of RegularEngine
     val isDrifting: Boolean
         get() = kart.saddle.getKartMeta(KnownAttrModId.STATE_DRIFTING) == 1.0
     val accurateDriftState: Boolean
         get() {
-            val internalKart = kart as? KartImpl ?: return false
+            val internalKart = kart as? KartImpl<*, *> ?: return false
             return internalKart.internalModelOrNull?.passengers?.flatMap { it.passengers }?.any {
                 it.customName?.string == "mcrider-drift-effect" && it is Display && it.viewRange > 0
             } ?: false

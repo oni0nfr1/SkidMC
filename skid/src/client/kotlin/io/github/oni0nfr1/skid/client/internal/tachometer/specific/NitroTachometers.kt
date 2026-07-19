@@ -5,29 +5,29 @@ import net.minecraft.util.CommonColors.YELLOW
 import io.github.oni0nfr1.skid.client.api.tachometer.*
 import io.github.oni0nfr1.skid.client.internal.tachometer.NitroTachometerImpl
 import io.github.oni0nfr1.skid.client.internal.tachometer.TachometerUpdateResult
-import io.github.oni0nfr1.skid.client.api.engine.KartEngine
+import io.github.oni0nfr1.skid.client.api.utils.KartType
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import java.util.Optional
 
 internal class XTachometerImpl(revision: Long, kartId: Int) :
-    NitroTachometerImpl(revision, kartId, KartEngine.Type.X), XTachometer
+    NitroTachometerImpl(revision, kartId, KartType.X), XTachometer
 
 internal class EXTachometerImpl(revision: Long, kartId: Int) :
-    NitroTachometerImpl(revision, kartId, KartEngine.Type.EX), EXTachometer
+    NitroTachometerImpl(revision, kartId, KartType.EX), EXTachometer
 
 internal class JiuTachometerImpl(revision: Long, kartId: Int) :
-    NitroTachometerImpl(revision, kartId, KartEngine.Type.JIU), JiuTachometer
+    NitroTachometerImpl(revision, kartId, KartType.JIU), JiuTachometer
 
 internal class NewTachometerImpl(revision: Long, kartId: Int) :
-    NitroTachometerImpl(revision, kartId, KartEngine.Type.NEW), NewTachometer
+    NitroTachometerImpl(revision, kartId, KartType.NEW), NewTachometer
 
 internal class Z7TachometerImpl(revision: Long, kartId: Int) :
-    NitroTachometerImpl(revision, kartId, KartEngine.Type.Z7), Z7Tachometer
+    NitroTachometerImpl(revision, kartId, KartType.Z7), Z7Tachometer
 
 internal class V1TachometerImpl(revision: Long, kartId: Int) :
-    NitroTachometerImpl(revision, kartId, KartEngine.Type.V1), V1Tachometer {
+    NitroTachometerImpl(revision, kartId, KartType.V1), V1Tachometer {
 
     override var exceedGauge: Float = 0f
 
@@ -39,10 +39,10 @@ internal class V1TachometerImpl(revision: Long, kartId: Int) :
 }
 
 internal class A2TachometerImpl(revision: Long, kartId: Int) :
-    NitroTachometerImpl(revision, kartId, KartEngine.Type.A2), A2Tachometer
+    NitroTachometerImpl(revision, kartId, KartType.A2), A2Tachometer
 
 internal class LegacyTachometerImpl(revision: Long, kartId: Int) :
-    NitroTachometerImpl(revision, kartId, KartEngine.Type.LEGACY), LegacyTachometer {
+    NitroTachometerImpl(revision, kartId, KartType.LEGACY), LegacyTachometer {
     override val gaugeText: Char = '-'
 
     override fun parseNitro(actionBar: Component): Int? {
@@ -83,10 +83,10 @@ internal class LegacyTachometerImpl(revision: Long, kartId: Int) :
 }
 
 internal class ProTachometerImpl(revision: Long, kartId: Int) :
-    NitroTachometerImpl(revision, kartId, KartEngine.Type.PRO), ProTachometer
+    NitroTachometerImpl(revision, kartId, KartType.PRO), ProTachometer
 
 internal class ChargeTachometerImpl(revision: Long, kartId: Int) :
-    NitroTachometerImpl(revision, kartId, KartEngine.Type.CHARGE), ChargeTachometer {
+    NitroTachometerImpl(revision, kartId, KartType.CHARGE), ChargeTachometer {
 
     override var chargerGauge: Float = 0f
 
@@ -98,15 +98,15 @@ internal class ChargeTachometerImpl(revision: Long, kartId: Int) :
 }
 
 internal class N1TachometerImpl(revision: Long, kartId: Int) :
-    NitroTachometerImpl(revision, kartId, KartEngine.Type.N1), N1Tachometer
+    NitroTachometerImpl(revision, kartId, KartType.N1), N1Tachometer
 
 internal class KeyTachometerImpl(revision: Long, kartId: Int) :
-    NitroTachometerImpl(revision, kartId, KartEngine.Type.KEY), KeyTachometer
+    NitroTachometerImpl(revision, kartId, KartType.KEY), KeyTachometer
 
 internal class RushPlusTachometerImpl(
     revision: Long,
     kartId: Int,
-) : NitroTachometerImpl(revision, kartId, KartEngine.Type.RUSHPLUS), RushPlusTachometer {
+) : NitroTachometerImpl(revision, kartId, KartType.RUSHPLUS), RushPlusTachometer {
 
     private val fusionNitroPattern = Regex("""FUSION x(0|[1-9]\d*)""")
     private val fusionLabelPattern = Regex("""\bFUSION\b""")
@@ -141,7 +141,7 @@ internal class RushPlusTachometerImpl(
 }
 
 internal class SRTachometerImpl(revision: Long, kartId: Int) :
-    NitroTachometerImpl(revision, kartId, KartEngine.Type.SR), SRTachometer
+    NitroTachometerImpl(revision, kartId, KartType.SR), SRTachometer
 
 internal class RXTachometerImpl(revision: Long, kartId: Int) :
-    NitroTachometerImpl(revision, kartId, KartEngine.Type.RX), RXTachometer
+    NitroTachometerImpl(revision, kartId, KartType.RX), RXTachometer

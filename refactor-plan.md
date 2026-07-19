@@ -67,6 +67,7 @@
   - rider와 tachometer는 엔진에서 제거
 - [x] `KartTachometer`에 `text`, `rawString` 계약 이동
 - [x] `KartType<out ENGINE, out TACHOMETER>` 타입 토큰 정의
+- [x] 각 엔진의 구체적인 `Kart<E, T>` 조합을 `XEngineKart` 형태의 타입 별칭으로 제공
 - [x] `KartType`에 엔진 메타데이터 추가
   - `engineCode`
   - `attrEngineCode`

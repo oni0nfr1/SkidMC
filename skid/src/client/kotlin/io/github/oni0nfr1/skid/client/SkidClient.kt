@@ -1,5 +1,6 @@
 package io.github.oni0nfr1.skid.client
 
+import io.github.oni0nfr1.skid.client.internal.events.KartMountMixinHandler
 import io.github.oni0nfr1.skid.client.internal.kart.KartManager
 import io.github.oni0nfr1.skid.client.internal.tachometer.TachometerManager
 import net.fabricmc.api.ClientModInitializer
@@ -16,6 +17,7 @@ class SkidClient : ClientModInitializer {
     /** 카트와 타코미터 추적기를 초기화합니다. */
     override fun onInitializeClient() {
         KartManager.init()
+        KartMountMixinHandler.init()
         TachometerManager.init()
     }
 }

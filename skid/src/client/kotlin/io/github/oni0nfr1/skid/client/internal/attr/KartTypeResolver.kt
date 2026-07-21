@@ -21,7 +21,8 @@ internal object KartTypeResolver {
 
         if (type == null) {
             SkidClient.LOGGER.warn(
-                "unknown kart attribute engine code: {} (raw: {})",
+                "Unknown kart engine attribute code: saddleId={}, attrEngineCode={}, rawValue={}",
+                saddle.id,
                 attrEngineCode,
                 rawCode,
             )

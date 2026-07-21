@@ -19,7 +19,7 @@ internal abstract class KartEngineImpl<ENGINE, TACHOMETER>(
     override val tachometer: TACHOMETER?
         get() {
             @Suppress("UNCHECKED_CAST")
-            return TachometerManager.getForKart(kart.saddle.id, kart.type) as? TACHOMETER
+            return TachometerManager.getForEngine(this) as? TACHOMETER
         }
 
     val currentLap: Int

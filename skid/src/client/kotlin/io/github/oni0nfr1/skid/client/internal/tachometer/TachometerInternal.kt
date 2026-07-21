@@ -1,8 +1,8 @@
 package io.github.oni0nfr1.skid.client.internal.tachometer
 
+import io.github.oni0nfr1.skid.client.api.engine.KartEngine
 import io.github.oni0nfr1.skid.client.api.events.KartTachometerEvents
 import io.github.oni0nfr1.skid.client.api.tachometer.KartTachometer
-import io.github.oni0nfr1.skid.client.api.utils.KartType
 import net.minecraft.network.chat.Component
 
 internal data class TachometerUpdateResult(
@@ -16,9 +16,7 @@ internal data class TachometerUpdateResult(
 }
 
 internal interface TachometerInternal : KartTachometer {
-    val revision: Long
-    val kartId: Int
-    val type: KartType<*>
+    val engine: KartEngine
 
     fun update(actionBar: Component): TachometerUpdateResult
     fun update(additionalMatched: Boolean, actionBar: Component): TachometerUpdateResult

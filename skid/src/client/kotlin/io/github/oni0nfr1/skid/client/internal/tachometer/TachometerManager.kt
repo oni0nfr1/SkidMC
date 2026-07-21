@@ -14,41 +14,54 @@ import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.player.Player
 
 internal object TachometerManager {
-    private var _currentTachometer : KartTachometer? = null
-    private var nextRevision = 1L
+
+    /**
+     * 마지막으로 현재 탑승·관전 대상에서 정상 파싱된 타코미터입니다.
+     *
+     * INVARIANT:
+     * - 저장된 타코미터는 생성 당시의 정확한 KartEngine 인스턴스를 참조한다.
+     *
+     * THREADING:
+     * - 렌더 스레드에서만 접근하고 변경한다.
+     */
+    private var currentTachometer: TachometerInternal? = null
 
     fun init() {
-        _currentTachometer = null
+        currentTachometer = null
         ClientTickEvents.END_CLIENT_TICK.register {
             clearIfInvalid()
-            val current = _currentTachometer as? TachometerInternal
-            current?.tick()
+            currentTachometer?.tick()
         }
     }
 
-    val currentTachometerOrNull: KartTachometer?
-        get() = _currentTachometer
-
     fun clear() {
-        _currentTachometer = null
+        currentTachometer = null
     }
 
+    /**
+     * REQUIRES:
+     * - [kart]는 alive이며 [engine]을 현재 엔진으로 소유하고, [engine]도 [kart]를 참조한다.
+     */
     fun handleActionbar(
         kart: Kart<*>,
         engine: KartEngine,
         actionBar: Component,
     ): KartTachometerEvents.Result {
-        val current = _currentTachometer as? TachometerInternal
+        check(kart.alive && kart.engine === engine && engine.kart === kart) {
+            "Cannot update a tachometer with a stale or mismatched kart engine"
+        }
+
+        val current = currentTachometer
         val match: TachometerUpdateResult
 
         if (current != null && current.matches(kart, engine)) {
-            match =  current.update(actionBar)
+            match = current.update(actionBar)
         } else {
             clear()
 
-            val tachometer = createTachometer(kart)
-            match = (tachometer as TachometerInternal).update(actionBar)
-            if (match.matched) _currentTachometer = tachometer
+            val tachometer = createTachometer(engine)
+            match = tachometer.update(actionBar)
+            if (match.matched) currentTachometer = tachometer
         }
 
         var receiveResult = KartTachometerEvents.Result.SHOW
@@ -58,12 +71,8 @@ internal object TachometerManager {
     }
 
     private fun clearIfInvalid() {
-        val current = _currentTachometer as? TachometerInternal ?: return
-        val subject = Minecraft.getInstance().player?.subject as? Player ?: run {
-            clear()
-            return
-        }
-        val kart = KartManager.getByRiderId(subject.id) ?: run {
+        val current = currentTachometer ?: return
+        val kart = currentSubjectKart() ?: run {
             clear()
             return
         }
@@ -75,39 +84,47 @@ internal object TachometerManager {
     }
 
     private fun TachometerInternal.matches(kart: Kart<*>, engine: KartEngine): Boolean {
-        return kart.saddle.id == kartId && kart.type === type && kart.engine === engine
+        return kart.alive && this.engine === engine && engine.kart === kart && kart.engine === engine
     }
 
-    fun getForKart(kartId: Int, type: KartType<*>): KartTachometer? {
-        val current = _currentTachometer as? TachometerInternal ?: return null
-        return current.takeIf { it.kartId == kartId && it.type === type }
+    /**
+     * ENSURES:
+     * - [engine]이 현재 탑승·관전 대상의 정확한 alive 엔진이면 그 엔진에 바인딩된 타코미터를 반환한다.
+     * - 현재 타코미터가 없거나 대상·카트·엔진 중 하나라도 달라졌으면 `null`을 반환한다.
+     */
+    fun getForEngine(engine: KartEngine): KartTachometer? {
+        val current = currentTachometer ?: return null
+        val kart = currentSubjectKart() ?: return null
+        return current.takeIf { it.matches(kart, engine) }
     }
 
-    private fun createTachometer(kart: Kart<*>): KartTachometer {
-        val kartId = kart.saddle.id
-        val revision = nextRevision++
+    private fun currentSubjectKart(): Kart<*>? {
+        val subject = Minecraft.getInstance().player?.subject as? Player ?: return null
+        return KartManager.getByRiderId(subject.id)
+    }
 
-        return when (kart.type) {
-            KartType.X -> XTachometerImpl(revision, kartId)
-            KartType.EX -> EXTachometerImpl(revision, kartId)
-            KartType.JIU -> JiuTachometerImpl(revision, kartId)
-            KartType.NEW -> NewTachometerImpl(revision, kartId)
-            KartType.Z7 -> Z7TachometerImpl(revision, kartId)
-            KartType.V1 -> V1TachometerImpl(revision, kartId)
-            KartType.A2 -> A2TachometerImpl(revision, kartId)
-            KartType.LEGACY -> LegacyTachometerImpl(revision, kartId)
-            KartType.PRO -> ProTachometerImpl(revision, kartId)
-            KartType.RUSHPLUS -> RushPlusTachometerImpl(revision, kartId)
-            KartType.CHARGE -> ChargeTachometerImpl(revision, kartId)
-            KartType.SR -> SRTachometerImpl(revision, kartId)
-            KartType.N1 -> N1TachometerImpl(revision, kartId)
-            KartType.RX -> RXTachometerImpl(revision, kartId)
-            KartType.KEY -> KeyTachometerImpl(revision, kartId)
-            KartType.GEAR -> GearTachometerImpl(revision, kartId)
-            KartType.F1 -> F1TachometerImpl(revision, kartId)
-            KartType.RALLY -> RallyTachometerImpl(revision, kartId)
-            KartType.MK -> MKTachometerImpl(revision, kartId)
-            KartType.BOAT -> BoatTachometerImpl(revision, kartId)
+    private fun createTachometer(engine: KartEngine): TachometerInternal {
+        return when (engine.kart.type) {
+            KartType.X -> XTachometerImpl(engine)
+            KartType.EX -> EXTachometerImpl(engine)
+            KartType.JIU -> JiuTachometerImpl(engine)
+            KartType.NEW -> NewTachometerImpl(engine)
+            KartType.Z7 -> Z7TachometerImpl(engine)
+            KartType.V1 -> V1TachometerImpl(engine)
+            KartType.A2 -> A2TachometerImpl(engine)
+            KartType.LEGACY -> LegacyTachometerImpl(engine)
+            KartType.PRO -> ProTachometerImpl(engine)
+            KartType.RUSHPLUS -> RushPlusTachometerImpl(engine)
+            KartType.CHARGE -> ChargeTachometerImpl(engine)
+            KartType.SR -> SRTachometerImpl(engine)
+            KartType.N1 -> N1TachometerImpl(engine)
+            KartType.RX -> RXTachometerImpl(engine)
+            KartType.KEY -> KeyTachometerImpl(engine)
+            KartType.GEAR -> GearTachometerImpl(engine)
+            KartType.F1 -> F1TachometerImpl(engine)
+            KartType.RALLY -> RallyTachometerImpl(engine)
+            KartType.MK -> MKTachometerImpl(engine)
+            KartType.BOAT -> BoatTachometerImpl(engine)
         }
     }
 }

@@ -1,18 +1,16 @@
 package io.github.oni0nfr1.skid.client.internal.tachometer
 
-import io.github.oni0nfr1.skid.client.internal.utils.visit
+import io.github.oni0nfr1.skid.client.api.engine.KartEngine
 import io.github.oni0nfr1.skid.client.api.events.KartTachometerEvents
-import io.github.oni0nfr1.skid.client.api.utils.KartType
+import io.github.oni0nfr1.skid.client.internal.utils.visit
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
 import java.util.Optional
 
 internal abstract class NitroTachometerImpl(
-    revision: Long,
-    kartId: Int,
-    engineType: KartType<*>,
-) : KartTachometerImpl(revision, kartId, engineType) {
+    engine: KartEngine,
+) : KartTachometerImpl(engine) {
 
     open var speed: Double = 0.0
         protected set

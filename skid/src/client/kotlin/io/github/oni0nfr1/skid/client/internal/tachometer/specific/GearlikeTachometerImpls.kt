@@ -1,7 +1,7 @@
 package io.github.oni0nfr1.skid.client.internal.tachometer.specific
 
+import io.github.oni0nfr1.skid.client.api.engine.KartEngine
 import io.github.oni0nfr1.skid.client.api.events.KartTachometerEvents
-import io.github.oni0nfr1.skid.client.api.utils.KartType
 import io.github.oni0nfr1.skid.client.api.tachometer.F1Tachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.GearTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.RallyTachometer
@@ -9,18 +9,17 @@ import io.github.oni0nfr1.skid.client.internal.tachometer.GearlikeTachometerImpl
 import io.github.oni0nfr1.skid.client.internal.tachometer.TachometerUpdateResult
 import net.minecraft.network.chat.Component
 
-internal class GearTachometerImpl(revision: Long, kartId: Int) :
-    GearlikeTachometerImpl(revision, kartId, KartType.GEAR), GearTachometer {
+internal class GearTachometerImpl(engine: KartEngine) :
+    GearlikeTachometerImpl(engine), GearTachometer {
     override val gearPattern = Regex("""GEAR (\d+)단""")
 }
 
-internal class RallyTachometerImpl(revision: Long, kartId: Int) :
-    GearlikeTachometerImpl(revision, kartId, KartType.RALLY), RallyTachometer
+internal class RallyTachometerImpl(engine: KartEngine) :
+    GearlikeTachometerImpl(engine), RallyTachometer
 
 internal class F1TachometerImpl(
-    revision: Long,
-    kartId: Int,
-) : GearlikeTachometerImpl(revision, kartId, KartType.F1), F1Tachometer {
+    engine: KartEngine,
+) : GearlikeTachometerImpl(engine), F1Tachometer {
 
     private val ersPattern = Regex("""ERS \[(\d{3})]""")
 

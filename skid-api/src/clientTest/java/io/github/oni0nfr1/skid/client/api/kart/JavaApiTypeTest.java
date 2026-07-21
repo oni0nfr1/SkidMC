@@ -1,6 +1,7 @@
 package io.github.oni0nfr1.skid.client.api.kart;
 
 import io.github.oni0nfr1.skid.client.api.engine.XEngine;
+import io.github.oni0nfr1.skid.client.api.kart.unstable.KartRaceUtils;
 import io.github.oni0nfr1.skid.client.api.tachometer.XTachometer;
 import io.github.oni0nfr1.skid.client.api.utils.KartType;
 import io.github.oni0nfr1.skid.client.api.utils.Ref;
@@ -22,6 +23,8 @@ final class JavaApiTypeTest {
         KartType<?> type = KartType.fromEngineCode(10);
         specified.get().ifPresent(value -> {
             XTachometer tachometer = value.getEngine().getTachometer();
+            int currentLap = KartRaceUtils.getCurrentLap(value);
+            Integer maxLap = KartRaceUtils.getMaxLap(value);
         });
     }
 

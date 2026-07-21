@@ -2,6 +2,8 @@ package io.github.oni0nfr1.skid.client.api.kart
 
 import io.github.oni0nfr1.skid.client.api.engine.NitroEngine
 import io.github.oni0nfr1.skid.client.api.engine.XEngine
+import io.github.oni0nfr1.skid.client.api.kart.unstable.currentLap
+import io.github.oni0nfr1.skid.client.api.kart.unstable.maxLap
 import io.github.oni0nfr1.skid.client.api.tachometer.NitroTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.XTachometer
 import io.github.oni0nfr1.skid.client.api.utils.KartType
@@ -23,6 +25,8 @@ private fun specifiedKartTypeIsInferred(ref: KartRef) {
 @Suppress("unused", "UNUSED_VARIABLE")
 private fun kartEngineTypeIsCovariant(kart: Kart<XEngine>) {
     val nitroKart: Kart<NitroEngine> = kart
+    val currentLap: Int = kart.currentLap
+    val maxLap: Int? = kart.maxLap
 }
 
 @Suppress("unused", "UNUSED_VARIABLE")

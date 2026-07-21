@@ -22,9 +22,6 @@ internal abstract class KartEngineImpl<ENGINE, TACHOMETER>(
             return TachometerManager.getForEngine(this) as? TACHOMETER
         }
 
-    val currentLap: Int
-        get() = kart.saddle.getKartInfo(KnownAttrModId.CTX_CURRENT_LAP)?.toInt() ?: 0
-
     // implementation of RegularEngine
     val isDrifting: Boolean
         get() = kart.saddle.getKartInfo(KnownAttrModId.STATE_DRIFTING) == 1.0

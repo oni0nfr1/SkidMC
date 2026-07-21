@@ -2,7 +2,6 @@ package io.github.oni0nfr1.skid.client.internal.events
 
 import io.github.oni0nfr1.skid.client.SkidClient
 import io.github.oni0nfr1.skid.client.api.events.KartMountEvents
-import io.github.oni0nfr1.skid.client.api.events.KartSummonEvents
 import io.github.oni0nfr1.skid.client.api.kart.KartSaddleEntity
 import io.github.oni0nfr1.skid.client.api.kart.MountType
 import io.github.oni0nfr1.skid.client.api.kart.mountStatus
@@ -34,11 +33,18 @@ internal object KartMountMixinHandler {
      *
      * THREADING:
      * - 렌더 스레드에서만 접근하고 변경한다.
-     *
-     * RECOVERY:
-     * - 처리된 관계의 엔티티를 찾지 못하면 WARN을 기록하고 이벤트 없이 내부 관계를 제거한다.
      */
     private val handledPassengerIdsByKartId = mutableMapOf<Int, MutableSet<Int>>()
+
+    /**
+     * 성공적으로 시작되어 아직 종료 처리되지 않은 관전 이벤트 수명 주기입니다.
+     *
+     * INVARIANT:
+     * - `true`이면 SPECTATE가 정상 완료됐고 이후 SPECTATE_END 처리가 시작되지 않았다.
+     *
+     * THREADING:
+     * - 렌더 스레드에서만 접근하고 변경한다.
+     */
     private var wasSpectating = false
 
     /** 탑승 관계 lifecycle 콜백을 등록하고 이전 로컬 상태를 초기화합니다. */
@@ -46,6 +52,29 @@ internal object KartMountMixinHandler {
         clearLocalState()
         ClientPlayConnectionEvents.INIT.register { _, _ -> clearLocalState() }
         ClientPlayConnectionEvents.DISCONNECT.register { _, _ -> teardownTrackedKarts() }
+    }
+
+    /**
+     * 새 saddle 수명 주기가 추적되기 전에 같은 ID에 남은 탑승 관계를 폐기합니다.
+     *
+     * ENSURES:
+     * - [entity]가 KartSaddleEntity이면 해당 ID의 handled 관계가 남아 있지 않는다.
+     * - 남은 관계를 제거할 때는 DISMOUNT를 발행하지 않는다.
+     */
+    @JvmStatic
+    fun beforeEntityTracked(entity: Entity) {
+        if (entity !is KartSaddleEntity) return
+
+        val riderIds = handledPassengerIdsByKartId.remove(entity.id).orEmpty()
+        if (riderIds.isEmpty()) return
+
+        SkidClient.LOGGER.warn(
+            "Handled kart passengers remain when a new saddle lifecycle starts: " +
+                "saddleId={}, riderIds={}; discarding the relations without DISMOUNT",
+            entity.id,
+            riderIds,
+        )
+        riderIds.forEach { KartManager.dismountRider(it) }
     }
 
     /**
@@ -59,8 +88,9 @@ internal object KartMountMixinHandler {
      * - 정상 종료 시 실제 Player가 확인되고 MOUNT_EARLY가 완료된 관계만 handled 상태에 포함된다.
      * - 패킷에서 제거된 관계는 handled 상태와 KartManager에서 제거된다.
      *
-     * THREADING:
-     * - 렌더 스레드에서 호출된다.
+     * FAILURE:
+     * - 예외 전에 완료된 관계는 유지하며, 실패한 DISMOUNT 관계는 제거한다.
+     * - 실패한 MOUNT의 active 관계는 유지하고 실패한 MOUNT_EARLY 관계는 기록하지 않는다.
      *
      * @see io.github.oni0nfr1.skid.client.internal.mixin.ClientPacketListenerMixin.onHandleSetEntityPassengersPacket
      */
@@ -82,7 +112,7 @@ internal object KartMountMixinHandler {
                     handledRiderIds,
                 )
                 handledRiderIds.forEach { KartManager.dismountRider(it) }
-                KartManager.removeKart(packet.vehicle)
+                KartSummonMixinHandler.discardTrackedKart(packet.vehicle, "passenger update")
             }
             return
         }
@@ -135,6 +165,9 @@ internal object KartMountMixinHandler {
      * ENSURES:
      * - 정상 종료 시 관계가 handled 상태에 존재한다.
      * - 다른 saddle에 남아 있던 동일 rider 관계는 제거된다.
+     *
+     * FAILURE:
+     * - MOUNT_EARLY 콜백이 예외를 던지면 새 관계를 handled 상태에 추가하지 않는다.
      */
     private fun handleMountEarly(kart: KartSaddleEntity, rider: Player) {
         val kartId = kart.id
@@ -171,12 +204,14 @@ internal object KartMountMixinHandler {
      * 준비된 카트에 rider 관계를 반영하고 MOUNT를 한 번만 발행합니다.
      *
      * REQUIRES:
-     * - [kart]와 [rider]는 현재 client level에 존재한다.
      * - 해당 관계의 MOUNT_EARLY 처리가 완료됐다.
      *
      * ENSURES:
      * - 카트가 ready이면 관계가 KartManager에 등록된다.
      * - 카트가 pending이거나 이미 등록된 관계이면 MOUNT를 발행하지 않는다.
+     *
+     * FAILURE:
+     * - MOUNT 콜백이 예외를 던져도 active 관계를 유지한다.
      */
     private fun completeMountIfReady(kart: KartSaddleEntity, rider: Player) {
         if (!KartManager.isReady(kart.id)) return
@@ -188,11 +223,14 @@ internal object KartMountMixinHandler {
     /**
      * [ClientboundRemoveEntitiesPacket]에 따라 엔티티가 제거되기 직전에 호출됩니다.
      *
+     * REQUIRES:
+     * - Vanilla가 해당 엔티티를 client level에서 제거하기 전에 호출된다.
+     *
      * ENSURES:
      * - 정상 종료 시 [entityId]는 handled 또는 active 탑승 관계에 남지 않는다.
      *
-     * THREADING:
-     * - 렌더 스레드에서 호출된다.
+     * FAILURE:
+     * - DISMOUNT 콜백이 예외를 던져도 해당 엔티티의 탑승 관계를 모두 제거한다.
      *
      * @see io.github.oni0nfr1.skid.client.internal.mixin.ClientPacketListenerMixin.onHandleRemoveEntitiesPacket
      */
@@ -204,78 +242,67 @@ internal object KartMountMixinHandler {
         val level = client.level ?: return
         when (val entity = level.getEntity(entityId)) {
             is KartSaddleEntity -> removeAllPassengers(entity)
-            is Player -> removePlayerRelations(level, entity)
+            is Player -> {
+                val riderId = entity.id
+                val kartIds = buildSet {
+                    (entity.vehicle as? KartSaddleEntity)?.let { add(it.id) }
+                    KartManager.getSaddleIdByRiderId(riderId)?.let(::add)
+                    handledPassengerIdsByKartId.forEach { (kartId, riderIds) ->
+                        if (riderId in riderIds) add(kartId)
+                    }
+                }
+
+                if (kartIds.size > 1) {
+                    SkidClient.LOGGER.warn(
+                        "Kart passenger is associated with multiple saddles during removal: " +
+                            "saddleIds={}, riderId={}",
+                        kartIds,
+                        riderId,
+                    )
+                }
+
+                try {
+                    kartIds.forEach { kartId ->
+                        val kart = level.getEntity(kartId) as? KartSaddleEntity
+                        if (kart != null) {
+                            dismountAndForget(kart, riderId)
+                        } else {
+                            SkidClient.LOGGER.warn(
+                                "Handled kart saddle is missing during rider removal: " +
+                                    "saddleId={}, riderId={}; " +
+                                    "cleaning the relation without firing DISMOUNT",
+                                kartId,
+                                riderId,
+                            )
+                            removeHandledPassenger(kartId, riderId)
+                            KartManager.dismountRider(riderId)
+                        }
+                    }
+                } finally {
+                    // DISMOUNT 리스너 예외가 kartIds 순회를 중단하면, 남은 관계는 이벤트 없이 정리한다.
+                    // 한 rider의 복수 saddle 관계는 불변식 위반이므로 정리를 우선하고 원래 예외를 다시 전파한다.
+                    kartIds.forEach { removeHandledPassenger(it, riderId) }
+                    KartManager.dismountRider(riderId)
+                }
+            }
         }
     }
 
-    /**
-     * 제거될 player가 가진 모든 handled 및 active 카트 관계를 종료합니다.
-     *
-     * ENSURES:
-     * - 정상 종료 시 rider ID는 어느 handled set과 KartManager에도 남지 않는다.
-     */
-    private fun removePlayerRelations(level: ClientLevel, rider: Player) {
-        val riderId = rider.id
-        val kartIds = buildSet {
-            (rider.vehicle as? KartSaddleEntity)?.let { add(it.id) }
-            KartManager.getSaddleIdByRiderId(riderId)?.let(::add)
-            handledPassengerIdsByKartId.forEach { (kartId, riderIds) ->
-                if (riderId in riderIds) add(kartId)
-            }
-        }
-
-        if (kartIds.size > 1) {
-            SkidClient.LOGGER.warn(
-                "Kart passenger is associated with multiple saddles during removal: " +
-                    "saddleIds={}, riderId={}",
-                kartIds,
-                riderId,
-            )
-        }
-
-        kartIds.forEach { kartId ->
-            val kart = level.getEntity(kartId) as? KartSaddleEntity
-            if (kart != null) {
-                dismountAndForget(kart, riderId)
-            } else {
-                SkidClient.LOGGER.warn(
-                    "Handled kart saddle is missing during rider removal: saddleId={}, riderId={}; " +
-                        "cleaning the relation without firing DISMOUNT",
-                    kartId,
-                    riderId,
-                )
-                removeHandledPassenger(kartId, riderId)
-                KartManager.dismountRider(riderId)
-            }
-        }
-
-        if (kartIds.isEmpty()) KartManager.dismountRider(riderId)
-    }
-
-    /**
-     * [handledPassengerIdsByKartId]의 특정 관계를 제거합니다.
-     *
-     * ENSURES:
-     * - 정상 종료 시 [riderId]는 [kartId]의 handled set에 존재하지 않는다.
-     * - set이 비면 [kartId] 키도 제거된다.
-     *
-     * @return 실제 handled 관계가 제거되었으면 `true`
-     */
-    private fun removeHandledPassenger(kartId: Int, riderId: Int): Boolean {
-        val handled = handledPassengerIdsByKartId[kartId] ?: return false
-        val removed = handled.remove(riderId)
+    private fun removeHandledPassenger(kartId: Int, riderId: Int) {
+        val handled = handledPassengerIdsByKartId[kartId] ?: return
+        handled.remove(riderId)
         if (handled.isEmpty()) handledPassengerIdsByKartId.remove(kartId)
-        return removed
     }
 
     /**
      * rider 객체가 있으면 DISMOUNT를 발행하고 관계를 항상 정리합니다.
      *
      * ENSURES:
-     * - 이벤트 콜백의 성공 여부와 관계없이 해당 rider의 handled 및 active 관계를 제거한다.
-     *
-     * RECOVERY:
+     * - 해당 rider의 handled 및 active 관계를 제거한다.
      * - rider 엔티티가 없으면 WARN을 기록하고 DISMOUNT 없이 관계를 정리한다.
+     *
+     * FAILURE:
+     * - DISMOUNT 콜백이 예외를 던져도 관계를 제거한다.
      */
     private fun dismountAndForget(kart: KartSaddleEntity, riderId: Int) {
         val rider = client.level?.getEntity(riderId) as? Player
@@ -296,27 +323,38 @@ internal object KartMountMixinHandler {
         }
     }
 
-    /** 카트에 연결된 handled 및 active rider 관계를 모두 종료합니다. */
+    /**
+     * 카트에 연결된 handled 및 active rider 관계를 모두 종료합니다.
+     *
+     * FAILURE:
+     * - DISMOUNT 콜백이 예외를 던져도 카트의 모든 rider 관계를 제거한다.
+     */
     private fun removeAllPassengers(kart: KartSaddleEntity) {
         val riderIds = buildSet {
             addAll(handledPassengerIdsByKartId[kart.id].orEmpty())
             addAll(KartManager.getRiderIdsBySaddleId(kart.id))
         }
-        riderIds.forEach { dismountAndForget(kart, it) }
-        handledPassengerIdsByKartId.remove(kart.id)
+        try {
+            riderIds.forEach { dismountAndForget(kart, it) }
+        } finally {
+            handledPassengerIdsByKartId.remove(kart.id)
+            riderIds.forEach { KartManager.dismountRider(it) }
+        }
     }
 
     /**
-     * 첫 카트 어트리뷰트가 준비된 뒤 pending 카트와 탑승 관계를 완료합니다.
+     * 카트 어트리뷰트가 준비된 뒤 현재 passenger 관계의 처리를 완료합니다.
      *
      * ENSURES:
-     * - 새로 준비된 카트에 존재하는 Player passenger는 MOUNT_EARLY 이후 MOUNT 순서로 처리된다.
+     * - ready 카트에 존재하는 Player passenger는 MOUNT_EARLY 이후 MOUNT 순서로 처리된다.
+     *
+     * FAILURE:
+     * - 실패한 MOUNT의 active 관계는 유지하고 실패한 MOUNT_EARLY 관계는 기록하지 않는다.
      */
     @JvmStatic
-    fun onFirstAttrUpdateAfterMount(entity: Entity) {
+    fun afterUpdateAttributes(entity: Entity) {
         if (entity !is KartSaddleEntity) return
-        val kart = KartManager.prepareKart(entity) ?: return
-        KartSummonEvents.SUMMON.invoker().onSummon(kart)
+        if (!KartManager.isReady(entity.id)) return
 
         entity.passengers.forEach { passenger ->
             if (passenger !is Player) return@forEach
@@ -331,16 +369,37 @@ internal object KartMountMixinHandler {
      * ENSURES:
      * - SPECTATE_END, DISMOUNT, REMOVE 순서로 가능한 이벤트를 발행한다.
      * - REMOVE 콜백이 끝날 때까지 Kart는 유효하다.
-     * - 종료 후 handled, pending, active 관계가 모두 비어 있다.
+     * - 가능한 이벤트를 발행한 뒤 모든 추적 상태를 제거한다.
      *
-     * RECOVERY:
-     * - 필요한 엔티티가 없으면 WARN을 기록하고 가능한 이벤트만 생략한 뒤 상태를 정리한다.
+     * FAILURE:
+     * - 이벤트 콜백이 예외를 던져도 모든 추적 상태를 제거한다.
      */
     @JvmStatic
     fun teardownTrackedKarts() {
         val level = client.level
         try {
-            endSpectatingBeforeTeardown(level)
+            if (wasSpectating) {
+                val player = client.player
+                val target = client.cameraEntity as? RemotePlayer
+                val saddle = (target?.vehicle as? KartSaddleEntity)
+                    ?: target?.let { KartManager.getByRiderId(it.id)?.internalSaddleOrNull }
+
+                wasSpectating = false
+                if (player != null && target != null && saddle != null) {
+                    KartMountEvents.SPECTATE_END.invoker()
+                        .onKartSpectateEnd(saddle, player, target)
+                } else {
+                    SkidClient.LOGGER.warn(
+                        "Spectated kart relation is incomplete during client level teardown; " +
+                            "skipping SPECTATE_END " +
+                            "(hasLevel={}, hasPlayer={}, hasTarget={}, hasSaddle={})",
+                        level != null,
+                        player != null,
+                        target != null,
+                        saddle != null,
+                    )
+                }
+            }
 
             val kartIds = buildSet {
                 addAll(KartManager.getTrackedSaddleIds())
@@ -351,50 +410,26 @@ internal object KartMountMixinHandler {
                 val saddle = level?.getEntity(kartId) as? KartSaddleEntity
                 if (saddle != null) {
                     removeAllPassengers(saddle)
-                    KartManager.getBySaddleId(kartId)?.let { kart ->
-                        KartSummonEvents.REMOVE.invoker().onRemove(kart)
-                    }
+                    KartSummonMixinHandler.removeTrackedKart(saddle)
                 } else {
                     val riderIds = handledPassengerIdsByKartId.remove(kartId).orEmpty()
-                    if (riderIds.isNotEmpty() || KartManager.getBySaddleId(kartId) != null) {
+                    if (riderIds.isNotEmpty()) {
                         SkidClient.LOGGER.warn(
-                            "Tracked kart saddle is missing during client level teardown: saddleId={}; " +
-                                "cleaning state without DISMOUNT or REMOVE",
+                            "Handled kart passengers lost their saddle during client level teardown: " +
+                                "saddleId={}, riderIds={}; cleaning relations without DISMOUNT",
                             kartId,
+                            riderIds,
                         )
                     }
                     riderIds.forEach { KartManager.dismountRider(it) }
+                    KartSummonMixinHandler.discardTrackedKart(kartId, "client level teardown")
                 }
-                KartManager.removeKart(kartId)
             }
         } finally {
             clearLocalState()
             KartManager.clear()
             TachometerManager.clear()
         }
-    }
-
-    private fun endSpectatingBeforeTeardown(level: ClientLevel?) {
-        if (!wasSpectating) return
-
-        val player = client.player
-        val target = client.cameraEntity as? RemotePlayer
-        val saddle = (target?.vehicle as? KartSaddleEntity)
-            ?: target?.let { KartManager.getByRiderId(it.id)?.internalSaddleOrNull }
-
-        if (player != null && target != null && saddle != null) {
-            KartMountEvents.SPECTATE_END.invoker().onKartSpectateEnd(saddle, player, target)
-        } else {
-            SkidClient.LOGGER.warn(
-                "Spectated kart relation is incomplete during client level teardown; " +
-                    "skipping SPECTATE_END (hasLevel={}, hasPlayer={}, hasTarget={}, hasSaddle={})",
-                level != null,
-                player != null,
-                target != null,
-                saddle != null,
-            )
-        }
-        wasSpectating = false
     }
 
     /** 이전 client level에 속한 handler 로컬 상태를 이벤트 없이 초기화합니다. */
@@ -406,8 +441,11 @@ internal object KartMountMixinHandler {
     /**
      * [Minecraft.setCameraEntity]가 호출된 직후, 실제 카메라 대상이 변경된 경우 호출됩니다.
      *
-     * THREADING:
-     * - 렌더 스레드에서 호출된다.
+     * ENSURES:
+     * - 이전 관전 수명 주기를 종료한 뒤 확인 가능한 새 관전 수명 주기를 시작한다.
+     *
+     * FAILURE:
+     * - 관전 이벤트 콜백이 예외를 던지면 완료되지 않은 관전 상태를 기록하지 않는다.
      */
     @JvmStatic
     fun afterSpectateTargetChange(player: Player, prevCamera: Entity, newCamera: Entity) {
@@ -415,9 +453,19 @@ internal object KartMountMixinHandler {
         val prevSaddleEntity = prevCamera.vehicle as? KartSaddleEntity
         val newSaddleEntity = newCamera.vehicle as? KartSaddleEntity
 
-        if (wasSpectating && prevCamera is RemotePlayer && prevSaddleEntity != null) {
-            KartMountEvents.SPECTATE_END.invoker().onKartSpectateEnd(prevSaddleEntity, player, prevCamera)
+        if (wasSpectating) {
             wasSpectating = false
+            if (prevCamera is RemotePlayer && prevSaddleEntity != null) {
+                KartMountEvents.SPECTATE_END.invoker()
+                    .onKartSpectateEnd(prevSaddleEntity, player, prevCamera)
+            } else {
+                SkidClient.LOGGER.warn(
+                    "Spectated kart relation is incomplete after camera target change; " +
+                        "skipping SPECTATE_END (hasTarget={}, hasSaddle={})",
+                    prevCamera is RemotePlayer,
+                    prevSaddleEntity != null,
+                )
+            }
         }
 
         if (player.isSpectator && newCamera is RemotePlayer && newSaddleEntity != null) {
@@ -431,12 +479,21 @@ internal object KartMountMixinHandler {
         }
     }
 
-    /** 첫 카트 어트리뷰트가 준비된 뒤 pending 관전 관계를 완료합니다. */
+    /**
+     * 카트 어트리뷰트가 준비된 뒤 pending 관전 관계를 완료합니다.
+     *
+     * ENSURES:
+     * - 카트가 ready이고 현재 관전 관계가 확인된 경우에만 SPECTATE를 발행한다.
+     *
+     * FAILURE:
+     * - SPECTATE 콜백이 예외를 던지면 관전 상태를 기록하지 않는다.
+     */
     @JvmStatic
     fun onFirstAttrUpdateAfterSpectate(entity: Entity) {
         val player = client.player ?: return
         val camera = client.cameraEntity as? RemotePlayer ?: return
         if (entity !is KartSaddleEntity) return
+        if (!KartManager.isReady(entity.id)) return
         if (camera !in entity.passengers) return
 
         val mountStatus = player.mountStatus

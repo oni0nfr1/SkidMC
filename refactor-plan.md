@@ -210,6 +210,7 @@ data object X : KartType<XEngine>(
 - [ ] 관전 이벤트가 준비된 `Kart`, `KartEngine`, `KartTachometer` 계약과 일치하도록 변경
 - [x] `SPECTATE_EARLY`와 `SPECTATE` 시작점을 하나의 `SPECTATE_END`로 정리
 - [x] `KartMountEvents`와 이벤트 생성 기반을 `skid-api`로 이전
+- [x] 준비된 카트 수명 주기의 `KartSummonEvents`를 `skid-api`로 이전
 - [x] 제거·하차·관전 종료 이벤트 순서 보장
 - [ ] 아직 안정화되지 않은 이벤트를 `api.unstable.events`에 둘지 결정
 - [x] `MountTest`를 새 이벤트 구조로 전환

@@ -1,9 +1,8 @@
 package io.github.oni0nfr1.skid.client.api.events
 
 import io.github.oni0nfr1.skid.client.api.kart.Kart
-import io.github.oni0nfr1.skid.client.internal.utils.createEvent
 
-/** 클라이언트 월드에서 카트가 생성되거나 제거되는 이벤트를 제공합니다. */
+/** 클라이언트 월드에서 준비된 카트의 추적 시작과 종료 이벤트를 제공합니다. */
 object KartSummonEvents {
 
     /**
@@ -12,7 +11,8 @@ object KartSummonEvents {
      * 콜백에 전달되는 [Kart]는 유효하며 엔진에 접근할 수 있습니다.
      * 렌더 스레드에서 호출됩니다.
      */
-    @JvmField val SUMMON = createEvent<KartSummonCallback> { listeners ->
+    @JvmField
+    val SUMMON = createEvent<KartSummonCallback> { listeners ->
         KartSummonCallback { kart ->
             for (listener in listeners) {
                 listener.onSummon(kart)
@@ -21,13 +21,14 @@ object KartSummonEvents {
     }
 
     /**
-     * 추적 중인 카트가 client level에서 제거되거나 level 자체가 종료될 때 호출됩니다.
+     * 추적 중인 카트가 클라이언트 월드에서 제거되거나 월드 자체가 종료될 때 호출됩니다.
      *
      * 콜백이 끝날 때까지 [Kart]는 유효하며, 콜백이 끝난 직후 무효화됩니다.
-     * 아직 준비되지 않아 SUMMON이 발행되지 않은 pending saddle에는 REMOVE를 발행하지 않습니다.
-     * 렌더 스레드에서 호출됩니다.
+     * 아직 준비되지 않아 [SUMMON]이 발행되지 않은 pending saddle에는 이 이벤트를 발행하지
+     * 않습니다. 렌더 스레드에서 호출됩니다.
      */
-    @JvmField val REMOVE = createEvent<KartRemoveCallback> { listeners ->
+    @JvmField
+    val REMOVE = createEvent<KartRemoveCallback> { listeners ->
         KartRemoveCallback { kart ->
             for (listener in listeners) {
                 listener.onRemove(kart)

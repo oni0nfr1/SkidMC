@@ -114,7 +114,7 @@ interface XEngine : NitroEngine, InstantBoostEngine, DualBoostEngine, DraftEngin
 - [x] `engineCode` 조회 함수 제공
 - [x] `attrEngineCode` 조회 함수 제공
 - [x] 알 수 없는 코드는 API에서 로그를 남기지 않고 `null`로 반환
-- [ ] 구현체에서 알 수 없는 엔진 코드를 로깅할지 결정
+- [x] 구현체에서 알 수 없는 엔진 코드를 saddle ID와 함께 WARN으로 기록
 - [x] Java에서 각 타입에 접근하는 형태 확인
 
 예정 형태:
@@ -137,9 +137,9 @@ data object X : KartType<XEngine>(
 - [x] `specify()` 결과의 `access` 블록에서 `Kart<XEngine>`과 `engine.tachometer: XTachometer?` 추론 확인
 - [x] Java의 `Optional` 및 제네릭 API 컴파일 테스트 추가
 - [ ] Java 사용 예제 추가
-- [ ] 기존 `handle`, `Specific`, `accessEngine` 제거 또는 마이그레이션
-- [ ] `StaleKartException` 제거 여부 확정
-  - 현재 계획에서는 유효하지 않은 참조를 `Optional.empty()`로 표현한다.
+- [x] 기존 `handle`, `Specific`, `accessEngine` 제거 또는 마이그레이션
+- [x] `StaleKartException`을 제거하고 직접 stale 객체 접근은 `IllegalStateException`으로 통일
+  - `KartRef`를 통한 유효하지 않은 참조 접근은 `Optional.empty()`로 표현한다.
 
 ### 3. API provider와 구현체 연결
 
@@ -161,9 +161,9 @@ data object X : KartType<XEngine>(
 - [x] 기존 구현 엔진이 새 API 엔진 인터페이스를 구현하도록 변경
 - [x] 기존 카트 구현이 `Kart<E>`와 `KartType<E>` 관계를 보장하도록 변경
 - [x] 엔진 생성 매핑과 구현 클래스 정보는 구현체 모듈의 factory에 유지
-- [ ] `currentLap`의 새 소유 위치 결정
+- [x] `currentLap`과 `maxLap`을 `api.kart.unstable`의 `Kart<*>` 확장 프로퍼티로 제공
   - 엔진 공통 계약에서는 제거
-  - 카트 메타데이터 또는 별도 레이스 상태 API 후보
+  - 1.1.0에서 레이스 상태 API를 추가할 때 해당 계약으로 이전
 - [ ] 카트 제거 시 엔진·타코미터·참조가 올바르게 무효화되는지 검증
 
 ### 5. 카트 접근 유틸리티 이전
@@ -197,7 +197,7 @@ data object X : KartType<XEngine>(
 - [x] 준비된 `Kart`를 제공하는 공개 이벤트 진입점을 `KartRef`로 통일
   - EARLY, 공통 종료 및 첫 어트리뷰트 갱신은 준비 전 관계도 식별할 수 있도록 saddle 엔티티를 제공
   - 준비 완료 이벤트에서는 콜백이 끝날 때까지 참조가 유효한 `Kart`로 해석됨
-- [ ] 소환 이벤트를 조기 감지와 준비 완료 시점으로 분리
+- [x] 소환 이벤트를 조기 감지와 준비 완료 시점으로 분리
   - `SUMMON_EARLY`
   - `SUMMON`
 - [x] 탑승 이벤트 시점 재정의
@@ -256,6 +256,7 @@ data object X : KartType<XEngine>(
 - [x] 배포 JAR에 `skid-api`가 정확히 한 번 포함되는지 확인
 - [ ] 버전을 `1.0.0-beta.1`로 갱신
 - [ ] 0.x → 1.0.0 마이그레이션 문서 작성
+  - 1.0.0-beta API 계약이 더 확정될 때까지 보류
 - [ ] refactor/fix/test 커밋을 목적별로 분리
 - [ ] 브랜치 push 및 draft PR 작성
 
@@ -342,6 +343,12 @@ kartRef.specify(KartType.X).access {
 
 타코미터는 엔진 종류에 따라 달라지는 현재 화면 상태이므로 별도 장기 참조 객체를 제공하지 않고, 유효한 `KartRef`에서 `kart.engine.tachometer`로 접근하는 방향으로 변경한다.
 
+### 랩 정보는 임시 unstable API로 제공됨
+
+1.0.0에서는 `Kart<*>.currentLap`과 `Kart<*>.maxLap`을 `api.kart.unstable` 확장
+프로퍼티로 제공한다. 이 값들은 카트 정보 어트리뷰트에서 직접 읽으며, 1.1.0에서 레이스
+상태 API가 추가되면 그 계약으로 이전할 예정이다.
+
 ### API와 구현체가 분리됨
 
 - `skid-api`: 공개 계약, 타입 토큰, 참조 및 이벤트 API
@@ -371,7 +378,6 @@ rg 'io\.github\.oni0nfr1\.skid\..*\.unstable' src
 
 ## 아직 확정하지 않은 사항
 
-- `currentLap`을 `Kart`에 둘지 별도 레이스 상태 객체에 둘지
 - 알 수 없는 엔진 코드를 nullable로만 처리할지 `Unknown` 타입을 둘지
 - 이벤트 API를 1.0.0부터 stable로 둘지 `unstable.events`에서 시작할지
 - 원시 어트리뷰트 API의 공개 범위

@@ -34,7 +34,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Generate Dokka documentation
-        run: ./gradlew :skid:dokkaGeneratePublicationHtml
+        run: ./gradlew :skid-api:dokkaGeneratePublicationHtml
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v6
@@ -42,7 +42,7 @@ jobs:
       - name: Upload documentation artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: skid/build/dokka/html
+          path: skid-api/build/dokka/html
 
   deploy:
     name: Deploy documentation

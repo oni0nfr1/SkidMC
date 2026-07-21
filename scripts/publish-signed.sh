@@ -54,7 +54,7 @@ export ORG_GRADLE_PROJECT_signingInMemoryKeyPassword="$(<"$PASSWORD_FILE")"
 
 case "$1" in
   local)
-    TASK=":skid:publishToMavenLocal"
+    TASK=":skid-api:publishToMavenLocal"
     ;;
   central)
     if [[ -z "${ORG_GRADLE_PROJECT_mavenCentralUsername:-}" ]]; then
@@ -73,7 +73,7 @@ case "$1" in
       export ORG_GRADLE_PROJECT_mavenCentralPassword="$(<"$CENTRAL_PASSWORD_FILE")"
     fi
 
-    TASK=":skid:publishAndReleaseToMavenCentral"
+    TASK=":skid-api:publishAndReleaseToMavenCentral"
     ;;
   *)
     usage

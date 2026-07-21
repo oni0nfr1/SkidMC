@@ -43,7 +43,7 @@
 - [x] `skid` 구현체 모듈에서 `skid-api`를 임시 `compileOnly` 의존성으로 연결
 - [x] 기존 0.x 중복 계약 제거 후 `modImplementation`으로 전환
 - [x] 최종 배포 JAR에 API 모듈 포함
-- [ ] API만 사용하는 모드의 권장 의존성 구성 확정
+- [x] API만 사용하는 모드의 권장 의존성 구성 확정
   - 컴파일: `modCompileOnly(project(":skid-api"))`
   - 개발 런타임: 구현체 모드 추가
   - 배포: 구현체와 API가 포함된 전체 SkidMC JAR 사용
@@ -163,7 +163,7 @@ data object X : KartType<XEngine>(
 - [x] 엔진 생성 매핑과 구현 클래스 정보는 구현체 모듈의 factory에 유지
 - [x] `currentLap`과 `maxLap`을 `api.kart.unstable`의 `Kart<*>` 확장 프로퍼티로 제공
   - 엔진 공통 계약에서는 제거
-  - 1.1.0에서 레이스 상태 API를 추가할 때 해당 계약으로 이전
+  - 향후 레이스 상태 API를 추가할 때 해당 계약으로 이전
 - [x] 카트 제거 시 엔진·타코미터·참조가 올바르게 무효화되는지 검증
 
 ### 5. 카트 접근 유틸리티 이전
@@ -189,7 +189,7 @@ data object X : KartType<XEngine>(
   - 데이터팩 기반 최초 생성에서는 passengers → attributes 순서도 가능
 - [x] 어트리뷰트와 탑승 관계의 두 도착 순서에 대한 회귀 테스트 추가
 - [x] 레이스 도중 접속 후 즉시 관전하는 시나리오 회귀 테스트 추가
-- [ ] 준비 완료 전에 끝나는 탑승·관전 관계의 EARLY-only 종료 흐름 검증
+- [x] 준비 완료 전에 끝나는 EARLY-only 관계는 정상 마크라이더 흐름에서 발생하지 않음을 확인하고 방어적 종료 계약으로 유지
 - [x] 엔진 준비 전에는 일반 탑승·관전 이벤트가 발행되지 않도록 보장
 - [x] 엔진 준비 후 대기 중인 탑승·관전 상태를 완료하도록 보장
 
@@ -237,17 +237,17 @@ data object X : KartType<XEngine>(
 
 ### 9. 패키지 안정성 표시
 
-- [ ] 안정 API와 unstable API의 기준 문서화
+- [x] 안정 API와 unstable API의 기준 문서화
 - [x] 기존 전체 패키지 구조는 유지
 - [x] 불안정한 기능만 해당 영역 아래 `unstable` 하위 패키지로 이동
 - [x] 저장소 전체에서 `unstable` 사용을 `grep`으로 확인할 수 있는 구조 유지
-- [ ] unstable API의 호환성 보장 범위를 README와 KDoc에 명시
+- [x] unstable API의 호환성 보장 범위를 README와 KDoc에 명시
 
 ### 10. 빌드, 테스트 및 릴리스
 
-- [ ] `skid-api` 전체 빌드 및 API JAR 내용 검증
-- [ ] `skid`가 새 API만 사용하도록 전환
-- [ ] `skid-test`를 새 API 계약으로 이전
+- [x] `skid-api` 전체 빌드 및 API JAR 내용 검증
+- [x] `skid`가 새 API만 사용하도록 전환
+- [x] `skid-test`를 새 API 계약으로 이전
 - [x] Kotlin 타입 추론 테스트 추가
   - `KartRef.specify(KartType.X).access { ... }`
   - 중간·구체 엔진 타입에서 대응 타코미터 타입 추론
@@ -257,10 +257,10 @@ data object X : KartType<XEngine>(
 - [x] 엔티티 패킷 순서 조합별 mount/spectate 테스트 추가
 - [x] 기존 `skid` 모듈의 중복 API 소스 제거
 - [x] 배포 JAR에 `skid-api`가 정확히 한 번 포함되는지 확인
-- [ ] 버전을 `1.0.0-beta.1`로 갱신
+- [x] 버전을 `1.0.0-beta.1`로 갱신
 - [ ] 0.x → 1.0.0 마이그레이션 문서 작성
   - 1.0.0-beta API 계약이 더 확정될 때까지 보류
-- [ ] refactor/fix/test 커밋을 목적별로 분리
+- [x] refactor/fix/test 커밋을 목적별로 분리
 - [ ] 브랜치 push 및 draft PR 작성
 
 ## 1.0.0 API 변동사항
@@ -349,8 +349,8 @@ kartRef.specify(KartType.X).access {
 ### 랩 정보는 임시 unstable API로 제공됨
 
 1.0.0에서는 `Kart<*>.currentLap`과 `Kart<*>.maxLap`을 `api.kart.unstable` 확장
-프로퍼티로 제공한다. 이 값들은 카트 정보 어트리뷰트에서 직접 읽으며, 1.1.0에서 레이스
-상태 API가 추가되면 그 계약으로 이전할 예정이다.
+프로퍼티로 제공한다. 이 값들은 카트 정보 어트리뷰트에서 직접 읽으며, 향후 레이스 상태
+API가 추가되면 그 계약으로 이전할 예정이다.
 
 ### API와 구현체가 분리됨
 

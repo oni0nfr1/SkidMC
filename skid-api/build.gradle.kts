@@ -1,14 +1,22 @@
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SourcesJar
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier
+import java.net.URI
 
 plugins {
     kotlin("jvm")
     id("fabric-loom")
+    id("org.jetbrains.dokka")
+    id("com.vanniktech.maven.publish")
+    `maven-publish`
     `java-library`
 }
 
 version = project.property("mod_version") as String
 group = project.property("maven_group") as String
+val enableSourcesJar = providers.gradleProperty("release").isPresent
 
 base {
     archivesName.set(project.property("archives_base_name") as String)
@@ -18,6 +26,10 @@ val targetJavaVersion = 21
 
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    if (enableSourcesJar) {
+        // Only generate/remap sources for release publishing builds.
+        withSourcesJar()
+    }
 }
 
 loom {
@@ -91,8 +103,82 @@ tasks.withType<KotlinCompile>().configureEach {
     compilerOptions.jvmTarget.set(JvmTarget.fromTarget(targetJavaVersion.toString()))
 }
 
+dokka {
+    dokkaPublications.html {
+        moduleName.set("SkidMC API")
+        moduleVersion.set(project.version.toString())
+        outputDirectory.set(layout.buildDirectory.dir("dokka/html"))
+        suppressObviousFunctions.set(true)
+    }
+
+    dokkaSourceSets.configureEach {
+        documentedVisibilities.set(setOf(VisibilityModifier.Public))
+        jdkVersion.set(targetJavaVersion)
+        reportUndocumented.set(false)
+        skipDeprecated.set(false)
+    }
+
+    dokkaSourceSets.named("main") {
+        suppress.set(true)
+    }
+
+    dokkaSourceSets.named("client") {
+        suppress.set(false)
+
+        sourceLink {
+            localDirectory.set(file("src/client/kotlin"))
+            remoteUrl.set(URI("https://github.com/oni0nfr1/SkidMC/tree/main/skid-api/src/client/kotlin"))
+            remoteLineSuffix.set("#L")
+        }
+    }
+}
+
 tasks.jar {
     from(rootProject.file("LICENSE.txt")) {
         rename { "${it}_${project.base.archivesName.get()}" }
+    }
+}
+
+mavenPublishing {
+    @Suppress("UnstableApiUsage")
+    configureBasedOnAppliedPlugins(
+        javadocJar = JavadocJar.Dokka("dokkaGeneratePublicationHtml"),
+        sourcesJar = SourcesJar.Sources(),
+    )
+
+    publishToMavenCentral()
+    signAllPublications()
+
+    coordinates(
+        groupId = project.group.toString(),
+        artifactId = "skid-api",
+        version = project.version.toString(),
+    )
+
+    pom {
+        name.set("SkidMC API")
+        description.set("Public API contracts for KartRider: Minecraft client mod development")
+        url.set("https://github.com/oni0nfr1/SkidMC")
+
+        licenses {
+            license {
+                name.set("MIT License")
+                url.set("https://opensource.org/licenses/MIT")
+            }
+        }
+
+        developers {
+            developer {
+                id.set("oni0nfr1")
+                name.set("Kim Tae Eon")
+                email.set("taeun06@gmail.com")
+            }
+        }
+
+        scm {
+            url.set("https://github.com/oni0nfr1/SkidMC")
+            connection.set("scm:git:git://github.com/oni0nfr1/SkidMC.git")
+            developerConnection.set("scm:git:ssh://git@github.com:oni0nfr1/SkidMC.git")
+        }
     }
 }

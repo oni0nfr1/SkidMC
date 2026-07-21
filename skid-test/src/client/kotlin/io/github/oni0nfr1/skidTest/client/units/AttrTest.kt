@@ -1,6 +1,6 @@
 package io.github.oni0nfr1.skidTest.client.units
 
-import io.github.oni0nfr1.skid.client.api.events.KartAttrEvents
+import io.github.oni0nfr1.skid.client.api.events.unstable.KartAttrModifierEvents
 import io.github.oni0nfr1.skidTest.annotations.SkidTest
 import io.github.oni0nfr1.skidTest.client.TestUnit
 import io.github.oni0nfr1.skidTest.client.utils.sendChat
@@ -40,50 +40,50 @@ object AttrTest: TestUnit() {
     }
 
     override fun test(): TestResult {
-        KartAttrEvents.ID_ENGINE.register { kart, value ->
-            chatIfTesting("kart#${kart.id} data-engine = $value")
+        KartAttrModifierEvents.ID_ENGINE.register { kart, previous, value ->
+            chatIfTesting("kart#${kart.id} data-engine: $previous -> $value")
         }
-        KartAttrEvents.ID_ENGINE_REAL.register { kart, value ->
-            chatIfTesting("kart#${kart.id} data-engine-real = $value")
+        KartAttrModifierEvents.ID_ENGINE_REAL.register { kart, previous, value ->
+            chatIfTesting("kart#${kart.id} data-engine-real: $previous -> $value")
         }
-        KartAttrEvents.CAP_NITRO_COUNT.register { kart, value ->
-            chatIfTesting("kart#${kart.id} data-max-boost-count = $value")
+        KartAttrModifierEvents.CAP_NITRO_COUNT.register { kart, previous, value ->
+            chatIfTesting("kart#${kart.id} data-max-boost-count: $previous -> $value")
         }
-        KartAttrEvents.STATE_TEAM_NITRO_COUNT.register { kart, value ->
-            chatIfTesting("kart#${kart.id} data-team-boost-count = $value")
+        KartAttrModifierEvents.STATE_TEAM_NITRO_COUNT.register { kart, previous, value ->
+            chatIfTesting("kart#${kart.id} data-team-boost-count: $previous -> $value")
         }
-        KartAttrEvents.STATE_DRAFT_ACCEL.register { kart, value ->
-            chatIfTesting("kart#${kart.id} state-draft = $value")
+        KartAttrModifierEvents.STATE_DRAFT_ACCEL.register { kart, previous, value ->
+            chatIfTesting("kart#${kart.id} state-draft: $previous -> $value")
         }
-        KartAttrEvents.STATE_DRIFTING.register { kart, value ->
-            chatIfTesting("kart#${kart.id} state-drift = $value")
+        KartAttrModifierEvents.STATE_DRIFTING.register { kart, previous, value ->
+            chatIfTesting("kart#${kart.id} state-drift: $previous -> $value")
         }
-        KartAttrEvents.STATE_NITRO.register { kart, value ->
-            chatIfTesting("kart#${kart.id} state-boost = $value")
+        KartAttrModifierEvents.STATE_NITRO.register { kart, previous, value ->
+            chatIfTesting("kart#${kart.id} state-boost: $previous -> $value")
         }
-        KartAttrEvents.CAN_IBOOST.register { kart, value ->
-            chatIfTesting("kart#${kart.id} skill-instant-boost = $value")
+        KartAttrModifierEvents.CAN_IBOOST.register { kart, previous, value ->
+            chatIfTesting("kart#${kart.id} skill-instant-boost: $previous -> $value")
         }
-        KartAttrEvents.STATE_IBOOST.register { kart, value ->
-            chatIfTesting("kart#${kart.id} state-instant-boost = $value")
+        KartAttrModifierEvents.STATE_IBOOST.register { kart, previous, value ->
+            chatIfTesting("kart#${kart.id} state-instant-boost: $previous -> $value")
         }
-        KartAttrEvents.CTX_MAX_LAP.register { kart, value ->
-            chatIfTesting("kart#${kart.id} data-max-lap = $value")
+        KartAttrModifierEvents.CTX_MAX_LAP.register { kart, previous, value ->
+            chatIfTesting("kart#${kart.id} data-max-lap: $previous -> $value")
         }
-        KartAttrEvents.CTX_CURRENT_LAP.register { kart, value ->
-            chatIfTesting("kart#${kart.id} data-current-lap = $value")
+        KartAttrModifierEvents.CTX_CURRENT_LAP.register { kart, previous, value ->
+            chatIfTesting("kart#${kart.id} data-current-lap: $previous -> $value")
         }
-        KartAttrEvents.CTX_PERF_LIMIT.register { kart, value ->
-            chatIfTesting("kart#${kart.id} data-performance-limit-level = $value")
+        KartAttrModifierEvents.CTX_PERF_LIMIT.register { kart, previous, value ->
+            chatIfTesting("kart#${kart.id} data-performance-limit-level: $previous -> $value")
         }
-        KartAttrEvents.ID_TIRE.register { kart, value ->
-            chatIfTesting("kart#${kart.id} data-tire = $value")
+        KartAttrModifierEvents.ID_TIRE.register { kart, previous, value ->
+            chatIfTesting("kart#${kart.id} data-tire: $previous -> $value")
         }
-        KartAttrEvents.ID_BODY_TYPE.register { kart, value ->
-            chatIfTesting("kart#${kart.id} data-is-bike = $value")
+        KartAttrModifierEvents.ID_BODY_TYPE.register { kart, previous, value ->
+            chatIfTesting("kart#${kart.id} data-is-bike: $previous -> $value")
         }
-        KartAttrEvents.STATE_MODEL_ROTATION_ALLOWED.register { kart, value ->
-            chatIfTesting("kart#${kart.id} state-allow-model-rotation = $value")
+        KartAttrModifierEvents.STATE_MODEL_ROTATION_ALLOWED.register { kart, previous, value ->
+            chatIfTesting("kart#${kart.id} state-allow-model-rotation: $previous -> $value")
         }
         return TestResult.TESTING
     }

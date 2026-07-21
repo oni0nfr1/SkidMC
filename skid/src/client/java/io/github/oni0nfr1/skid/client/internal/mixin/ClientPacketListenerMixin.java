@@ -1,7 +1,10 @@
 package io.github.oni0nfr1.skid.client.internal.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import io.github.oni0nfr1.skid.client.internal.events.KartMountMixinHandler;
+import io.github.oni0nfr1.skid.client.internal.events.PendingKartInfoUpdate;
 import io.github.oni0nfr1.skid.client.internal.events.KartSummonMixinHandler;
 import io.github.oni0nfr1.skid.client.internal.events.KartTachometerMixinHandler;
 import io.github.oni0nfr1.skid.client.internal.events.KartAttrMixinHandler;
@@ -43,20 +46,34 @@ public abstract class ClientPacketListenerMixin {
         KartSummonMixinHandler.onAddEntityPacket(entity, ci);
     }
 
-    @Inject(method = "handleUpdateAttributes", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/attributes/AttributeInstance;setBaseValue(D)V"))
-    private void onHandleUpdateAttributes(CallbackInfo ci, @Local ClientboundUpdateAttributesPacket.AttributeSnapshot attributeSnapshot, @Local Entity entity) {
-        KartAttrMixinHandler.onUpdateAttrPacket(entity, attributeSnapshot);
+    @Inject(method = "handleUpdateAttributes", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/attributes/AttributeInstance;setBaseValue(D)V"), require = 1)
+    private void beforeHandleUpdateAttributes(
+            CallbackInfo ci,
+            @Local ClientboundUpdateAttributesPacket.AttributeSnapshot attributeSnapshot,
+            @Local Entity entity,
+            @Share("kartInfoUpdate") LocalRef<PendingKartInfoUpdate> updateRef
+    ) {
+        PendingKartInfoUpdate update = KartAttrMixinHandler.captureBeforeUpdate(entity, attributeSnapshot);
+        if (update != null) updateRef.set(update);
     }
 
     @Inject(method = "handleUpdateAttributes", at = @At("TAIL"))
-    private void afterHandleUpdateAttributes(ClientboundUpdateAttributesPacket packet, CallbackInfo ci) {
+    private void afterHandleUpdateAttributes(
+            ClientboundUpdateAttributesPacket packet,
+            CallbackInfo ci,
+            @Share("kartInfoUpdate") LocalRef<PendingKartInfoUpdate> updateRef
+    ) {
         ClientLevel level = Minecraft.getInstance().level;
         if (level == null) return;
         Entity entity = level.getEntity(packet.getEntityId());
         if (entity == null) return;
 
-        KartSummonMixinHandler.afterUpdateAttributes(entity);
-        KartMountMixinHandler.afterUpdateAttributes(entity);
-        KartMountMixinHandler.onFirstAttrUpdateAfterSpectate(entity);
+        try {
+            KartAttrMixinHandler.publishAfterUpdate(updateRef.get());
+        } finally {
+            KartSummonMixinHandler.afterUpdateAttributes(entity);
+            KartMountMixinHandler.afterUpdateAttributes(entity);
+            KartMountMixinHandler.onFirstAttrUpdateAfterSpectate(entity);
+        }
     }
 }

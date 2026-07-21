@@ -1,8 +1,8 @@
 package io.github.oni0nfr1.skid.client.internal.attr
 
 import io.github.oni0nfr1.skid.client.SkidClient
-import io.github.oni0nfr1.skid.client.api.attr.KnownAttrModId
-import io.github.oni0nfr1.skid.client.api.attr.getKartMeta
+import io.github.oni0nfr1.skid.client.api.attr.getKartInfo
+import io.github.oni0nfr1.skid.client.api.attr.unstable.KnownAttrModId
 import io.github.oni0nfr1.skid.client.api.kart.KartSaddle
 import io.github.oni0nfr1.skid.client.api.utils.KartType
 
@@ -15,7 +15,7 @@ internal object KartTypeResolver {
      * 못하는 코드이면 경고를 남기고 `null`을 반환합니다.
      */
     fun resolve(saddle: KartSaddle): KartType<*>? {
-        val rawCode = saddle.getKartMeta(KnownAttrModId.ID_ENGINE_REAL) ?: return null
+        val rawCode = saddle.getKartInfo(KnownAttrModId.ID_ENGINE_REAL) ?: return null
         val attrEngineCode = rawCode.toInt()
         val type = KartType.fromAttrEngineCode(attrEngineCode)
 

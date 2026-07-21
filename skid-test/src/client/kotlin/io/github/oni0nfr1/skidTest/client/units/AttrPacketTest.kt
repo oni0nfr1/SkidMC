@@ -35,7 +35,7 @@ object AttrPacketTest: TestUnit() {
     }
 
     override fun test(): TestResult {
-        KartAttrEvents.KART_META_ATTR.register { kartEntity, _, modifiers ->
+        KartAttrEvents.UPDATE.register { kartEntity, _, modifiers ->
             if (kartEntity.passengers.contains(client.player?.subject)) this.modifiers = modifiers
         }
 

@@ -150,7 +150,7 @@ data object X : KartType<XEngine>(
 - [x] provider가 없으면 첫 API 접근 시 명확한 오류로 실패
 - [x] provider가 둘 이상이면 첫 API 접근 시 명확한 오류로 실패
 - [x] `skid` 모듈에 provider 구현 추가
-- [ ] API 코드에서 구현체의 `internal` 패키지를 직접 import하지 않도록 정리
+- [x] API 코드에서 구현체의 `internal` 패키지를 직접 import하지 않도록 정리
 
 ### 4. 구현체를 카트 중심 수명 주기로 전환
 
@@ -218,20 +218,26 @@ data object X : KartType<XEngine>(
 
 ### 8. 어트리뷰트 API 정리
 
-- [ ] 엔진 타입 어트리뷰트의 기준 엔티티를 플레이어에서 카트로 완전히 전환
-- [ ] `RiderAttrEvents` 제거 또는 호환 계층으로 격리
-- [ ] 플레이어 기준 `realKartEngine`, `selectedKartEngine` 제거 또는 deprecated 처리
-- [ ] 카트 기준 조회 결과를 `KartType`으로 변경
+- [x] 엔진 타입 어트리뷰트의 기준 엔티티를 플레이어에서 카트로 완전히 전환
+- [x] `RiderAttrEvents` 제거
+- [x] 플레이어 기준 `realKartEngine`, `selectedKartEngine` 제거
+- [x] 카트 기준 조회 결과를 `KartType`으로 변경
 - [x] `AttrModifierSnapshot`은 stable, `KnownAttrModId`는 `api.attr.unstable`에 이전하기로 결정
 - [x] 나머지 어트리뷰트 접근 API는 정리 후 stable API로 제공하기로 결정
-- [ ] API 모듈에서 내부 로거와 구현 클래스 의존성 제거
+- [x] `KART_INFO_ATTR_KEY`와 `getKartInfo()` 명칭으로 카트 정보 조회 API 통일
+- [x] `AttrModifierSnapshot`이 전달받은 Map을 불변 복사하도록 변경
+- [x] stable `KartAttrEvents.UPDATE`를 Vanilla 값 적용 후 발행
+- [x] modifier별 이벤트를 `api.events.unstable`로 분리하고 이전 값을 함께 제공
+  - 새 스냅샷에 존재하는 modifier의 추가·변경만 발행하고 제거는 별도 의미로 처리하지 않음
+- [x] modifier 이벤트 registry를 구현 모듈의 immutable Map으로 이동
+- [x] API 모듈에서 내부 로거와 구현 클래스 의존성 제거
 
 ### 9. 패키지 안정성 표시
 
 - [ ] 안정 API와 unstable API의 기준 문서화
-- [ ] 기존 전체 패키지 구조는 유지
-- [ ] 불안정한 기능만 해당 영역 아래 `unstable` 하위 패키지로 이동
-- [ ] 저장소 전체에서 `unstable` 사용을 `grep`으로 확인할 수 있는 구조 유지
+- [x] 기존 전체 패키지 구조는 유지
+- [x] 불안정한 기능만 해당 영역 아래 `unstable` 하위 패키지로 이동
+- [x] 저장소 전체에서 `unstable` 사용을 `grep`으로 확인할 수 있는 구조 유지
 - [ ] unstable API의 호환성 보장 범위를 README와 KDoc에 명시
 
 ### 10. 빌드, 테스트 및 릴리스

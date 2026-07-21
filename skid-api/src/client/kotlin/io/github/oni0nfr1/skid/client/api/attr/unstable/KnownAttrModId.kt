@@ -1,4 +1,4 @@
-package io.github.oni0nfr1.skid.client.api.attr
+package io.github.oni0nfr1.skid.client.api.attr.unstable
 
 import net.minecraft.resources.ResourceLocation
 

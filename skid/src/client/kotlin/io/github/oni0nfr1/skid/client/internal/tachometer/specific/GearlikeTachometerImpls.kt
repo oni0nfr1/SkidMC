@@ -38,7 +38,7 @@ internal class F1TachometerImpl(
 
         if (baseResult.matched && parsedErs != null) {
             ers = parsedErs
-            val ersResult = KartTachometerEvents.ERS.invoker().onErsUpdate(parsedErs)
+            val ersResult = KartTachometerEvents.ERS.invoker().onErsUpdate(engine.kart, parsedErs)
 
             return TachometerUpdateResult.matched(
                 KartTachometerEvents.Result.finalize(baseResult.result, ersResult)

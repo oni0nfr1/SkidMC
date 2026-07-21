@@ -1,8 +1,6 @@
 package io.github.oni0nfr1.skid.client.api.events
 
-import io.github.oni0nfr1.skid.client.api.engine.KartEngine
 import io.github.oni0nfr1.skid.client.api.kart.Kart
-import io.github.oni0nfr1.skid.client.internal.utils.createEvent
 import net.minecraft.network.chat.Component
 
 /**
@@ -12,6 +10,7 @@ import net.minecraft.network.chat.Component
  * SkidMC의 액션바 처리 파이프라인은 **서버**로부터 액션바 패킷이 도착했을 때만 작동합니다.
  *
  * 따라서 타 클라이언트 모드에서 액션바 출력 메서드를 호출하더라도 SkidMC에서는 그것을 처리하지 않습니다.
+ * 모든 콜백은 렌더 스레드에서 호출되며, 전달되는 [Kart]는 콜백이 끝날 때까지 유효합니다.
  */
 object KartTachometerEvents {
 
@@ -21,13 +20,12 @@ object KartTachometerEvents {
      *
      * 렌더 스레드에서 호출됩니다.
      */
-    @Suppress("UNUSED")
     @JvmField
     val RECEIVE = createEvent { listeners ->
-        KartTachometerCallback { kart, engine, text ->
+        KartTachometerCallback { kart, text ->
             var result = Result.SHOW
             for (listener in listeners) {
-                val listenerResult = listener.onActionbarReceive(kart, engine, text)
+                val listenerResult = listener.onActionbarReceive(kart, text)
                 result = if (listenerResult == Result.BLOCK) Result.BLOCK else result
             }
             result
@@ -42,13 +40,12 @@ object KartTachometerEvents {
      * 렌더 스레드에서 호출됩니다.
      * @see Kart.velocity
      */
-    @Suppress("UNUSED")
     @JvmField
     val SPEED = createEvent { listeners ->
-        KartSpeedCallback { speed ->
+        KartSpeedCallback { kart, speed ->
             var result = Result.SHOW
             for (listener in listeners) {
-                val listenerResult = listener.onSpeedUpdate(speed)
+                val listenerResult = listener.onSpeedUpdate(kart, speed)
                 result = if (listenerResult == Result.BLOCK) Result.BLOCK else result
             }
             result
@@ -60,13 +57,12 @@ object KartTachometerEvents {
      *
      * 렌더 스레드에서 호출됩니다.
      */
-    @Suppress("UNUSED")
     @JvmField
     val NITRO = createEvent { listeners ->
-        KartNitroCallback { nitro ->
+        KartNitroCallback { kart, nitro ->
             var result = Result.SHOW
             for (listener in listeners) {
-                val listenerResult = listener.onNitroUpdate(nitro)
+                val listenerResult = listener.onNitroUpdate(kart, nitro)
                 result = if (listenerResult == Result.BLOCK) Result.BLOCK else result
             }
             result
@@ -78,13 +74,12 @@ object KartTachometerEvents {
      *
      * 렌더 스레드에서 호출됩니다.
      */
-    @Suppress("UNUSED")
     @JvmField
     val GAUGE = createEvent { listeners ->
-        KartGaugeCallback { gauge ->
+        KartGaugeCallback { kart, gauge ->
             var result = Result.SHOW
             for (listener in listeners) {
-                val listenerResult = listener.onGaugeUpdate(gauge)
+                val listenerResult = listener.onGaugeUpdate(kart, gauge)
                 result = if (listenerResult == Result.BLOCK) Result.BLOCK else result
             }
             result
@@ -96,13 +91,12 @@ object KartTachometerEvents {
      *
      * 렌더 스레드에서 호출됩니다.
      */
-    @Suppress("UNUSED")
     @JvmField
     val RPM = createEvent { listeners ->
-        KartRpmCallback { rpm ->
+        KartRpmCallback { kart, rpm ->
             var result = Result.SHOW
             for (listener in listeners) {
-                val listenerResult = listener.onRpmUpdate(rpm)
+                val listenerResult = listener.onRpmUpdate(kart, rpm)
                 result = if (listenerResult == Result.BLOCK) Result.BLOCK else result
             }
             result
@@ -114,13 +108,12 @@ object KartTachometerEvents {
      *
      * 렌더 스레드에서 호출됩니다.
      */
-    @Suppress("UNUSED")
     @JvmField
     val GEAR = createEvent { listeners ->
-        KartGearCallback { rpm ->
+        KartGearCallback { kart, gear ->
             var result = Result.SHOW
             for (listener in listeners) {
-                val listenerResult = listener.onGearUpdate(rpm)
+                val listenerResult = listener.onGearUpdate(kart, gear)
                 result = if (listenerResult == Result.BLOCK) Result.BLOCK else result
             }
             result
@@ -132,13 +125,12 @@ object KartTachometerEvents {
      *
      * 렌더 스레드에서 호출됩니다.
      */
-    @Suppress("UNUSED")
     @JvmField
     val ERS = createEvent { listeners ->
-        KartErsCallback { ers ->
+        KartErsCallback { kart, ers ->
             var result = Result.SHOW
             for (listener in listeners) {
-                val listenerResult = listener.onErsUpdate(ers)
+                val listenerResult = listener.onErsUpdate(kart, ers)
                 result = if (listenerResult == Result.BLOCK) Result.BLOCK else result
             }
             result
@@ -150,13 +142,12 @@ object KartTachometerEvents {
      *
      * 렌더 스레드에서 호출됩니다.
      */
-    @Suppress("UNUSED")
     @JvmField
     val MK_GAUGE = createEvent { listeners ->
-        MarioKartGaugeCallback { gauge ->
+        MarioKartGaugeCallback { kart, gauge ->
             var result = Result.SHOW
             for (listener in listeners) {
-                val listenerResult = listener.onGaugeUpdate(gauge)
+                val listenerResult = listener.onGaugeUpdate(kart, gauge)
                 result = if (listenerResult == Result.BLOCK) Result.BLOCK else result
             }
             result
@@ -167,74 +158,80 @@ object KartTachometerEvents {
     fun interface KartTachometerCallback {
         /**
          * @param kart 액션바와 연결된 현재 카트
-         * @param engine 액션바와 연결된 현재 엔진
          * @param text 수신한 원본 액션바 컴포넌트
          * @return 액션바 표시 여부
          */
-        fun onActionbarReceive(kart: Kart<*>, engine: KartEngine, text: Component): Result
+        fun onActionbarReceive(kart: Kart<*>, text: Component): Result
     }
 
     /** 파싱된 속도 값을 처리합니다. */
     fun interface KartSpeedCallback {
         /**
+         * @param kart 값이 파싱된 현재 카트
          * @param speed 액션바에 표시된 속도(`km/h`)
          * @return 액션바 표시 여부
          */
-        fun onSpeedUpdate(speed: Double): Result
+        fun onSpeedUpdate(kart: Kart<*>, speed: Double): Result
     }
 
     /** 파싱된 부스터 개수를 처리합니다. */
     fun interface KartNitroCallback {
         /**
+         * @param kart 값이 파싱된 현재 카트
          * @param nitro 현재 보유한 부스터 개수
          * @return 액션바 표시 여부
          */
-        fun onNitroUpdate(nitro: Int): Result
+        fun onNitroUpdate(kart: Kart<*>, nitro: Int): Result
     }
 
     /** 파싱된 부스터 게이지를 처리합니다. */
     fun interface KartGaugeCallback {
         /**
+         * @param kart 값이 파싱된 현재 카트
          * @param gauge `0.0..1.0` 범위의 부스터 게이지 진행도
          * @return 액션바 표시 여부
          */
-        fun onGaugeUpdate(gauge: Double): Result
+        fun onGaugeUpdate(kart: Kart<*>, gauge: Double): Result
     }
 
     /** 파싱된 MK 터보 게이지를 처리합니다. */
     fun interface MarioKartGaugeCallback {
         /**
+         * @param kart 값이 파싱된 현재 카트
          * @param gauge `0.0..1.0` 범위의 터보 게이지 진행도
          * @return 액션바 표시 여부
          */
-        fun onGaugeUpdate(gauge: Double): Result
+        fun onGaugeUpdate(kart: Kart<*>, gauge: Double): Result
     }
 
     /** 파싱된 RPM 게이지를 처리합니다. */
     fun interface KartRpmCallback {
         /**
+         * @param kart 값이 파싱된 현재 카트
          * @param rpm `0.0..1.0` 범위의 RPM 게이지 진행도
          * @return 액션바 표시 여부
          */
-        fun onRpmUpdate(rpm: Double): Result
+        fun onRpmUpdate(kart: Kart<*>, rpm: Double): Result
     }
 
     /** 파싱된 기어 단수를 처리합니다. */
     fun interface KartGearCallback {
         /**
+         * @param kart 값이 파싱된 현재 카트
          * @param gear 현재 기어 단수
          * @return 액션바 표시 여부
          */
-        fun onGearUpdate(gear: Int): Result
+        fun onGearUpdate(kart: Kart<*>, gear: Int): Result
     }
 
     /** 파싱된 F1 ERS 값을 처리합니다. */
     fun interface KartErsCallback {
         /**
+         * @param kart 값이 파싱된 현재 카트
          * @param ers 액션바에 표시된 ERS 충전량
          * @return 액션바 표시 여부
          */
-        fun onErsUpdate(ers: Int): Result
+        fun onErsUpdate(kart: Kart<*>, ers: Int): Result
     }
 
     /**

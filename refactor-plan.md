@@ -211,8 +211,9 @@ data object X : KartType<XEngine>(
 - [x] `SPECTATE_EARLY`와 `SPECTATE` 시작점을 하나의 `SPECTATE_END`로 정리
 - [x] `KartMountEvents`와 이벤트 생성 기반을 `skid-api`로 이전
 - [x] 준비된 카트 수명 주기의 `KartSummonEvents`를 `skid-api`로 이전
+- [x] 모든 콜백에 현재 `Kart`를 제공하도록 `KartTachometerEvents`를 정리해 `skid-api`로 이전
 - [x] 제거·하차·관전 종료 이벤트 순서 보장
-- [ ] 아직 안정화되지 않은 이벤트를 `api.unstable.events`에 둘지 결정
+- [x] modifier별 어트리뷰트 이벤트만 `api.events.unstable`에 배치하기로 결정
 - [x] `MountTest`를 새 이벤트 구조로 전환
 
 ### 8. 어트리뷰트 API 정리
@@ -221,8 +222,8 @@ data object X : KartType<XEngine>(
 - [ ] `RiderAttrEvents` 제거 또는 호환 계층으로 격리
 - [ ] 플레이어 기준 `realKartEngine`, `selectedKartEngine` 제거 또는 deprecated 처리
 - [ ] 카트 기준 조회 결과를 `KartType`으로 변경
-- [ ] `AttrModifierSnapshot`, `KnownAttrModId` 이전 여부 결정
-- [ ] 원시 어트리뷰트 접근 API를 `api.unstable.attr`에 둘지 결정
+- [x] `AttrModifierSnapshot`은 stable, `KnownAttrModId`는 `api.attr.unstable`에 이전하기로 결정
+- [x] 나머지 어트리뷰트 접근 API는 정리 후 stable API로 제공하기로 결정
 - [ ] API 모듈에서 내부 로거와 구현 클래스 의존성 제거
 
 ### 9. 패키지 안정성 표시

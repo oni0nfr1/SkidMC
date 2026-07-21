@@ -5,7 +5,6 @@ import io.github.oni0nfr1.skid.client.api.kart.Kart
 import io.github.oni0nfr1.skid.client.api.kart.KartMain
 import io.github.oni0nfr1.skid.client.api.kart.KartModelRoot
 import io.github.oni0nfr1.skid.client.api.kart.KartSaddle
-import io.github.oni0nfr1.skid.client.api.kart.StaleKartException
 import io.github.oni0nfr1.skid.client.api.utils.KartType
 import net.minecraft.client.Minecraft
 import net.minecraft.world.entity.player.Player
@@ -36,29 +35,29 @@ internal class KartImpl<ENGINE : KartEngine>(
         }
 
     override val saddle: KartSaddle
-        get() = internalSaddleOrNull ?: throw StaleKartException()
+        get() = internalSaddleOrNull ?: unavailable("saddle")
     override val entity: KartMain
-        get() = internalEntityOrNull ?: throw StaleKartException()
+        get() = internalEntityOrNull ?: unavailable("main entity")
     override val model: KartModelRoot
-        get() = internalModelOrNull ?: throw StaleKartException()
+        get() = internalModelOrNull ?: unavailable("model")
 
     // 현재의 엔티티 위치를 그대로 반환
     override val position: Vec3
-        get() = internalEntityOrNull?.position() ?: throw StaleKartException()
+        get() = internalEntityOrNull?.position() ?: unavailable("position")
 
     internal var currentPosition: Vec3 = saddle.position()
-        get() = if (alive) field else throw StaleKartException()
+        get() = if (alive) field else unavailable("current position")
         private set
     internal var prevPosition: Vec3 = saddle.position()
-        get() = if (alive) field else throw StaleKartException()
+        get() = if (alive) field else unavailable("previous position")
         private set
     override var velocity: Vec3 = Vec3.ZERO
-        get() = if (alive) field else throw StaleKartException()
+        get() = if (alive) field else unavailable("velocity")
         private set
 
     private lateinit var internalEngine: ENGINE
     override val engine: ENGINE
-        get() = if (alive && ::internalEngine.isInitialized) internalEngine else throw StaleKartException()
+        get() = if (alive && ::internalEngine.isInitialized) internalEngine else unavailable("engine")
 
     override var rider: Player? = null
         private set
@@ -87,5 +86,9 @@ internal class KartImpl<ENGINE : KartEngine>(
         return if (!alive) {
             other === null
         } else this === other
+    }
+
+    private fun unavailable(property: String): Nothing {
+        throw IllegalStateException("Kart $property is not available")
     }
 }

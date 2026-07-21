@@ -233,7 +233,7 @@ internal object KartMountMixinHandler {
         if (!KartManager.isReady(kart.id)) return
 
         val mounted = KartManager.mountRider(rider.id, kart.id)
-        if (mounted) KartMountEvents.MOUNT.invoker().onKartMount(KartRef(kart.id), rider)
+        if (mounted) KartMountEvents.MOUNT.invoker().onKartMount(KartRef(kart), rider)
         completeSpectatingIfReady(kart)
     }
 
@@ -501,7 +501,7 @@ internal object KartMountMixinHandler {
         if (!KartManager.isReady(saddle.id)) return
 
         KartMountEvents.SPECTATE.invoker()
-            .onKartSpectate(KartRef(saddle.id), relation.rider, relation.target)
+            .onKartSpectate(KartRef(saddle), relation.rider, relation.target)
         if (spectateRelation === relation) relation.stage = SpectateStage.READY
     }
 

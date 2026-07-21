@@ -29,6 +29,7 @@ final class JavaApiTypeTest {
     }
 
     static void accessors(Cod saddle, Player rider, LocalPlayer localPlayer) {
+        KartRef directRef = new KartRef(saddle);
         KartRef kart = KartUtils.getKart(saddle);
         KartRef ridingKart = KartUtils.getRidingKart(rider);
         MountType mountStatus = KartUtils.getMountStatus(localPlayer);

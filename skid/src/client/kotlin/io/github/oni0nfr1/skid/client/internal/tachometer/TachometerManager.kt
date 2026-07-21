@@ -68,7 +68,7 @@ internal object TachometerManager {
         var receiveResult = KartTachometerEvents.Result.SHOW
         if (match.matched) {
             receiveResult = KartTachometerEvents.RECEIVE.invoker()
-                .onActionbarReceive(KartRef(kart.saddle.id), actionBar)
+                .onActionbarReceive(KartRef(kart.saddle), actionBar)
         }
 
         return KartTachometerEvents.Result.finalize(match.result, receiveResult)

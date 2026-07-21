@@ -176,7 +176,7 @@ internal object KartManager {
 
     fun getBySaddleId(saddleId: Int): KartImpl<*>? {
         val handle = saddleIdToKart[saddleId]
-        if (handle?.alive == false) {
+        if (handle != null && (!handle.alive || handle.internalSaddleOrNull == null)) {
             removeKart(saddleId)
             return null
         }

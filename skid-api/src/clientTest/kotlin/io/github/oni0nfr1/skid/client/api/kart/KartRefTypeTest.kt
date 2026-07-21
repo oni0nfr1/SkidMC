@@ -46,6 +46,7 @@ private fun kartAccessorsExposeApiTypes(
     rider: Player,
     localPlayer: LocalPlayer,
 ) {
+    val directRef: KartRef = KartRef(saddle)
     val kart: KartRef? = saddle.kart
     val ridingKart: KartRef? = rider.ridingKart
     val mountStatus: MountType = localPlayer.mountStatus

@@ -1,6 +1,7 @@
 package io.github.oni0nfr1.skidTest.client.units
 
 import io.github.oni0nfr1.skid.client.api.events.KartSummonEvents
+import io.github.oni0nfr1.skid.client.api.kart.Kart
 import io.github.oni0nfr1.skid.client.api.kart.KartRef
 import io.github.oni0nfr1.skid.client.api.kart.kart
 import io.github.oni0nfr1.skid.client.api.utils.access
@@ -9,6 +10,7 @@ import io.github.oni0nfr1.skidTest.client.TestUnit
 import io.github.oni0nfr1.skidTest.client.utils.sendChat
 import net.minecraft.client.DeltaTracker
 import net.minecraft.client.gui.GuiGraphics
+import java.util.UUID
 
 @SkidTest
 object SummonTest : TestUnit() {
@@ -18,21 +20,28 @@ object SummonTest : TestUnit() {
         1. 카트를 생성하고 SUMMON_EARLY 이후 SUMMON이 출력되는지 확인한다.
         2. SUMMON에서 카트 참조와 엔진 종류가 출력되는지 확인한다.
         3. 준비 전 또는 준비 후 카트를 제거하고 REMOVE가 한 번 출력되는지 확인한다.
-        4. 준비 후 제거한 카트 참조가 REMOVE 콜백 이후 무효화되는지 확인한다.
+        4. REMOVE 콜백 이후 이전 Kart 객체가 무효화되는지 확인한다.
+        5. 같은 saddle이 재동기화되면 기존 KartRef가 같은 UUID에만 연결되는지 확인한다.
 
         테스트 통과 시 통과 커맨드를 입력하면 테스트가 종료됩니다.
     """.trimIndent()
 
     private val earlySaddleIds = mutableSetOf<Int>()
     private val readySaddleIds = mutableSetOf<Int>()
-    private val removedRefsToCheck = mutableListOf<KartRef>()
+    private data class RemovedKart(
+        val ref: KartRef,
+        val kart: Kart<*>,
+        val saddleUuid: UUID,
+    )
+
+    private val removedKartsToCheck = mutableListOf<RemovedKart>()
 
     init { register() }
 
     override fun test(): TestResult {
         earlySaddleIds.clear()
         readySaddleIds.clear()
-        removedRefsToCheck.clear()
+        removedKartsToCheck.clear()
 
         KartSummonEvents.SUMMON_EARLY.register { kartEntity ->
             if (!status.testing) return@register
@@ -75,12 +84,17 @@ object SummonTest : TestUnit() {
 
             val wasReady = readySaddleIds.remove(kartEntity.id)
             if (wasReady) {
-                val kart = kartEntity.kart ?: run {
+                val ref = kartEntity.kart ?: run {
                     client.sendChat("[REMOVE] ready kart#${kartEntity.id} does not resolve during callback!")
                     autoFail()
                     return@register
                 }
-                removedRefsToCheck += kart
+                val kart = ref.get().orElse(null) ?: run {
+                    client.sendChat("[REMOVE] ready kart#${kartEntity.id} is missing during callback!")
+                    autoFail()
+                    return@register
+                }
+                removedKartsToCheck += RemovedKart(ref, kart, kartEntity.uuid)
             }
             val stage = if (wasReady) "READY" else "EARLY"
             client.sendChat("[REMOVE:$stage] kart#${kartEntity.id} was removed.")
@@ -90,18 +104,27 @@ object SummonTest : TestUnit() {
     }
 
     override fun drawHud(guiGraphics: GuiGraphics, tickDelta: DeltaTracker) {
-        if (!status.testing || removedRefsToCheck.isEmpty()) return
+        if (!status.testing || removedKartsToCheck.isEmpty()) return
 
-        val iterator = removedRefsToCheck.iterator()
+        val iterator = removedKartsToCheck.iterator()
         while (iterator.hasNext()) {
-            val kart = iterator.next()
-            if (kart.get().isPresent) {
-                client.sendChat("[REMOVE] kart#${kart.saddleId} still resolves after callback!")
+            val removed = iterator.next()
+            if (removed.kart.alive) {
+                client.sendChat("[REMOVE] previous kart#${removed.ref.saddleId} is still alive!")
                 autoFail()
+                iterator.remove()
             } else {
-                client.sendChat("[REMOVE] kart#${kart.saddleId} was invalidated after callback.")
+                val resolved = removed.ref.get().orElse(null) ?: continue
+                if (resolved.saddle.uuid == removed.saddleUuid) {
+                    client.sendChat("[REMOVE] kart#${removed.ref.saddleId} was resynchronized.")
+                } else {
+                    client.sendChat(
+                        "[REMOVE] kart#${removed.ref.saddleId} resolved to a different entity!"
+                    )
+                    autoFail()
+                }
+                iterator.remove()
             }
-            iterator.remove()
         }
     }
 }

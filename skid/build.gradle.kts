@@ -45,6 +45,16 @@ loom {
     }
 }
 
+val clientSourceSet = sourceSets.named("client")
+val clientTestSourceSet = sourceSets.create("clientTest") {
+    compileClasspath += clientSourceSet.get().output + clientSourceSet.get().compileClasspath
+    runtimeClasspath += output + compileClasspath + clientSourceSet.get().runtimeClasspath
+}
+
+kotlin.target.compilations.named("clientTest") {
+    associateWith(kotlin.target.compilations.getByName("client"))
+}
+
 
 repositories {
     // Add repositories to retrieve artifacts from in here.
@@ -66,6 +76,24 @@ dependencies {
     implementation(project(path = ":skid-api", configuration = "namedElements"))
     add("clientImplementation", skidApiSourceSets.named("client").get().output)
     include(project(":skid-api"))
+
+    add(clientTestSourceSet.implementationConfigurationName, kotlin("test-junit5"))
+    add(
+        clientTestSourceSet.runtimeOnlyConfigurationName,
+        "org.junit.platform:junit-platform-launcher",
+    )
+}
+
+val clientTest by tasks.registering(Test::class) {
+    description = "Runs tests for the client implementation source set."
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    testClassesDirs = clientTestSourceSet.output.classesDirs
+    classpath = clientTestSourceSet.runtimeClasspath
+    useJUnitPlatform()
+}
+
+tasks.check {
+    dependsOn(clientTest)
 }
 
 tasks.processResources {

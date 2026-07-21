@@ -131,7 +131,7 @@ data object X : KartType<XEngine>(
 ### 2. KartRef 재설계
 
 - [x] `KartRef`를 `Ref<Kart<*>>` 기반 계약으로 정의
-- [x] saddle entity ID를 안정적인 참조 키로 유지
+- [x] saddle entity ID로 조회하고 생성 당시 UUID 비교로 ID 재사용을 차단
 - [x] `get()` 호출 시 렌더 스레드 및 카트 유효성 검사
 - [x] `KartRef.specify(KartType.X)` 형태로 타입이 지정된 참조 제공
 - [x] `specify()` 결과의 `access` 블록에서 `Kart<XEngine>`과 `engine.tachometer: XTachometer?` 추론 확인
@@ -251,6 +251,8 @@ data object X : KartType<XEngine>(
   - `KartRef.specify(KartType.X).access { ... }`
   - 중간·구체 엔진 타입에서 대응 타코미터 타입 추론
 - [x] Java API 사용 테스트 추가
+- [x] `skid` 구현 모듈의 `clientTest` 소스셋을 구성하고 `check`에 연결
+- [x] 실제 provider resolver에서 동일 ID의 UUID 재사용을 거부하는 회귀 테스트 추가
 - [ ] 엔티티 패킷 순서 조합별 mount/spectate 테스트 추가
 - [x] 기존 `skid` 모듈의 중복 API 소스 제거
 - [x] 배포 JAR에 `skid-api`가 정확히 한 번 포함되는지 확인

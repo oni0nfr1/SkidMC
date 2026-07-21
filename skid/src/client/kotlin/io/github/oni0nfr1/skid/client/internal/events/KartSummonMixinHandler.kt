@@ -66,7 +66,7 @@ internal object KartSummonMixinHandler {
     fun afterUpdateAttributes(entity: Entity) {
         if (entity !is KartSaddle) return
         val kart = KartManager.prepareKart(entity) ?: return
-        KartSummonEvents.SUMMON.invoker().onSummon(KartRef(kart.saddle.id))
+        KartSummonEvents.SUMMON.invoker().onSummon(KartRef(kart.saddle))
     }
 
     /**

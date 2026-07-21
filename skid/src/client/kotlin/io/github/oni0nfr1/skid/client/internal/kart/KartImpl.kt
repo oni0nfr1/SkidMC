@@ -9,6 +9,7 @@ import io.github.oni0nfr1.skid.client.api.utils.KartType
 import net.minecraft.client.Minecraft
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.phys.Vec3
+import java.util.UUID
 
 internal class KartImpl<ENGINE : KartEngine>(
     saddle: KartSaddle,
@@ -17,11 +18,18 @@ internal class KartImpl<ENGINE : KartEngine>(
 
     override var alive = true
 
+    /**
+     * INVARIANT:
+     * - 이 Kart가 생성된 saddle의 ID와 UUID이며 수명 주기 동안 변경되지 않는다.
+     * - [internalSaddleOrNull]은 현재 월드 엔티티가 이 identity와 모두 일치할 때만 존재한다.
+     */
     val saddleId: Int = saddle.id
+    val saddleUuid: UUID = saddle.uuid
     internal val internalSaddleOrNull: KartSaddle?
         get() =
             if (!alive) null
-            else Minecraft.getInstance().level?.getEntity(saddleId) as? KartSaddle
+            else (Minecraft.getInstance().level?.getEntity(saddleId) as? KartSaddle)
+                ?.takeIf { it.uuid == saddleUuid }
     internal val internalEntityOrNull: KartMain?
         get() =
             if (!alive) null
@@ -79,7 +87,7 @@ internal class KartImpl<ENGINE : KartEngine>(
     }
 
     override fun hashCode(): Int {
-        return this@KartImpl.saddle.id.hashCode()
+        return saddleId.hashCode()
     }
 
     override fun equals(other: Any?): Boolean {

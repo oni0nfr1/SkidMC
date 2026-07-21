@@ -6,23 +6,29 @@ import io.github.oni0nfr1.skid.client.api.utils.KartType
 import io.github.oni0nfr1.skid.client.api.utils.Ref
 import net.minecraft.client.Minecraft
 import java.util.Optional
+import java.util.UUID
 
 /**
  * 카트의 수명 주기와 독립적으로 보관할 수 있는 참조입니다.
  *
- * 실제 카트는 [get]을 호출하는 시점에 다시 조회하므로, saddle 엔티티가 아직 준비되지
- * 않았거나 준비 전에 사라졌거나 이미 제거되었다면 빈 [Optional]을 반환합니다.
+ * 실제 카트는 [get]을 호출하는 시점에 엔티티 ID로 다시 조회하고 생성 당시의 UUID와
+ * 비교합니다. 같은 서버 엔티티가 다시 동기화되면 resolve될 수 있지만, 다른 엔티티가
+ * 같은 ID를 재사용하면 빈 [Optional]을 반환합니다.
  */
-class KartRef(
-    /** 참조하는 카트의 대구 엔티티 ID입니다. */
+class KartRef private constructor(
+    /** 참조하는 카트 saddle의 엔티티 ID입니다. */
     val saddleId: Int,
+    private val saddleUuid: UUID,
 ) : Ref<Kart<*>> {
+
+    /** [saddle]의 엔티티 ID와 UUID를 함께 캡처한 카트 참조를 생성합니다. */
+    constructor(saddle: KartSaddle) : this(saddle.id, saddle.uuid)
 
     /**
      * 현재 시점에 유효한 카트를 반환합니다.
      *
-     * 카트가 아직 준비되지 않았거나 준비 전에 사라졌거나, provider가 반환한 카트가 이미
-     * 제거되었거나 다른 대구 엔티티를 가리키면 빈 [Optional]을 반환합니다.
+     * 카트가 아직 준비되지 않았거나 현재 추적되지 않거나, provider가 반환한 saddle의
+     * UUID가 생성 당시와 다르면 빈 [Optional]을 반환합니다.
      *
      * @throws IllegalStateException 렌더 스레드가 아닌 곳에서 호출한 경우
      */
@@ -31,9 +37,7 @@ class KartRef(
             "Kart can only be accessed on the render thread"
         }
 
-        return SkidApiProviderLoader.provider.getKart(saddleId).filter { kart ->
-            kart.alive && kart.saddle.id == saddleId
-        }
+        return SkidApiProviderLoader.provider.getKart(saddleId, saddleUuid)
     }
 
     /**

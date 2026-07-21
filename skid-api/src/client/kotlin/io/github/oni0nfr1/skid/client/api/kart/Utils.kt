@@ -42,8 +42,8 @@ val LocalPlayer.mountStatus: MountType
 val KartSaddle.kart: KartRef?
     get() {
         checkRenderThread()
-        return SkidApiProviderLoader.provider.getKart(this.id)
-            .map { KartRef(it.saddle.id) }
+        return SkidApiProviderLoader.provider.getKart(this.id, this.uuid)
+            .map { KartRef(this) }
             .orElse(null)
     }
 
@@ -57,7 +57,7 @@ val Player.ridingKart: KartRef?
     get() {
         checkRenderThread()
         return SkidApiProviderLoader.provider.getKartByRiderId(this.id)
-            .map { KartRef(it.saddle.id) }
+            .map { KartRef(it.saddle) }
             .orElse(null)
     }
 

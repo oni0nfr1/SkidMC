@@ -8,7 +8,7 @@ internal abstract class KartTachometerImpl(
     final override val engine: KartEngine,
 ) : TachometerInternal {
 
-    protected val kartRef = KartRef(engine.kart.saddle.id)
+    protected val kartRef = KartRef(engine.kart.saddle)
 
     final override var text: Component = Component.empty()
         protected set

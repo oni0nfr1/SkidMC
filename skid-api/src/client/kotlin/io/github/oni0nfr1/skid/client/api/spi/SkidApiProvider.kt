@@ -2,6 +2,7 @@ package io.github.oni0nfr1.skid.client.api.spi
 
 import io.github.oni0nfr1.skid.client.api.kart.Kart
 import java.util.Optional
+import java.util.UUID
 
 /**
  * SkidMC API와 구현체를 연결하는 Fabric entrypoint 계약입니다.
@@ -12,11 +13,12 @@ import java.util.Optional
 interface SkidApiProvider {
 
     /**
-     * [saddleId]에 대응하는 현재 유효한 카트를 반환합니다.
+     * [saddleId]와 [saddleUuid]에 대응하는 현재 유효한 카트를 반환합니다.
      *
-     * 카트가 제거되었거나 아직 API 객체가 준비되지 않았으면 빈 [Optional]을 반환합니다.
+     * 카트가 제거되었거나 아직 API 객체가 준비되지 않았거나, 같은 ID를 다른 엔티티가
+     * 재사용하고 있으면 빈 [Optional]을 반환합니다.
      */
-    fun getKart(saddleId: Int): Optional<Kart<*>>
+    fun getKart(saddleId: Int, saddleUuid: UUID): Optional<Kart<*>>
 
     /**
      * [riderId]에 대응하는 현재 유효한 카트를 반환합니다.

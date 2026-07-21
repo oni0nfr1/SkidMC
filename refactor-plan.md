@@ -198,18 +198,21 @@ data object X : KartType<XEngine>(
 - [ ] 소환 이벤트를 조기 감지와 준비 완료 시점으로 분리
   - `SUMMON_EARLY`
   - `SUMMON`
-- [ ] 탑승 이벤트 시점 재정의
+- [x] 탑승 이벤트 시점 재정의
   - `MOUNT_EARLY`
   - `MOUNT`
+  - EARLY 또는 ready 시작점을 하나의 `DISMOUNT`로 정리
 - [x] `SYNC`/`UNSYNC` 계열 이벤트 도입 잠정 보류
   - 이름만 기존 EARLY/준비 완료 단계를 바꾸는 이벤트로는 도입하지 않음
   - 향후 서버의 실제 `SUMMON`/`REMOVE`, `MOUNT`/`DISMOUNT` 수명 주기와 클라이언트의 정보 접근 가능 기간을 구분할 수 있을 때 재검토
   - `SYNC`는 필요한 엔티티·어트리뷰트·관계 정보를 읽을 수 있게 된 시점, `UNSYNC`는 더 이상 읽을 수 없게 된 시점으로 쌍을 이루어야 함
   - 현재 Vanilla 패킷만으로는 실제 서버 생성·삭제와 클라이언트 추적 시작·종료를 신뢰성 있게 구분할 수 없으므로 효과적인 구현이 불가능함
 - [ ] 관전 이벤트가 준비된 `Kart`, `KartEngine`, `KartTachometer` 계약과 일치하도록 변경
-- [ ] 제거·하차·관전 종료 이벤트 순서 보장
+- [x] `SPECTATE_EARLY`와 `SPECTATE` 시작점을 하나의 `SPECTATE_END`로 정리
+- [x] `KartMountEvents`와 이벤트 생성 기반을 `skid-api`로 이전
+- [x] 제거·하차·관전 종료 이벤트 순서 보장
 - [ ] 아직 안정화되지 않은 이벤트를 `api.unstable.events`에 둘지 결정
-- [ ] `MountTest`를 새 이벤트 구조로 전환
+- [x] `MountTest`를 새 이벤트 구조로 전환
 
 ### 8. 어트리뷰트 API 정리
 

@@ -2,6 +2,7 @@ package io.github.oni0nfr1.skid.client.internal.events
 
 import io.github.oni0nfr1.skid.client.SkidClient
 import io.github.oni0nfr1.skid.client.api.events.KartMountEvents
+import io.github.oni0nfr1.skid.client.api.kart.KartRef
 import io.github.oni0nfr1.skid.client.api.kart.KartSaddle
 import io.github.oni0nfr1.skid.client.internal.kart.KartManager
 import io.github.oni0nfr1.skid.client.internal.tachometer.TachometerManager
@@ -232,7 +233,7 @@ internal object KartMountMixinHandler {
         if (!KartManager.isReady(kart.id)) return
 
         val mounted = KartManager.mountRider(rider.id, kart.id)
-        if (mounted) KartMountEvents.MOUNT.invoker().onKartMount(kart, rider)
+        if (mounted) KartMountEvents.MOUNT.invoker().onKartMount(KartRef(kart.id), rider)
         completeSpectatingIfReady(kart)
     }
 
@@ -472,7 +473,8 @@ internal object KartMountMixinHandler {
         if (spectateRelation != null) return
 
         TachometerManager.clear()
-        KartMountEvents.SPECTATE_EARLY.invoker().onKartSpectate(saddle, rider, target)
+        KartMountEvents.SPECTATE_EARLY.invoker()
+            .onKartSpectate(saddle, rider, target)
         spectateRelation = SpectateRelation(
             saddle = saddle,
             rider = rider,
@@ -499,7 +501,7 @@ internal object KartMountMixinHandler {
         if (!KartManager.isReady(saddle.id)) return
 
         KartMountEvents.SPECTATE.invoker()
-            .onKartSpectate(saddle, relation.rider, relation.target)
+            .onKartSpectate(KartRef(saddle.id), relation.rider, relation.target)
         if (spectateRelation === relation) relation.stage = SpectateStage.READY
     }
 

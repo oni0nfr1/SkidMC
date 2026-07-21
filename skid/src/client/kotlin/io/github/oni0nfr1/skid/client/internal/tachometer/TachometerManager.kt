@@ -3,6 +3,7 @@ package io.github.oni0nfr1.skid.client.internal.tachometer
 import io.github.oni0nfr1.skid.client.api.engine.KartEngine
 import io.github.oni0nfr1.skid.client.api.events.KartTachometerEvents
 import io.github.oni0nfr1.skid.client.api.kart.Kart
+import io.github.oni0nfr1.skid.client.api.kart.KartRef
 import io.github.oni0nfr1.skid.client.api.kart.subject
 import io.github.oni0nfr1.skid.client.api.tachometer.KartTachometer
 import io.github.oni0nfr1.skid.client.api.utils.KartType
@@ -66,7 +67,8 @@ internal object TachometerManager {
 
         var receiveResult = KartTachometerEvents.Result.SHOW
         if (match.matched) {
-            receiveResult = KartTachometerEvents.RECEIVE.invoker().onActionbarReceive(kart, actionBar)
+            receiveResult = KartTachometerEvents.RECEIVE.invoker()
+                .onActionbarReceive(KartRef(kart.saddle.id), actionBar)
         }
 
         return KartTachometerEvents.Result.finalize(match.result, receiveResult)

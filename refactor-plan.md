@@ -194,7 +194,9 @@ data object X : KartType<XEngine>(
 
 ### 7. 이벤트 API 재정비
 
-- [ ] 이벤트 콜백이 엔티티 원본, `Kart`, `KartRef` 중 무엇을 전달할지 일관된 규칙 확정
+- [x] 준비된 `Kart`를 제공하는 공개 이벤트 진입점을 `KartRef`로 통일
+  - EARLY, 공통 종료 및 첫 어트리뷰트 갱신은 준비 전 관계도 식별할 수 있도록 saddle 엔티티를 제공
+  - 준비 완료 이벤트에서는 콜백이 끝날 때까지 참조가 유효한 `Kart`로 해석됨
 - [ ] 소환 이벤트를 조기 감지와 준비 완료 시점으로 분리
   - `SUMMON_EARLY`
   - `SUMMON`
@@ -207,11 +209,11 @@ data object X : KartType<XEngine>(
   - 향후 서버의 실제 `SUMMON`/`REMOVE`, `MOUNT`/`DISMOUNT` 수명 주기와 클라이언트의 정보 접근 가능 기간을 구분할 수 있을 때 재검토
   - `SYNC`는 필요한 엔티티·어트리뷰트·관계 정보를 읽을 수 있게 된 시점, `UNSYNC`는 더 이상 읽을 수 없게 된 시점으로 쌍을 이루어야 함
   - 현재 Vanilla 패킷만으로는 실제 서버 생성·삭제와 클라이언트 추적 시작·종료를 신뢰성 있게 구분할 수 없으므로 효과적인 구현이 불가능함
-- [ ] 관전 이벤트가 준비된 `Kart`, `KartEngine`, `KartTachometer` 계약과 일치하도록 변경
+- [x] 관전 이벤트가 준비된 `Kart`, `KartEngine`, `KartTachometer` 계약과 일치하도록 변경
 - [x] `SPECTATE_EARLY`와 `SPECTATE` 시작점을 하나의 `SPECTATE_END`로 정리
 - [x] `KartMountEvents`와 이벤트 생성 기반을 `skid-api`로 이전
 - [x] 준비된 카트 수명 주기의 `KartSummonEvents`를 `skid-api`로 이전
-- [x] 모든 콜백에 현재 `Kart`를 제공하도록 `KartTachometerEvents`를 정리해 `skid-api`로 이전
+- [x] 모든 콜백에 현재 `KartRef`를 제공하도록 `KartTachometerEvents`를 정리해 `skid-api`로 이전
 - [x] 제거·하차·관전 종료 이벤트 순서 보장
 - [x] modifier별 어트리뷰트 이벤트만 `api.events.unstable`에 배치하기로 결정
 - [x] `MountTest`를 새 이벤트 구조로 전환

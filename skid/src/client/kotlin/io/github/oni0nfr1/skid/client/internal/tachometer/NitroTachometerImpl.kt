@@ -60,14 +60,12 @@ internal abstract class NitroTachometerImpl(
         }
 
         commit(actionBar)
-        val kart = engine.kart
-
         speed = parsedSpeed
-        val speedResult = KartTachometerEvents.SPEED.invoker().onSpeedUpdate(kart, parsedSpeed)
+        val speedResult = KartTachometerEvents.SPEED.invoker().onSpeedUpdate(kartRef, parsedSpeed)
         nitro = parsedNitro
-        val nitroResult = KartTachometerEvents.NITRO.invoker().onNitroUpdate(kart, parsedNitro)
+        val nitroResult = KartTachometerEvents.NITRO.invoker().onNitroUpdate(kartRef, parsedNitro)
         gauge = parsedGauge
-        val gaugeResult = KartTachometerEvents.GAUGE.invoker().onGaugeUpdate(kart, parsedGauge)
+        val gaugeResult = KartTachometerEvents.GAUGE.invoker().onGaugeUpdate(kartRef, parsedGauge)
 
         return TachometerUpdateResult.matched(
             KartTachometerEvents.Result.finalize(speedResult, nitroResult, gaugeResult)

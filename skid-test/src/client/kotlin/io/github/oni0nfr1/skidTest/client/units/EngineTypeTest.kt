@@ -5,8 +5,7 @@ import io.github.oni0nfr1.skid.client.api.engine.GearlikeEngine
 import io.github.oni0nfr1.skid.client.api.engine.MKEngine
 import io.github.oni0nfr1.skid.client.api.engine.NitroEngine
 import io.github.oni0nfr1.skid.client.api.events.KartMountEvents
-import io.github.oni0nfr1.skid.client.api.kart.KartSaddle
-import io.github.oni0nfr1.skid.client.api.kart.kart
+import io.github.oni0nfr1.skid.client.api.kart.KartRef
 import io.github.oni0nfr1.skid.client.api.utils.access
 import io.github.oni0nfr1.skidTest.annotations.SkidTest
 import io.github.oni0nfr1.skidTest.client.TestUnit
@@ -28,8 +27,8 @@ object EngineTypeTest: TestUnit() {
 
     init { register() }
 
-    fun showKartEngineCategory(kartEntity: KartSaddle) {
-        kartEntity.kart?.access {
+    fun showKartEngineCategory(kart: KartRef) {
+        kart.access {
             val engineCategoryName = when (engine) {
                 is NitroEngine -> "kartrider-like"
                 is GearlikeEngine -> "gear-like"

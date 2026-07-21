@@ -45,7 +45,7 @@ internal class MKTachometerImpl(
         commit(actionBar)
 
         turboGauge = parsedGauge
-        val result = KartTachometerEvents.MK_GAUGE.invoker().onGaugeUpdate(engine.kart, parsedGauge)
+        val result = KartTachometerEvents.MK_GAUGE.invoker().onGaugeUpdate(kartRef, parsedGauge)
         return TachometerUpdateResult.matched(result)
     }
 

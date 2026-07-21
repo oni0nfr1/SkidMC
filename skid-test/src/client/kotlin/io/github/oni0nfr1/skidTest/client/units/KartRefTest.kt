@@ -4,9 +4,8 @@ import io.github.oni0nfr1.skid.client.api.engine.KartEngine
 import io.github.oni0nfr1.skid.client.api.engine.XEngine
 import io.github.oni0nfr1.skid.client.api.events.KartMountEvents
 import io.github.oni0nfr1.skid.client.api.kart.Kart
-import io.github.oni0nfr1.skid.client.api.kart.KartSaddle
 import io.github.oni0nfr1.skid.client.api.kart.KartRef
-import io.github.oni0nfr1.skid.client.api.kart.kart
+import io.github.oni0nfr1.skid.client.api.kart.KartSaddle
 import io.github.oni0nfr1.skid.client.api.utils.KartType
 import io.github.oni0nfr1.skid.client.api.utils.Ref
 import io.github.oni0nfr1.skid.client.api.utils.access
@@ -46,15 +45,15 @@ object KartRefTest : TestUnit() {
         }
     }
 
-    fun onMount(kartEntity: KartSaddle, player: Player) {
+    fun onMount(kart: KartRef, player: Player) {
         if (!status.testing || hudRenderer != null) return
         if (player != client.player) return
 
-        kartEntity.kart?.access {
+        kart.access {
             // 카트 타입을 확인한 뒤 엔진 타입이 지정된 참조를 생성합니다.
             // 대응 타코미터 타입은 구체 엔진 인터페이스의 프로퍼티에서 함께 결정됩니다.
             hudRenderer = when (type) {
-                KartType.X -> XEngineRenderer(KartRef(kartEntity.id).specify(KartType.X))
+                KartType.X -> XEngineRenderer(kart.specify(KartType.X))
                 else -> null
             }
         }

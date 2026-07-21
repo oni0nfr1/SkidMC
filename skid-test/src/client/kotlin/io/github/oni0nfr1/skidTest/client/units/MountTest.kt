@@ -1,8 +1,7 @@
 package io.github.oni0nfr1.skidTest.client.units
 
 import io.github.oni0nfr1.skid.client.api.events.KartMountEvents
-import io.github.oni0nfr1.skid.client.api.kart.KartSaddle
-import io.github.oni0nfr1.skid.client.api.kart.kart
+import io.github.oni0nfr1.skid.client.api.kart.KartRef
 import io.github.oni0nfr1.skid.client.api.utils.access
 import io.github.oni0nfr1.skidTest.annotations.SkidTest
 import io.github.oni0nfr1.skidTest.client.TestUnit
@@ -37,14 +36,9 @@ object MountTest: TestUnit() {
 
     init { register() }
 
-    private fun verifyKartReady(event: String, kartEntity: KartSaddle): String? {
-        val kart = kartEntity.kart ?: run {
-            client.sendChat("[$event] kart object is missing for kart#${kartEntity.id}!")
-            autoFail()
-            return null
-        }
+    private fun verifyKartReady(event: String, kart: KartRef): String? {
         val engineType = kart.access { type } ?: run {
-            client.sendChat("[$event] engine is missing for kart#${kartEntity.id}!")
+            client.sendChat("[$event] kart object or engine is missing for kart#${kart.saddleId}!")
             autoFail()
             return null
         }
@@ -61,10 +55,10 @@ object MountTest: TestUnit() {
             client.sendChat("[MOUNT_EARLY] ${rider.name.string} (player#${rider.id}) is riding kart#${kartEntity.id}.")
         }
 
-        KartMountEvents.MOUNT.register { kartEntity, rider ->
+        KartMountEvents.MOUNT.register { kart, rider ->
             if (!status.testing) return@register
-            val engineName = verifyKartReady("MOUNT", kartEntity) ?: return@register
-            client.sendChat("[MOUNT] ${rider.name.string} (player#${rider.id}) is riding kart#${kartEntity.id} (kart=present, engine=$engineName).")
+            val engineName = verifyKartReady("MOUNT", kart) ?: return@register
+            client.sendChat("[MOUNT] ${rider.name.string} (player#${rider.id}) is riding kart#${kart.saddleId} (kart=present, engine=$engineName).")
         }
 
         KartMountEvents.DISMOUNT.register { kartEntity, rider ->
@@ -83,16 +77,16 @@ object MountTest: TestUnit() {
             client.sendChat("[SPECTATE_EARLY] ${rider.name.string} (player#${rider.id}) is spectating ${target.name.string} (player#${target.id}) riding kart#${kartEntity.id}.")
         }
 
-        KartMountEvents.SPECTATE.register { kartEntity, rider, target ->
+        KartMountEvents.SPECTATE.register { kart, rider, target ->
             if (!status.testing) return@register
-            val relation = SpectateRelationKey(kartEntity.id, rider.id, target.id)
+            val relation = SpectateRelationKey(kart.saddleId, rider.id, target.id)
             if (earlySpectateRelation != relation) {
                 client.sendChat("[SPECTATE] matching SPECTATE_EARLY relation is missing!")
                 autoFail()
             }
             readySpectateRelation = relation
-            val engineName = verifyKartReady("SPECTATE", kartEntity) ?: return@register
-            client.sendChat("[SPECTATE] ${rider.name.string} (player#${rider.id}) is spectating ${target.name.string} (player#${target.id}) riding kart#${kartEntity.id} (kart=present, engine=$engineName).")
+            val engineName = verifyKartReady("SPECTATE", kart) ?: return@register
+            client.sendChat("[SPECTATE] ${rider.name.string} (player#${rider.id}) is spectating ${target.name.string} (player#${target.id}) riding kart#${kart.saddleId} (kart=present, engine=$engineName).")
         }
 
         KartMountEvents.SPECTATE_END.register { kartEntity, rider, target ->

@@ -66,14 +66,12 @@ internal abstract class GearlikeTachometerImpl(
         }
 
         commit(actionBar)
-        val kart = engine.kart
-
         speed = parsedSpeed
-        val speedResult = KartTachometerEvents.SPEED.invoker().onSpeedUpdate(kart, parsedSpeed)
+        val speedResult = KartTachometerEvents.SPEED.invoker().onSpeedUpdate(kartRef, parsedSpeed)
         rpm = parsedRpm
-        val rpmResult = KartTachometerEvents.RPM.invoker().onRpmUpdate(kart, parsedRpm)
+        val rpmResult = KartTachometerEvents.RPM.invoker().onRpmUpdate(kartRef, parsedRpm)
         gear = parsedGear
-        val gearResult = KartTachometerEvents.GEAR.invoker().onGearUpdate(kart, parsedGear)
+        val gearResult = KartTachometerEvents.GEAR.invoker().onGearUpdate(kartRef, parsedGear)
 
         return TachometerUpdateResult.matched(
             KartTachometerEvents.Result.finalize(speedResult, rpmResult, gearResult)

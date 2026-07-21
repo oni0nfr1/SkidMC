@@ -1,6 +1,7 @@
 package io.github.oni0nfr1.skid.client.api.events
 
 import io.github.oni0nfr1.skid.client.api.kart.Kart
+import io.github.oni0nfr1.skid.client.api.kart.KartRef
 import net.minecraft.network.chat.Component
 
 /**
@@ -10,7 +11,8 @@ import net.minecraft.network.chat.Component
  * SkidMC의 액션바 처리 파이프라인은 **서버**로부터 액션바 패킷이 도착했을 때만 작동합니다.
  *
  * 따라서 타 클라이언트 모드에서 액션바 출력 메서드를 호출하더라도 SkidMC에서는 그것을 처리하지 않습니다.
- * 모든 콜백은 렌더 스레드에서 호출되며, 전달되는 [Kart]는 콜백이 끝날 때까지 유효합니다.
+ * 모든 콜백은 렌더 스레드에서 호출되며, 전달되는 [KartRef]는 콜백이 끝날 때까지
+ * 유효한 [Kart]로 해석됩니다.
  */
 object KartTachometerEvents {
 
@@ -161,7 +163,7 @@ object KartTachometerEvents {
          * @param text 수신한 원본 액션바 컴포넌트
          * @return 액션바 표시 여부
          */
-        fun onActionbarReceive(kart: Kart<*>, text: Component): Result
+        fun onActionbarReceive(kart: KartRef, text: Component): Result
     }
 
     /** 파싱된 속도 값을 처리합니다. */
@@ -171,7 +173,7 @@ object KartTachometerEvents {
          * @param speed 액션바에 표시된 속도(`km/h`)
          * @return 액션바 표시 여부
          */
-        fun onSpeedUpdate(kart: Kart<*>, speed: Double): Result
+        fun onSpeedUpdate(kart: KartRef, speed: Double): Result
     }
 
     /** 파싱된 부스터 개수를 처리합니다. */
@@ -181,7 +183,7 @@ object KartTachometerEvents {
          * @param nitro 현재 보유한 부스터 개수
          * @return 액션바 표시 여부
          */
-        fun onNitroUpdate(kart: Kart<*>, nitro: Int): Result
+        fun onNitroUpdate(kart: KartRef, nitro: Int): Result
     }
 
     /** 파싱된 부스터 게이지를 처리합니다. */
@@ -191,7 +193,7 @@ object KartTachometerEvents {
          * @param gauge `0.0..1.0` 범위의 부스터 게이지 진행도
          * @return 액션바 표시 여부
          */
-        fun onGaugeUpdate(kart: Kart<*>, gauge: Double): Result
+        fun onGaugeUpdate(kart: KartRef, gauge: Double): Result
     }
 
     /** 파싱된 MK 터보 게이지를 처리합니다. */
@@ -201,7 +203,7 @@ object KartTachometerEvents {
          * @param gauge `0.0..1.0` 범위의 터보 게이지 진행도
          * @return 액션바 표시 여부
          */
-        fun onGaugeUpdate(kart: Kart<*>, gauge: Double): Result
+        fun onGaugeUpdate(kart: KartRef, gauge: Double): Result
     }
 
     /** 파싱된 RPM 게이지를 처리합니다. */
@@ -211,7 +213,7 @@ object KartTachometerEvents {
          * @param rpm `0.0..1.0` 범위의 RPM 게이지 진행도
          * @return 액션바 표시 여부
          */
-        fun onRpmUpdate(kart: Kart<*>, rpm: Double): Result
+        fun onRpmUpdate(kart: KartRef, rpm: Double): Result
     }
 
     /** 파싱된 기어 단수를 처리합니다. */
@@ -221,7 +223,7 @@ object KartTachometerEvents {
          * @param gear 현재 기어 단수
          * @return 액션바 표시 여부
          */
-        fun onGearUpdate(kart: Kart<*>, gear: Int): Result
+        fun onGearUpdate(kart: KartRef, gear: Int): Result
     }
 
     /** 파싱된 F1 ERS 값을 처리합니다. */
@@ -231,7 +233,7 @@ object KartTachometerEvents {
          * @param ers 액션바에 표시된 ERS 충전량
          * @return 액션바 표시 여부
          */
-        fun onErsUpdate(kart: Kart<*>, ers: Int): Result
+        fun onErsUpdate(kart: KartRef, ers: Int): Result
     }
 
     /**

@@ -2,6 +2,7 @@ package io.github.oni0nfr1.skid.client.internal.events
 
 import io.github.oni0nfr1.skid.client.SkidClient
 import io.github.oni0nfr1.skid.client.api.events.KartSummonEvents
+import io.github.oni0nfr1.skid.client.api.kart.KartRef
 import io.github.oni0nfr1.skid.client.api.kart.KartSaddle
 import io.github.oni0nfr1.skid.client.internal.kart.KartManager
 import io.github.oni0nfr1.skid.client.internal.utils.MCClient
@@ -56,7 +57,7 @@ internal object KartSummonMixinHandler {
     fun afterUpdateAttributes(entity: Entity) {
         if (entity !is KartSaddle) return
         val kart = KartManager.prepareKart(entity) ?: return
-        KartSummonEvents.SUMMON.invoker().onSummon(kart)
+        KartSummonEvents.SUMMON.invoker().onSummon(KartRef(kart.saddle.id))
     }
 
     /**
@@ -97,7 +98,7 @@ internal object KartSummonMixinHandler {
     fun removeTrackedKart(saddle: KartSaddle) {
         val kart = KartManager.getBySaddleId(saddle.id)
         try {
-            if (kart != null) KartSummonEvents.REMOVE.invoker().onRemove(kart)
+            if (kart != null) KartSummonEvents.REMOVE.invoker().onRemove(KartRef(saddle.id))
         } finally {
             KartManager.removeKart(saddle.id)
         }

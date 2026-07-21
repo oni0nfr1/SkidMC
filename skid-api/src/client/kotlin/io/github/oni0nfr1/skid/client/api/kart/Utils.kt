@@ -3,8 +3,6 @@
 package io.github.oni0nfr1.skid.client.api.kart
 
 import io.github.oni0nfr1.skid.client.api.spi.SkidApiProviderLoader
-import io.github.oni0nfr1.skid.client.api.utils.KartType
-import io.github.oni0nfr1.skid.client.api.utils.access
 import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.entity.Entity
@@ -62,14 +60,6 @@ val Player.ridingKart: KartRef?
             .map { KartRef(it.saddle.id) }
             .orElse(null)
     }
-
-/**
- * 현재 로컬 플레이어 또는 관전 대상이 탑승한 카트의 엔진 타입을 반환합니다.
- *
- * @return 현재 엔진 타입, 대상이나 카트 또는 엔진을 확인할 수 없으면 `null`
- */
-val Minecraft.kartEngineType: KartType<*>?
-    get() = (this.player?.subject as? Player)?.ridingKart?.access { type }
 
 private fun checkRenderThread() {
     check(Minecraft.getInstance().isSameThread) {

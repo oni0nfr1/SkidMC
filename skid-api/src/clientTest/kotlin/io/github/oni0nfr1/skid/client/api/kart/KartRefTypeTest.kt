@@ -10,20 +10,26 @@ import io.github.oni0nfr1.skid.client.api.utils.access
 
 @Suppress("unused", "UNUSED_VARIABLE")
 private fun specifiedKartTypeIsInferred(ref: KartRef) {
-    val specified: Ref<XEngineKart> = ref.specify(KartType.X)
+    val specified: Ref<Kart<XEngine>> = ref.specify(KartType.X)
 
     specified.access {
         val typedEngine: XEngine = engine
-        val typedTachometer: XTachometer? = tachometer
+        val typedTachometer: XTachometer? = engine.tachometer
     }
 }
 
 @Suppress("unused", "UNUSED_VARIABLE")
-private fun kartTypeParametersAreCovariant(kart: Kart<XEngine, XTachometer>) {
-    val nitroKart: Kart<NitroEngine, NitroTachometer> = kart
+private fun kartEngineTypeIsCovariant(kart: Kart<XEngine>) {
+    val nitroKart: Kart<NitroEngine> = kart
+}
+
+@Suppress("unused", "UNUSED_VARIABLE")
+private fun intermediateEngineRetainsItsTachometerType(engine: NitroEngine) {
+    val kart: Kart<NitroEngine> = engine.kart
+    val tachometer: NitroTachometer? = engine.tachometer
 }
 
 @Suppress("unused", "UNUSED_VARIABLE")
 private fun engineRetainsItsConcreteKartType(engine: XEngine) {
-    val kart: XEngineKart = engine.kart
+    val kart: Kart<XEngine> = engine.kart
 }

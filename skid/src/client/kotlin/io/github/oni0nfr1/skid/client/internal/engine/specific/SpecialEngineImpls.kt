@@ -7,8 +7,8 @@ import io.github.oni0nfr1.skid.client.api.tachometer.BoatTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.MKTachometer
 import io.github.oni0nfr1.skid.client.internal.engine.KartEngineImpl
 
-internal class MKEngineImpl(kart: Kart<MKEngine, MKTachometer>) :
+internal class MKEngineImpl(kart: Kart<MKEngine>) :
     KartEngineImpl<MKEngine, MKTachometer>(kart), MKEngine
 
-internal class BoatEngineImpl(kart: Kart<BoatEngine, BoatTachometer>) :
+internal class BoatEngineImpl(kart: Kart<BoatEngine>) :
     KartEngineImpl<BoatEngine, BoatTachometer>(kart), BoatEngine

@@ -24,7 +24,7 @@ internal object KartManager {
      * THREADING:
      * - 렌더 스레드에서만 접근하고 변경한다.
      */
-    private val saddleIdToKart: MutableMap<Int, KartImpl<*, *>> = mutableMapOf()
+    private val saddleIdToKart: MutableMap<Int, KartImpl<*>> = mutableMapOf()
 
     /**
      * saddle 엔티티는 발견됐지만 KartType과 엔진이 아직 준비되지 않은 ID입니다.
@@ -85,7 +85,7 @@ internal object KartManager {
      * FAILURE:
      * - Kart 생성에 실패해도 pending 상태를 유지한다.
      */
-    fun prepareKart(saddle: KartSaddle): KartImpl<*, *>? {
+    fun prepareKart(saddle: KartSaddle): KartImpl<*>? {
         val saddleId = saddle.id
         if (saddleId !in pendingKartIds) return null
         val type = KartTypeResolver.resolve(saddle) ?: return null
@@ -174,7 +174,7 @@ internal object KartManager {
         return saddleId
     }
 
-    fun getBySaddleId(saddleId: Int): KartImpl<*, *>? {
+    fun getBySaddleId(saddleId: Int): KartImpl<*>? {
         val handle = saddleIdToKart[saddleId]
         if (handle?.alive == false) {
             removeKart(saddleId)
@@ -183,7 +183,7 @@ internal object KartManager {
         return handle
     }
 
-    fun getByRiderId(riderId: Int): KartImpl<*, *>? {
+    fun getByRiderId(riderId: Int): KartImpl<*>? {
         val saddleId = riderIdToSaddleId[riderId] ?: return null
         return getBySaddleId(saddleId) ?: run {
             riderIdToSaddleId.remove(riderId)

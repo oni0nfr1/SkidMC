@@ -18,7 +18,7 @@ internal data class TachometerUpdateResult(
 internal interface TachometerInternal : KartTachometer {
     val revision: Long
     val kartId: Int
-    val type: KartType<*, *>
+    val type: KartType<*>
 
     fun update(actionBar: Component): TachometerUpdateResult
     fun update(additionalMatched: Boolean, actionBar: Component): TachometerUpdateResult

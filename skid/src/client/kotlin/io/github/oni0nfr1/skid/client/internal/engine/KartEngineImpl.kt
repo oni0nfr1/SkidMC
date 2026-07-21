@@ -6,15 +6,22 @@ import io.github.oni0nfr1.skid.client.api.engine.KartEngine
 import io.github.oni0nfr1.skid.client.api.kart.Kart
 import io.github.oni0nfr1.skid.client.api.tachometer.KartTachometer
 import io.github.oni0nfr1.skid.client.internal.kart.KartImpl
+import io.github.oni0nfr1.skid.client.internal.tachometer.TachometerManager
 import net.minecraft.world.entity.Display
 
 internal abstract class KartEngineImpl<ENGINE, TACHOMETER>(
-    override val kart: Kart<ENGINE, TACHOMETER>,
+    override val kart: Kart<ENGINE>,
 ) : KartEngine
     where
         ENGINE : KartEngine,
         TACHOMETER : KartTachometer
 {
+    override val tachometer: TACHOMETER?
+        get() {
+            @Suppress("UNCHECKED_CAST")
+            return TachometerManager.getForKart(kart.saddle.id, kart.type) as? TACHOMETER
+        }
+
     val currentLap: Int
         get() = kart.saddle.getKartMeta(KnownAttrModId.CTX_CURRENT_LAP)?.toInt() ?: 0
 
@@ -23,7 +30,7 @@ internal abstract class KartEngineImpl<ENGINE, TACHOMETER>(
         get() = kart.saddle.getKartMeta(KnownAttrModId.STATE_DRIFTING) == 1.0
     val accurateDriftState: Boolean
         get() {
-            val internalKart = kart as? KartImpl<*, *> ?: return false
+            val internalKart = kart as? KartImpl<*> ?: return false
             return internalKart.internalModelOrNull?.passengers?.flatMap { it.passengers }?.any {
                 it.customName?.string == "mcrider-drift-effect" && it is Display && it.viewRange > 0
             } ?: false

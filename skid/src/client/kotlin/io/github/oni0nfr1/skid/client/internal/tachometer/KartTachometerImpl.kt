@@ -6,7 +6,7 @@ import net.minecraft.network.chat.Component
 internal abstract class KartTachometerImpl(
     final override val revision: Long,
     final override val kartId: Int,
-    final override val type: KartType<*, *>,
+    final override val type: KartType<*>,
 ) : TachometerInternal {
 
     final override var text: Component = Component.empty()

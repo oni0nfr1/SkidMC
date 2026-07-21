@@ -3,13 +3,12 @@ package io.github.oni0nfr1.skid.client.internal.kart
 import io.github.oni0nfr1.skid.client.api.engine.*
 import io.github.oni0nfr1.skid.client.api.kart.Kart
 import io.github.oni0nfr1.skid.client.api.kart.KartSaddle
-import io.github.oni0nfr1.skid.client.api.tachometer.*
 import io.github.oni0nfr1.skid.client.api.utils.KartType
 import io.github.oni0nfr1.skid.client.internal.engine.specific.*
 
 internal object KartFactory {
 
-    fun create(saddle: KartSaddle, type: KartType<*, *>): KartImpl<*, *> = when (type) {
+    fun create(saddle: KartSaddle, type: KartType<*>): KartImpl<*> = when (type) {
         KartType.X -> create(saddle, KartType.X, ::XEngineImpl)
         KartType.EX -> create(saddle, KartType.EX, ::EXEngineImpl)
         KartType.JIU -> create(saddle, KartType.JIU, ::JiuEngineImpl)
@@ -32,15 +31,11 @@ internal object KartFactory {
         KartType.RALLY -> create(saddle, KartType.RALLY, ::RallyEngineImpl)
     }
 
-    private fun <ENGINE, TACHOMETER> create(
+    private fun <ENGINE : KartEngine> create(
         saddle: KartSaddle,
-        type: KartType<ENGINE, TACHOMETER>,
-        createEngine: (Kart<ENGINE, TACHOMETER>) -> ENGINE,
-    ): KartImpl<ENGINE, TACHOMETER>
-        where
-            ENGINE : KartEngine,
-            TACHOMETER : KartTachometer
-    {
+        type: KartType<ENGINE>,
+        createEngine: (Kart<ENGINE>) -> ENGINE,
+    ): KartImpl<ENGINE> {
         val kart = KartImpl(saddle, type)
         kart.initializeEngine(createEngine(kart))
         return kart

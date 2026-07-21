@@ -1,7 +1,6 @@
 package io.github.oni0nfr1.skid.client.api.kart
 
 import io.github.oni0nfr1.skid.client.api.engine.KartEngine
-import io.github.oni0nfr1.skid.client.api.tachometer.KartTachometer
 import io.github.oni0nfr1.skid.client.api.utils.KartType
 import net.minecraft.world.entity.Display
 import net.minecraft.world.entity.animal.Cod
@@ -12,11 +11,7 @@ typealias KartSaddle = Cod
 typealias KartMain = Display.TextDisplay
 typealias KartModelRoot = Display.ItemDisplay
 
-interface Kart<out ENGINE, out TACHOMETER>
-    where
-        ENGINE : KartEngine,
-        TACHOMETER : KartTachometer
-{
+interface Kart<out ENGINE : KartEngine> {
 
     /**
      * 이 객체가 현재 유효한지 여부입니다.
@@ -44,9 +39,9 @@ interface Kart<out ENGINE, out TACHOMETER>
     val rider: Player?
 
     /**
-     * 이 카트의 엔진과 타코미터 타입 조합입니다.
+     * 이 카트의 엔진 타입입니다.
      */
-    val type: KartType<ENGINE, TACHOMETER>
+    val type: KartType<ENGINE>
 
     /**
      * 카트 엔진 객체에 접근할 수 있는 프로퍼티입니다.
@@ -66,12 +61,5 @@ interface Kart<out ENGINE, out TACHOMETER>
      * 마크라이더 카트는 텔레포트 방식으로 이동하기 때문에, 카트의 속도를 측정할 때 엔티티 속도값이 아닌 Skid에서 계산한 속도값을 써주세요.
      */
     val velocity: Vec3
-
-    /**
-     * 클라이언트의 게임 화면에 보여지는 정보들을 읽을 수 있는 객체입니다.
-     *
-     * 현재 게임 화면이 해당 카트에 관련된 정보를 제공하지 않고 있다면 null을 반환합니다.
-     */
-    val tachometer: TACHOMETER?
 
 }

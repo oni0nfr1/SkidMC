@@ -14,7 +14,7 @@ internal object KartTypeResolver {
      * 아직 어트리뷰트가 없으면 `null`을 반환합니다. 어트리뷰트는 있지만 SkidMC가 알지
      * 못하는 코드이면 경고를 남기고 `null`을 반환합니다.
      */
-    fun resolve(saddle: KartSaddle): KartType<*, *>? {
+    fun resolve(saddle: KartSaddle): KartType<*>? {
         val rawCode = saddle.getKartMeta(KnownAttrModId.ID_ENGINE_REAL) ?: return null
         val attrEngineCode = rawCode.toInt()
         val type = KartType.fromAttrEngineCode(attrEngineCode)

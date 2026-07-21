@@ -3,13 +3,12 @@ package io.github.oni0nfr1.skid.client.api.engine
 import io.github.oni0nfr1.skid.client.api.kart.Kart
 import io.github.oni0nfr1.skid.client.api.tachometer.ExceedTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.GearlikeTachometer
-import io.github.oni0nfr1.skid.client.api.tachometer.KartTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.NitroTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.SpeedTachometer
 
 /** 드리프트 상태를 제공하는 엔진입니다. */
 sealed interface DriftEngine : KartEngine {
-    override val kart: Kart<DriftEngine, KartTachometer>
+    override val kart: Kart<DriftEngine>
 
     /** 해당 카트가 드리프트 중인지 여부입니다. */
     val isDrifting: Boolean
@@ -20,12 +19,14 @@ sealed interface DriftEngine : KartEngine {
 
 /** 속도 타코미터를 사용하는 엔진입니다. */
 sealed interface SpeedEngine : KartEngine {
-    override val kart: Kart<SpeedEngine, SpeedTachometer>
+    override val kart: Kart<SpeedEngine>
+    override val tachometer: SpeedTachometer?
 }
 
 /** 부스터와 드리프트 기능을 제공하는 엔진입니다. */
 sealed interface NitroEngine : DriftEngine, SpeedEngine {
-    override val kart: Kart<NitroEngine, NitroTachometer>
+    override val kart: Kart<NitroEngine>
+    override val tachometer: NitroTachometer?
 
     /** 해당 카트가 부스터를 사용 중인지 여부입니다. */
     val isBoosting: Boolean
@@ -36,12 +37,13 @@ sealed interface NitroEngine : DriftEngine, SpeedEngine {
 
 /** RPM과 기어 단수를 제공하는 엔진입니다. */
 sealed interface GearlikeEngine : DriftEngine, SpeedEngine {
-    override val kart: Kart<GearlikeEngine, GearlikeTachometer>
+    override val kart: Kart<GearlikeEngine>
+    override val tachometer: GearlikeTachometer?
 }
 
 /** 순간 부스터 상태를 제공하는 니트로 엔진입니다. */
 sealed interface InstantBoostEngine : NitroEngine {
-    override val kart: Kart<InstantBoostEngine, NitroTachometer>
+    override val kart: Kart<InstantBoostEngine>
 
     /** 지금 순간 부스터를 발동할 수 있는지 여부입니다. */
     val instantBoostReady: Boolean
@@ -52,7 +54,7 @@ sealed interface InstantBoostEngine : NitroEngine {
 
 /** 듀얼 부스터의 충전 및 발동 상태를 제공하는 니트로 엔진입니다. */
 sealed interface DualBoostEngine : NitroEngine {
-    override val kart: Kart<DualBoostEngine, NitroTachometer>
+    override val kart: Kart<DualBoostEngine>
 
     /** 듀얼 부스터가 발동 중인지 여부입니다. */
     val dualBoostActive: Boolean
@@ -63,7 +65,7 @@ sealed interface DualBoostEngine : NitroEngine {
 
 /** 드래프트의 충전 및 발동 상태를 제공하는 엔진입니다. */
 sealed interface DraftEngine : KartEngine {
-    override val kart: Kart<DraftEngine, KartTachometer>
+    override val kart: Kart<DraftEngine>
 
     /** 드래프트가 발동 중인지 여부입니다. */
     val draftActive: Boolean
@@ -74,5 +76,6 @@ sealed interface DraftEngine : KartEngine {
 
 /** 익시드 게이지를 제공하는 엔진입니다. */
 sealed interface ExceedEngine : KartEngine {
-    override val kart: Kart<ExceedEngine, ExceedTachometer>
+    override val kart: Kart<ExceedEngine>
+    override val tachometer: ExceedTachometer?
 }

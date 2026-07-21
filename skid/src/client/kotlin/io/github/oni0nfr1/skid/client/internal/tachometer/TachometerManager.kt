@@ -34,7 +34,7 @@ internal object TachometerManager {
     }
 
     fun handleActionbar(
-        kart: Kart<*, *>,
+        kart: Kart<*>,
         engine: KartEngine,
         actionBar: Component,
     ): KartTachometerEvents.Result {
@@ -74,16 +74,16 @@ internal object TachometerManager {
         }
     }
 
-    private fun TachometerInternal.matches(kart: Kart<*, *>, engine: KartEngine): Boolean {
+    private fun TachometerInternal.matches(kart: Kart<*>, engine: KartEngine): Boolean {
         return kart.saddle.id == kartId && kart.type === type && kart.engine === engine
     }
 
-    fun getForKart(kartId: Int, type: KartType<*, *>): KartTachometer? {
+    fun getForKart(kartId: Int, type: KartType<*>): KartTachometer? {
         val current = _currentTachometer as? TachometerInternal ?: return null
         return current.takeIf { it.kartId == kartId && it.type === type }
     }
 
-    private fun createTachometer(kart: Kart<*, *>): KartTachometer {
+    private fun createTachometer(kart: Kart<*>): KartTachometer {
         val kartId = kart.saddle.id
         val revision = nextRevision++
 

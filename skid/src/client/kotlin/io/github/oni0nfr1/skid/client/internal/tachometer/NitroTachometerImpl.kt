@@ -11,7 +11,7 @@ import java.util.Optional
 internal abstract class NitroTachometerImpl(
     revision: Long,
     kartId: Int,
-    engineType: KartType<*, *>,
+    engineType: KartType<*>,
 ) : KartTachometerImpl(revision, kartId, engineType) {
 
     open var speed: Double = 0.0

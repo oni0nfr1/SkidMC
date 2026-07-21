@@ -64,7 +64,7 @@ fun Player.getRiderMeta(key: ResourceLocation): Double? {
  *
  * @return 실제 엔진 종류, 값이 없거나 알려지지 않은 코드이면 `null`
  */
-val KartSaddleEntity.realKartEngine: KartType<*, *>?
+val KartSaddleEntity.realKartEngine: KartType<*>?
     get() {
         val modifier = getKartMeta(KnownAttrModId.ID_ENGINE_REAL) ?: return null
         return KartType.fromAttrEngineCode(modifier.toInt())
@@ -75,7 +75,7 @@ val KartSaddleEntity.realKartEngine: KartType<*, *>?
  *
  * @return 설정된 엔진 종류, 값이 없거나 알려지지 않은 코드이면 `null`
  */
-val KartSaddleEntity.selectedKartEngine: KartType<*, *>?
+val KartSaddleEntity.selectedKartEngine: KartType<*>?
     get() {
         val modifier = getKartMeta(KnownAttrModId.ID_ENGINE) ?: return null
         return KartType.fromAttrEngineCode(modifier.toInt())
@@ -86,7 +86,7 @@ val KartSaddleEntity.selectedKartEngine: KartType<*, *>?
  *
  * @return 실제 엔진 종류, 값이 없거나 알려지지 않은 코드이면 `null`
  */
-val Player.realKartEngine: KartType<*, *>?
+val Player.realKartEngine: KartType<*>?
     get() = ridingKart?.access { saddle.realKartEngine }
 
 /**
@@ -94,7 +94,7 @@ val Player.realKartEngine: KartType<*, *>?
  *
  * @return 선택한 엔진 종류, 값이 없거나 알려지지 않은 코드이면 `null`
  */
-val Player.selectedKartEngine: KartType<*, *>?
+val Player.selectedKartEngine: KartType<*>?
     get() = ridingKart?.access { saddle.selectedKartEngine }
 
 /**

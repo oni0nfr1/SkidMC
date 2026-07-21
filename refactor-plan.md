@@ -12,9 +12,9 @@
 
 핵심 원칙은 다음과 같다.
 
-- 엔진, 탑승자, 타코미터는 모두 `Kart`가 소유하는 현재 상태로 제공한다.
+- 탑승자와 공통 주행 상태는 `Kart`가 제공하고, 엔진 종류에 따라 달라지는 상태는 `KartEngine` typed view가 제공한다.
 - 엔진은 플레이어 탑승 시점이 아니라 카트의 첫 어트리뷰트가 준비된 시점에 생성한다.
-- `KartType<E, T>`가 엔진과 타코미터 타입의 올바른 조합을 표현한다.
+- `KartType<E>`가 엔진 타입을 표현하고, 구체 엔진 인터페이스가 대응 타코미터 타입을 보장한다.
 - 장기간 보관 가능한 객체는 `Ref<T>`로 노출하고, 실제 객체 접근 시 유효성을 다시 확인한다.
 - 공개 API 계약과 SkidMC 구현체를 Gradle 모듈 수준에서 분리한다.
 - 안정성이 보장되지 않은 API는 기존 패키지 구조 아래의 `unstable` 패키지로 명확히 표시한다.
@@ -52,7 +52,7 @@
 
 - [x] `Ref<T>`와 `get(): Optional<T>` 정의
 - [x] Kotlin용 top-level inline `Ref<T>.access { ... }` 정의
-- [x] `Kart<out ENGINE, out TACHOMETER>` 정의
+- [x] `Kart<out ENGINE>` 정의
 - [x] `Kart`에 다음 상태 배치
   - `alive`
   - `entity`, `saddle`, `model`
@@ -60,14 +60,15 @@
   - `type`
   - `engine`
   - `position`, `velocity`
-  - `tachometer`
 - [x] 현재 사용 계획이 없는 `direction`은 1.0.0 초기 계약에서 제외
 - [x] 최소 `KartEngine` 계약 정의
-  - 엔진은 연결된 `kart`만 기본적으로 제공
-  - rider와 tachometer는 엔진에서 제거
+  - 엔진은 독립 소유 객체가 아니라 엔진 종류에 따라 달라지는 Kart 상태의 typed view
+  - 연결된 `kart`와 현재 `tachometer`를 제공
+  - rider는 엔진에서 제거
 - [x] `KartTachometer`에 `text`, `rawString` 계약 이동
-- [x] `KartType<out ENGINE, out TACHOMETER>` 타입 토큰 정의
-- [x] 각 엔진의 구체적인 `Kart<E, T>` 조합을 `XEngineKart` 형태의 타입 별칭으로 제공
+- [x] `KartType<out ENGINE>` 타입 토큰 정의
+- [x] 구체 엔진 인터페이스가 공변 반환 타입으로 대응 타코미터 타입을 보장
+- [x] 단일 타입 파라미터 전환 후 불필요해진 `XEngineKart` 계열 타입 별칭 제거
 - [x] `KartType`에 엔진 메타데이터 추가
   - `engineCode`
   - `attrEngineCode`
@@ -94,11 +95,13 @@
 
 ```kotlin
 sealed interface NitroEngine : DriftEngine, SpeedEngine {
-    override val kart: Kart<NitroEngine, NitroTachometer>
+    override val kart: Kart<NitroEngine>
+    override val tachometer: NitroTachometer?
 }
 
 interface XEngine : NitroEngine, InstantBoostEngine, DualBoostEngine, DraftEngine {
-    override val kart: Kart<XEngine, XTachometer>
+    override val kart: Kart<XEngine>
+    override val tachometer: XTachometer?
 }
 ```
 
@@ -106,7 +109,7 @@ interface XEngine : NitroEngine, InstantBoostEngine, DualBoostEngine, DraftEngin
 
 ### 1. 구체적인 KartType 정의
 
-- [x] 모든 엔진·타코미터 조합을 `KartType`의 sealed object로 정의
+- [x] 모든 엔진 타입을 `KartType`의 sealed object로 정의
 - [x] 기존 `KartEngine.Type`의 코드와 이름을 이전
 - [x] `engineCode` 조회 함수 제공
 - [x] `attrEngineCode` 조회 함수 제공
@@ -117,7 +120,7 @@ interface XEngine : NitroEngine, InstantBoostEngine, DualBoostEngine, DraftEngin
 예정 형태:
 
 ```kotlin
-data object X : KartType<XEngine, XTachometer>(
+data object X : KartType<XEngine>(
     engineCode = 10,
     attrEngineCode = 0,
     engineName = "x",
@@ -127,11 +130,11 @@ data object X : KartType<XEngine, XTachometer>(
 
 ### 2. KartRef 재설계
 
-- [x] `KartRef`를 `Ref<Kart<*, *>>` 기반 계약으로 정의
+- [x] `KartRef`를 `Ref<Kart<*>>` 기반 계약으로 정의
 - [x] saddle entity ID를 안정적인 참조 키로 유지
 - [x] `get()` 호출 시 렌더 스레드 및 카트 유효성 검사
 - [x] `KartRef.specify(KartType.X)` 형태로 타입이 지정된 참조 제공
-- [x] `specify()` 결과의 `access` 블록에서 `Kart<XEngine, XTachometer>` 추론 확인
+- [x] `specify()` 결과의 `access` 블록에서 `Kart<XEngine>`과 `engine.tachometer: XTachometer?` 추론 확인
 - [x] Java의 `Optional` 및 제네릭 API 컴파일 테스트 추가
 - [ ] Java 사용 예제 추가
 - [ ] 기존 `handle`, `Specific`, `accessEngine` 제거 또는 마이그레이션
@@ -154,9 +157,9 @@ data object X : KartType<XEngine, XTachometer>(
 - [x] 카트의 실제 엔진 어트리뷰트를 `KartType`으로 변환하는 internal resolver 추가
 - [x] 엔진 생성 시점을 플레이어 탑승 시점에서 카트의 첫 어트리뷰트 준비 시점으로 이동
 - [x] `KartEngine.rider`를 제거하고 `Kart.rider: Player?`로 이전
-- [x] `KartEngine.tachometer`를 제거하고 `Kart.tachometer: T?`로 이전
+- [x] `KartEngine.tachometer`가 구체 엔진별 타코미터 타입을 반환하도록 재정의
 - [x] 기존 구현 엔진이 새 API 엔진 인터페이스를 구현하도록 변경
-- [x] 기존 카트 구현이 `Kart<E, T>`와 `KartType<E, T>` 관계를 보장하도록 변경
+- [x] 기존 카트 구현이 `Kart<E>`와 `KartType<E>` 관계를 보장하도록 변경
 - [x] 엔진 생성 매핑과 구현 클래스 정보는 구현체 모듈의 factory에 유지
 - [ ] `currentLap`의 새 소유 위치 결정
   - 엔진 공통 계약에서는 제거
@@ -178,9 +181,13 @@ data object X : KartType<XEngine, XTachometer>(
 ### 6. 새 엔티티 동기화와 탑승 관계 추적
 
 - [x] 소환된 카트를 pending으로 추적하고 `KartType` 해석 후 ready로 전환
-- [ ] 새 엔티티 동기화 패킷에서 카트 생성뿐 아니라 기존 탑승 관계도 추적
-- [ ] 별도 passenger 패킷이 오지 않는 초기 동기화 경로 테스트 추가
-- [ ] 어트리뷰트와 탑승 관계의 도착 순서별 상태 전이 테스트 추가
+- [x] Vanilla 1.21.5의 초기 엔티티 추적에서도 별도 `SetPassengersPacket`이 전달됨을 확인
+  - pairing bundle은 일반적으로 `AddEntity` → entity data → attributes → passengers 순서로 처리
+  - passenger 엔티티의 pairing bundle도 기존 vehicle의 passenger 관계를 다시 전달할 수 있음
+- [x] 어트리뷰트와 탑승 관계 중 어느 쪽이 먼저 도착해도 ready 탑승 상태로 전환
+  - 기존 카트 재동기화에서는 attributes → passengers 순서가 일반적
+  - 데이터팩 기반 최초 생성에서는 passengers → attributes 순서도 가능
+- [ ] 어트리뷰트와 탑승 관계의 두 도착 순서에 대한 회귀 테스트 추가
 - [ ] 레이스 도중 접속 후 즉시 관전하는 시나리오 회귀 테스트 추가
 - [x] 엔진 준비 전에는 일반 탑승·관전 이벤트가 발행되지 않도록 보장
 - [x] 엔진 준비 후 대기 중인 탑승·관전 상태를 완료하도록 보장
@@ -191,13 +198,14 @@ data object X : KartType<XEngine, XTachometer>(
 - [ ] 소환 이벤트를 조기 감지와 준비 완료 시점으로 분리
   - `SUMMON_EARLY`
   - `SUMMON`
-- [ ] 초기 월드 동기화를 별도 이벤트로 노출할 필요가 있는지 결정
-  - `SUMMON_SYNC` 후보
-  - `MOUNT_SYNC` 후보
 - [ ] 탑승 이벤트 시점 재정의
   - `MOUNT_EARLY`
   - `MOUNT`
-  - 필요 시 `MOUNT_SYNC`
+- [x] `SYNC`/`UNSYNC` 계열 이벤트 도입 잠정 보류
+  - 이름만 기존 EARLY/준비 완료 단계를 바꾸는 이벤트로는 도입하지 않음
+  - 향후 서버의 실제 `SUMMON`/`REMOVE`, `MOUNT`/`DISMOUNT` 수명 주기와 클라이언트의 정보 접근 가능 기간을 구분할 수 있을 때 재검토
+  - `SYNC`는 필요한 엔티티·어트리뷰트·관계 정보를 읽을 수 있게 된 시점, `UNSYNC`는 더 이상 읽을 수 없게 된 시점으로 쌍을 이루어야 함
+  - 현재 Vanilla 패킷만으로는 실제 서버 생성·삭제와 클라이언트 추적 시작·종료를 신뢰성 있게 구분할 수 없으므로 효과적인 구현이 불가능함
 - [ ] 관전 이벤트가 준비된 `Kart`, `KartEngine`, `KartTachometer` 계약과 일치하도록 변경
 - [ ] 제거·하차·관전 종료 이벤트 순서 보장
 - [ ] 아직 안정화되지 않은 이벤트를 `api.unstable.events`에 둘지 결정
@@ -228,7 +236,7 @@ data object X : KartType<XEngine, XTachometer>(
 - [ ] `skid-test`를 새 API 계약으로 이전
 - [x] Kotlin 타입 추론 테스트 추가
   - `KartRef.specify(KartType.X).access { ... }`
-  - 중간 엔진 타입에서 대응 타코미터 타입 추론
+  - 중간·구체 엔진 타입에서 대응 타코미터 타입 추론
 - [x] Java API 사용 테스트 추가
 - [ ] 엔티티 패킷 순서 조합별 mount/spectate 테스트 추가
 - [x] 기존 `skid` 모듈의 중복 API 소스 제거
@@ -251,26 +259,29 @@ engine.tachometer
 
 // 1.0.0
 kart.rider
-kart.tachometer
 kart.engine
+kart.engine.tachometer
 kart.type
 ```
 
-### Kart가 엔진과 타코미터 타입을 함께 표현함
+### 엔진 인터페이스가 대응 타코미터 타입을 표현함
 
 ```kotlin
-interface Kart<out E, out T>
-    where E : KartEngine, T : KartTachometer
+interface Kart<out E : KartEngine>
+
+interface XEngine : KartEngine {
+    override val kart: Kart<XEngine>
+    override val tachometer: XTachometer?
+}
 ```
 
-`Kart<XEngine, XTachometer>`처럼 엔진과 타코미터의 올바른 조합을 컴파일 타임에 보존한다. 타입 파라미터는 공변이므로 구체 카트를 `Kart<NitroEngine, NitroTachometer>` 같은 공통 기능 타입으로 사용할 수 있다.
+`Kart<XEngine>`만 지정하면 `kart.engine.tachometer`가 `XTachometer?`로 추론된다. Kart의 엔진 타입 파라미터는 공변이므로 구체 카트를 `Kart<NitroEngine>` 같은 공통 기능 타입으로 사용할 수 있다. 엔진과 타코미터 타입을 별도로 반복해서 명시하거나 이를 묶는 타입 별칭은 제공하지 않는다.
 
 ### KartType이 KartEngine.Type을 대체함
 
-`KartEngine.Type` enum과 구현 클래스 매핑을 공개 API에서 제거한다. 새 `KartType<E, T>`는 다음을 함께 표현한다.
+`KartEngine.Type` enum과 구현 클래스 매핑을 공개 API에서 제거한다. 새 `KartType<E>`는 다음을 함께 표현한다.
 
 - 엔진 인터페이스 타입
-- 타코미터 인터페이스 타입
 - 명령용 엔진 코드
 - 어트리뷰트용 엔진 코드
 - 표준 엔진 이름
@@ -282,7 +293,8 @@ interface Kart<out E, out T>
 
 ```kotlin
 interface XEngine : NitroEngine {
-    override val kart: Kart<XEngine, XTachometer>
+    override val kart: Kart<XEngine>
+    override val tachometer: XTachometer?
 }
 ```
 
@@ -315,7 +327,7 @@ kartRef.specify(KartType.X).access {
 
 ### TachometerRef가 KartRef로 통합됨
 
-타코미터는 카트의 현재 화면 상태이므로 별도 장기 참조 객체를 제공하지 않고, 유효한 `KartRef`를 통해 접근하는 방향으로 변경한다.
+타코미터는 엔진 종류에 따라 달라지는 현재 화면 상태이므로 별도 장기 참조 객체를 제공하지 않고, 유효한 `KartRef`에서 `kart.engine.tachometer`로 접근하는 방향으로 변경한다.
 
 ### API와 구현체가 분리됨
 
@@ -348,7 +360,6 @@ rg 'io\.github\.oni0nfr1\.skid\..*\.unstable' src
 
 - `currentLap`을 `Kart`에 둘지 별도 레이스 상태 객체에 둘지
 - 알 수 없는 엔진 코드를 nullable로만 처리할지 `Unknown` 타입을 둘지
-- `SUMMON_SYNC`, `MOUNT_SYNC`를 공개 이벤트로 제공할지 내부 동기화 원인으로만 처리할지
 - 이벤트 API를 1.0.0부터 stable로 둘지 `unstable.events`에서 시작할지
 - 원시 어트리뷰트 API의 공개 범위
 - provider가 제공할 최소 조회 기능과 초기화 실패 처리 방식

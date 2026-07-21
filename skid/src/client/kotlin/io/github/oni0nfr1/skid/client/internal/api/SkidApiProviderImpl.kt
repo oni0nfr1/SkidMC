@@ -6,6 +6,6 @@ import io.github.oni0nfr1.skid.client.internal.kart.KartManager
 import java.util.Optional
 
 class SkidApiProviderImpl : SkidApiProvider {
-    override fun getKart(saddleId: Int): Optional<Kart<*, *>> =
+    override fun getKart(saddleId: Int): Optional<Kart<*>> =
         Optional.ofNullable(KartManager.getBySaddleId(saddleId))
 }

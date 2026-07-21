@@ -39,7 +39,7 @@ object TachometerTest: TestUnit() {
 
         val kart = (client.player?.subject as? Player)?.ridingKart
         engineData += kart?.access {
-            val currentTachometer = tachometer ?: return@access "tachometer: null\n"
+            val currentTachometer = engine.tachometer ?: return@access "tachometer: null\n"
             buildString {
                 appendLine("engine-code: ${type.engineCode}")
                 appendLine("engine-name: ${type.engineName}")

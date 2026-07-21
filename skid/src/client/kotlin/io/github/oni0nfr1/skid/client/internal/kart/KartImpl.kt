@@ -6,21 +6,15 @@ import io.github.oni0nfr1.skid.client.api.kart.KartMain
 import io.github.oni0nfr1.skid.client.api.kart.KartModelRoot
 import io.github.oni0nfr1.skid.client.api.kart.KartSaddle
 import io.github.oni0nfr1.skid.client.api.kart.StaleKartException
-import io.github.oni0nfr1.skid.client.api.tachometer.KartTachometer
 import io.github.oni0nfr1.skid.client.api.utils.KartType
-import io.github.oni0nfr1.skid.client.internal.tachometer.TachometerManager
 import net.minecraft.client.Minecraft
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.phys.Vec3
 
-internal class KartImpl<ENGINE, TACHOMETER>(
+internal class KartImpl<ENGINE : KartEngine>(
     saddle: KartSaddle,
-    override val type: KartType<ENGINE, TACHOMETER>,
-) : Kart<ENGINE, TACHOMETER>
-    where
-        ENGINE : KartEngine,
-        TACHOMETER : KartTachometer
-{
+    override val type: KartType<ENGINE>,
+) : Kart<ENGINE> {
 
     override var alive = true
 
@@ -68,13 +62,6 @@ internal class KartImpl<ENGINE, TACHOMETER>(
 
     override var rider: Player? = null
         private set
-
-    override val tachometer: TACHOMETER?
-        get() {
-            if (!alive) throw StaleKartException()
-            @Suppress("UNCHECKED_CAST")
-            return TachometerManager.getForKart(saddleId, type) as? TACHOMETER
-        }
 
     fun initializeEngine(engine: ENGINE) {
         check(!::internalEngine.isInitialized) { "kart engine is already initialized" }

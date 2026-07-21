@@ -67,5 +67,5 @@ val Player.ridingKart: KartRef?
  *
  * @return 현재 엔진 타입, 대상이나 카트 또는 엔진을 확인할 수 없으면 `null`
  */
-val Minecraft.kartEngineType: KartType<*, *>?
+val Minecraft.kartEngineType: KartType<*>?
     get() = (this.player?.subject as? Player)?.ridingKart?.access { type }

@@ -25,8 +25,11 @@ internal object KartSummonMixinHandler {
      * - Vanilla가 [entity]를 client level에 추가한 뒤 호출된다.
      *
      * ENSURES:
-     * - [entity]가 KartSaddle이면 해당 ID가 pending 상태가 된다.
+     * - [entity]가 KartSaddle이면 해당 ID가 pending인 상태에서 SUMMON_EARLY를 발행한다.
      * - 같은 ID의 이전 추적 상태가 있으면 무효화되고 새 수명 주기로 대체된다.
+     *
+     * FAILURE:
+     * - SUMMON_EARLY 콜백이 예외를 던지면 새 pending 상태를 제거하고 호출자에게 전파한다.
      *
      * @see io.github.oni0nfr1.skid.client.internal.mixin.ClientPacketListenerMixin.onHandleAddEntityPacket
      */
@@ -42,6 +45,12 @@ internal object KartSummonMixinHandler {
             )
         }
         KartManager.trackKart(entity)
+        try {
+            KartSummonEvents.SUMMON_EARLY.invoker().onSummon(entity)
+        } catch (failure: Throwable) {
+            KartManager.removeKart(entity.id)
+            throw failure
+        }
     }
 
     /**
@@ -67,8 +76,8 @@ internal object KartSummonMixinHandler {
      * - Vanilla의 [ClientLevel.removeEntity] 호출 전에 실행된다.
      *
      * ENSURES:
-     * - ready Kart이면 유효한 상태에서 REMOVE를 발행한 뒤 무효화한다.
-     * - pending saddle이면 이벤트 없이 추적 상태를 제거한다.
+     * - pending 또는 ready saddle이면 REMOVE를 발행한 뒤 추적 상태를 제거한다.
+     * - ready Kart이면 REMOVE 콜백이 끝날 때까지 유효하다.
      *
      * FAILURE:
      * - REMOVE 콜백이 예외를 던져도 추적 상태를 제거한다.
@@ -89,6 +98,7 @@ internal object KartSummonMixinHandler {
      * 존재하는 saddle의 추적 수명 주기를 정상적으로 종료합니다.
      *
      * ENSURES:
+     * - pending 또는 ready saddle이면 REMOVE를 한 번 발행한다.
      * - ready Kart이면 REMOVE 콜백이 끝날 때까지 유효하다.
      * - saddle의 추적 상태를 제거한다.
      *
@@ -96,9 +106,9 @@ internal object KartSummonMixinHandler {
      * - REMOVE 콜백이 예외를 던져도 추적 상태를 제거한다.
      */
     fun removeTrackedKart(saddle: KartSaddle) {
-        val kart = KartManager.getBySaddleId(saddle.id)
+        if (saddle.id !in KartManager.getTrackedSaddleIds()) return
         try {
-            if (kart != null) KartSummonEvents.REMOVE.invoker().onRemove(KartRef(saddle.id))
+            KartSummonEvents.REMOVE.invoker().onRemove(saddle)
         } finally {
             KartManager.removeKart(saddle.id)
         }

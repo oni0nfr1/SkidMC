@@ -393,7 +393,7 @@ internal object KartMountMixinHandler {
      *
      * ENSURES:
      * - SPECTATE_END, DISMOUNT, REMOVE 순서로 가능한 이벤트를 발행한다.
-     * - REMOVE 콜백이 끝날 때까지 Kart는 유효하다.
+     * - ready 수명 주기에서는 REMOVE 콜백이 끝날 때까지 Kart가 유효하다.
      * - 가능한 이벤트를 발행한 뒤 모든 추적 상태를 제거한다.
      *
      * FAILURE:

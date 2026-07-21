@@ -5,7 +5,14 @@ final class JavaKartSummonEventTypeTest {
     }
 
     static void registerSummonEvents() {
-        KartSummonEvents.SUMMON.register(kart -> { });
-        KartSummonEvents.REMOVE.register(kart -> { });
+        KartSummonEvents.SUMMON_EARLY.register(kartEntity -> {
+            kartEntity.getId();
+        });
+        KartSummonEvents.SUMMON.register(kart -> {
+            kart.getSaddleId();
+        });
+        KartSummonEvents.REMOVE.register(kartEntity -> {
+            kartEntity.getId();
+        });
     }
 }

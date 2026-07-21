@@ -2,7 +2,7 @@ package io.github.oni0nfr1.skid.client.internal.events
 
 import io.github.oni0nfr1.skid.client.SkidClient
 import io.github.oni0nfr1.skid.client.api.events.KartMountEvents
-import io.github.oni0nfr1.skid.client.api.kart.KartSaddleEntity
+import io.github.oni0nfr1.skid.client.api.kart.KartSaddle
 import io.github.oni0nfr1.skid.client.api.kart.MountType
 import io.github.oni0nfr1.skid.client.api.kart.mountStatus
 import io.github.oni0nfr1.skid.client.internal.kart.KartManager
@@ -26,7 +26,7 @@ internal object KartMountMixinHandler {
      * 서버가 선언한 passenger 중 SkidMC가 실제 엔티티를 확인하고 처리한 관계입니다.
      *
      * INVARIANT:
-     * - 저장된 saddle과 rider ID는 현재 client level에서 각각 KartSaddleEntity와 Player로 확인된 적이 있다.
+     * - 저장된 saddle과 rider ID는 현재 client level에서 각각 KartSaddle와 Player로 확인된 적이 있다.
      * - 저장되기 전에 해당 관계의 MOUNT_EARLY 호출이 정상적으로 완료됐다.
      * - 하나의 rider ID는 최대 하나의 saddle ID에만 속한다.
      * - 제거된 엔티티와 이전 client level의 ID는 남아 있지 않는다.
@@ -58,12 +58,12 @@ internal object KartMountMixinHandler {
      * 새 saddle 수명 주기가 추적되기 전에 같은 ID에 남은 탑승 관계를 폐기합니다.
      *
      * ENSURES:
-     * - [entity]가 KartSaddleEntity이면 해당 ID의 handled 관계가 남아 있지 않는다.
+     * - [entity]가 KartSaddle이면 해당 ID의 handled 관계가 남아 있지 않는다.
      * - 남은 관계를 제거할 때는 DISMOUNT를 발행하지 않는다.
      */
     @JvmStatic
     fun beforeEntityTracked(entity: Entity) {
-        if (entity !is KartSaddleEntity) return
+        if (entity !is KartSaddle) return
 
         val riderIds = handledPassengerIdsByKartId.remove(entity.id).orEmpty()
         if (riderIds.isEmpty()) return
@@ -100,7 +100,7 @@ internal object KartMountMixinHandler {
         @Suppress("UNUSED") ci: CallbackInfo,
     ) {
         val level = client.level ?: return
-        val kart = level.getEntity(packet.vehicle) as? KartSaddleEntity
+        val kart = level.getEntity(packet.vehicle) as? KartSaddle
         if (kart == null) {
             val handledRiderIds = handledPassengerIdsByKartId.remove(packet.vehicle).orEmpty()
             val wasTracked = packet.vehicle in KartManager.getTrackedSaddleIds()
@@ -169,7 +169,7 @@ internal object KartMountMixinHandler {
      * FAILURE:
      * - MOUNT_EARLY 콜백이 예외를 던지면 새 관계를 handled 상태에 추가하지 않는다.
      */
-    private fun handleMountEarly(kart: KartSaddleEntity, rider: Player) {
+    private fun handleMountEarly(kart: KartSaddle, rider: Player) {
         val kartId = kart.id
         val riderId = rider.id
         if (riderId in handledPassengerIdsByKartId[kartId].orEmpty()) return
@@ -187,7 +187,7 @@ internal object KartMountMixinHandler {
                 kartId,
                 riderId,
             )
-            val previousKart = client.level?.getEntity(previousKartId) as? KartSaddleEntity
+            val previousKart = client.level?.getEntity(previousKartId) as? KartSaddle
             if (previousKart != null) {
                 dismountAndForget(previousKart, riderId)
             } else {
@@ -213,7 +213,7 @@ internal object KartMountMixinHandler {
      * FAILURE:
      * - MOUNT 콜백이 예외를 던져도 active 관계를 유지한다.
      */
-    private fun completeMountIfReady(kart: KartSaddleEntity, rider: Player) {
+    private fun completeMountIfReady(kart: KartSaddle, rider: Player) {
         if (!KartManager.isReady(kart.id)) return
 
         val mounted = KartManager.mountRider(rider.id, kart.id)
@@ -241,11 +241,11 @@ internal object KartMountMixinHandler {
     ) {
         val level = client.level ?: return
         when (val entity = level.getEntity(entityId)) {
-            is KartSaddleEntity -> removeAllPassengers(entity)
+            is KartSaddle -> removeAllPassengers(entity)
             is Player -> {
                 val riderId = entity.id
                 val kartIds = buildSet {
-                    (entity.vehicle as? KartSaddleEntity)?.let { add(it.id) }
+                    (entity.vehicle as? KartSaddle)?.let { add(it.id) }
                     KartManager.getSaddleIdByRiderId(riderId)?.let(::add)
                     handledPassengerIdsByKartId.forEach { (kartId, riderIds) ->
                         if (riderId in riderIds) add(kartId)
@@ -263,7 +263,7 @@ internal object KartMountMixinHandler {
 
                 try {
                     kartIds.forEach { kartId ->
-                        val kart = level.getEntity(kartId) as? KartSaddleEntity
+                        val kart = level.getEntity(kartId) as? KartSaddle
                         if (kart != null) {
                             dismountAndForget(kart, riderId)
                         } else {
@@ -304,7 +304,7 @@ internal object KartMountMixinHandler {
      * FAILURE:
      * - DISMOUNT 콜백이 예외를 던져도 관계를 제거한다.
      */
-    private fun dismountAndForget(kart: KartSaddleEntity, riderId: Int) {
+    private fun dismountAndForget(kart: KartSaddle, riderId: Int) {
         val rider = client.level?.getEntity(riderId) as? Player
         try {
             if (rider == null) {
@@ -329,7 +329,7 @@ internal object KartMountMixinHandler {
      * FAILURE:
      * - DISMOUNT 콜백이 예외를 던져도 카트의 모든 rider 관계를 제거한다.
      */
-    private fun removeAllPassengers(kart: KartSaddleEntity) {
+    private fun removeAllPassengers(kart: KartSaddle) {
         val riderIds = buildSet {
             addAll(handledPassengerIdsByKartId[kart.id].orEmpty())
             addAll(KartManager.getRiderIdsBySaddleId(kart.id))
@@ -353,7 +353,7 @@ internal object KartMountMixinHandler {
      */
     @JvmStatic
     fun afterUpdateAttributes(entity: Entity) {
-        if (entity !is KartSaddleEntity) return
+        if (entity !is KartSaddle) return
         if (!KartManager.isReady(entity.id)) return
 
         entity.passengers.forEach { passenger ->
@@ -381,7 +381,7 @@ internal object KartMountMixinHandler {
             if (wasSpectating) {
                 val player = client.player
                 val target = client.cameraEntity as? RemotePlayer
-                val saddle = (target?.vehicle as? KartSaddleEntity)
+                val saddle = (target?.vehicle as? KartSaddle)
                     ?: target?.let { KartManager.getByRiderId(it.id)?.internalSaddleOrNull }
 
                 wasSpectating = false
@@ -407,7 +407,7 @@ internal object KartMountMixinHandler {
             }
 
             kartIds.forEach { kartId ->
-                val saddle = level?.getEntity(kartId) as? KartSaddleEntity
+                val saddle = level?.getEntity(kartId) as? KartSaddle
                 if (saddle != null) {
                     removeAllPassengers(saddle)
                     KartSummonMixinHandler.removeTrackedKart(saddle)
@@ -450,8 +450,8 @@ internal object KartMountMixinHandler {
     @JvmStatic
     fun afterSpectateTargetChange(player: Player, prevCamera: Entity, newCamera: Entity) {
         if (prevCamera === newCamera) return
-        val prevSaddleEntity = prevCamera.vehicle as? KartSaddleEntity
-        val newSaddleEntity = newCamera.vehicle as? KartSaddleEntity
+        val prevSaddleEntity = prevCamera.vehicle as? KartSaddle
+        val newSaddleEntity = newCamera.vehicle as? KartSaddle
 
         if (wasSpectating) {
             wasSpectating = false
@@ -492,7 +492,7 @@ internal object KartMountMixinHandler {
     fun onFirstAttrUpdateAfterSpectate(entity: Entity) {
         val player = client.player ?: return
         val camera = client.cameraEntity as? RemotePlayer ?: return
-        if (entity !is KartSaddleEntity) return
+        if (entity !is KartSaddle) return
         if (!KartManager.isReady(entity.id)) return
         if (camera !in entity.passengers) return
 

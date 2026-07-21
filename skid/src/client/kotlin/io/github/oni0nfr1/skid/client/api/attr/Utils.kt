@@ -2,7 +2,7 @@
 package io.github.oni0nfr1.skid.client.api.attr
 
 import io.github.oni0nfr1.skid.client.api.events.KartAttrEvents
-import io.github.oni0nfr1.skid.client.api.kart.KartSaddleEntity
+import io.github.oni0nfr1.skid.client.api.kart.KartSaddle
 import io.github.oni0nfr1.skid.client.api.kart.ridingKart
 import io.github.oni0nfr1.skid.client.api.utils.KartType
 import io.github.oni0nfr1.skid.client.api.utils.access
@@ -17,7 +17,7 @@ import net.minecraft.world.entity.player.Player
  * @param id 조회할 modifier ID의 경로
  * @return 수신된 modifier 값, 해당 값이 없거나 조회에 실패하면 `null`
  */
-fun KartSaddleEntity.getKartMeta(id: String): Double? {
+fun KartSaddle.getKartMeta(id: String): Double? {
     val key = ResourceLocation.withDefaultNamespace(id)
     return getKartMeta(key)
 }
@@ -28,7 +28,7 @@ fun KartSaddleEntity.getKartMeta(id: String): Double? {
  * @param key 조회할 modifier ID
  * @return 수신된 modifier 값, 해당 값이 없거나 조회에 실패하면 `null`
  */
-fun KartSaddleEntity.getKartMeta(key: ResourceLocation): Double? {
+fun KartSaddle.getKartMeta(key: ResourceLocation): Double? {
     return try {
         attributes.getModifierValue(KartAttrEvents.KART_META_ATTR_KEY, key)
     } catch (e: Exception) {
@@ -64,7 +64,7 @@ fun Player.getRiderMeta(key: ResourceLocation): Double? {
  *
  * @return 실제 엔진 종류, 값이 없거나 알려지지 않은 코드이면 `null`
  */
-val KartSaddleEntity.realKartEngine: KartType<*>?
+val KartSaddle.realKartEngine: KartType<*>?
     get() {
         val modifier = getKartMeta(KnownAttrModId.ID_ENGINE_REAL) ?: return null
         return KartType.fromAttrEngineCode(modifier.toInt())
@@ -75,7 +75,7 @@ val KartSaddleEntity.realKartEngine: KartType<*>?
  *
  * @return 설정된 엔진 종류, 값이 없거나 알려지지 않은 코드이면 `null`
  */
-val KartSaddleEntity.selectedKartEngine: KartType<*>?
+val KartSaddle.selectedKartEngine: KartType<*>?
     get() {
         val modifier = getKartMeta(KnownAttrModId.ID_ENGINE) ?: return null
         return KartType.fromAttrEngineCode(modifier.toInt())

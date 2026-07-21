@@ -7,6 +7,8 @@ import io.github.oni0nfr1.skid.client.api.tachometer.XTachometer
 import io.github.oni0nfr1.skid.client.api.utils.KartType
 import io.github.oni0nfr1.skid.client.api.utils.Ref
 import io.github.oni0nfr1.skid.client.api.utils.access
+import net.minecraft.client.player.LocalPlayer
+import net.minecraft.world.entity.player.Player
 
 @Suppress("unused", "UNUSED_VARIABLE")
 private fun specifiedKartTypeIsInferred(ref: KartRef) {
@@ -32,4 +34,15 @@ private fun intermediateEngineRetainsItsTachometerType(engine: NitroEngine) {
 @Suppress("unused", "UNUSED_VARIABLE")
 private fun engineRetainsItsConcreteKartType(engine: XEngine) {
     val kart: Kart<XEngine> = engine.kart
+}
+
+@Suppress("unused", "UNUSED_VARIABLE")
+private fun kartAccessorsExposeApiTypes(
+    saddle: KartSaddle,
+    rider: Player,
+    localPlayer: LocalPlayer,
+) {
+    val kart: KartRef? = saddle.kart
+    val ridingKart: KartRef? = rider.ridingKart
+    val mountStatus: MountType = localPlayer.mountStatus
 }

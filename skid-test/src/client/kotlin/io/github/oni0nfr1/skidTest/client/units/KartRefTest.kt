@@ -4,7 +4,7 @@ import io.github.oni0nfr1.skid.client.api.engine.KartEngine
 import io.github.oni0nfr1.skid.client.api.engine.XEngine
 import io.github.oni0nfr1.skid.client.api.events.KartMountEvents
 import io.github.oni0nfr1.skid.client.api.kart.Kart
-import io.github.oni0nfr1.skid.client.api.kart.KartSaddleEntity
+import io.github.oni0nfr1.skid.client.api.kart.KartSaddle
 import io.github.oni0nfr1.skid.client.api.kart.KartRef
 import io.github.oni0nfr1.skid.client.api.kart.kart
 import io.github.oni0nfr1.skid.client.api.utils.KartType
@@ -46,7 +46,7 @@ object KartRefTest : TestUnit() {
         }
     }
 
-    fun onMount(kartEntity: KartSaddleEntity, player: Player) {
+    fun onMount(kartEntity: KartSaddle, player: Player) {
         if (!status.testing || hudRenderer != null) return
         if (player != client.player) return
 
@@ -60,7 +60,7 @@ object KartRefTest : TestUnit() {
         }
     }
 
-    fun onDismount(kartEntity: KartSaddleEntity?, player: Player?) {
+    fun onDismount(kartEntity: KartSaddle?, player: Player?) {
         if (!status.testing || hudRenderer == null) return
 
         val clientPlayer = client.player ?: return

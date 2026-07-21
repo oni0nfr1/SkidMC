@@ -8,7 +8,7 @@ import net.minecraft.core.Holder
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.ai.attributes.Attribute
 import net.minecraft.world.entity.ai.attributes.Attributes
-import io.github.oni0nfr1.skid.client.api.kart.KartSaddleEntity
+import io.github.oni0nfr1.skid.client.api.kart.KartSaddle
 
 /**
  * 서버에서 카트 대구 엔티티의 어트리뷰트로 전송되는 카트 메타데이터 이벤트를 제공합니다.
@@ -89,7 +89,7 @@ object KartAttrEvents {
          * @param kartEntity 값이 변경된 카트의 대구 엔티티
          * @param value 패킷으로 새로 수신한 modifier 값
          */
-        fun onAttrChange(kartEntity: KartSaddleEntity, value: Double)
+        fun onAttrChange(kartEntity: KartSaddle, value: Double)
     }
 
     /** 카트 메타데이터 어트리뷰트 패킷 전체를 처리합니다. */
@@ -99,7 +99,7 @@ object KartAttrEvents {
          * @param base 패킷에 포함된 어트리뷰트 기본값
          * @param modifiers 패킷에 포함된 modifier 스냅샷
          */
-        fun onPacket(kartEntity: KartSaddleEntity, base: Double, modifiers: AttrModifierSnapshot)
+        fun onPacket(kartEntity: KartSaddle, base: Double, modifiers: AttrModifierSnapshot)
     }
 
     @Suppress("NOTHING_TO_INLINE")

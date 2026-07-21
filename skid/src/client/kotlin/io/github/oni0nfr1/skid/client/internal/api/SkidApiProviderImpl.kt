@@ -8,4 +8,7 @@ import java.util.Optional
 class SkidApiProviderImpl : SkidApiProvider {
     override fun getKart(saddleId: Int): Optional<Kart<*>> =
         Optional.ofNullable(KartManager.getBySaddleId(saddleId))
+
+    override fun getKartByRiderId(riderId: Int): Optional<Kart<*>> =
+        Optional.ofNullable(KartManager.getByRiderId(riderId))
 }

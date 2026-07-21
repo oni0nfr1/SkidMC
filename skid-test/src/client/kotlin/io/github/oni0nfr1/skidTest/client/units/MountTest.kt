@@ -1,7 +1,7 @@
 package io.github.oni0nfr1.skidTest.client.units
 
 import io.github.oni0nfr1.skid.client.api.events.KartMountEvents
-import io.github.oni0nfr1.skid.client.api.kart.KartSaddleEntity
+import io.github.oni0nfr1.skid.client.api.kart.KartSaddle
 import io.github.oni0nfr1.skid.client.api.kart.kart
 import io.github.oni0nfr1.skid.client.api.utils.access
 import io.github.oni0nfr1.skidTest.annotations.SkidTest
@@ -28,7 +28,7 @@ object MountTest: TestUnit() {
 
     init { register() }
 
-    private fun verifyKartReady(event: String, kartEntity: KartSaddleEntity): String? {
+    private fun verifyKartReady(event: String, kartEntity: KartSaddle): String? {
         val kart = kartEntity.kart ?: run {
             client.sendChat("[$event] kart object is missing for kart#${kartEntity.id}!")
             autoFail()

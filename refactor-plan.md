@@ -168,13 +168,13 @@ data object X : KartType<XEngine>(
 
 ### 5. 카트 접근 유틸리티 이전
 
-- [ ] `KartSaddle.kart`를 새 `KartRef` 기반으로 제공
-- [ ] `Player.ridingKart`를 새 `KartRef` 기반으로 제공
-- [ ] 로컬 플레이어의 탑승/관전 상태 API 이전
-- [ ] `MountType` 이전 및 새 동기화 모델에 맞춰 검토
+- [x] `KartSaddle.kart`를 새 `KartRef` 기반으로 제공
+- [x] `Player.ridingKart`를 새 `KartRef` 기반으로 제공
+- [x] 로컬 플레이어의 탑승/관전 상태 API 이전
+- [x] `MountType` 이전 및 새 동기화 모델에 맞춰 검토
 - [ ] `Minecraft.kartEngineType`을 `KartType` 기반 API로 대체
 - [ ] `TachometerRef` 제거 후 `KartRef`를 통한 타코미터 접근으로 통합
-- [ ] 기존 typealias 이름 마이그레이션
+- [x] 기존 typealias 이름 마이그레이션
   - `KartSaddleEntity` → `KartSaddle`
   - `KartMainEntity` → `KartMain`
 

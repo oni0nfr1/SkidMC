@@ -2,7 +2,7 @@ package io.github.oni0nfr1.skid.client.internal.events
 
 import io.github.oni0nfr1.skid.client.SkidClient
 import io.github.oni0nfr1.skid.client.api.events.KartSummonEvents
-import io.github.oni0nfr1.skid.client.api.kart.KartSaddleEntity
+import io.github.oni0nfr1.skid.client.api.kart.KartSaddle
 import io.github.oni0nfr1.skid.client.internal.kart.KartManager
 import io.github.oni0nfr1.skid.client.internal.utils.MCClient
 import net.minecraft.client.Minecraft
@@ -24,14 +24,14 @@ internal object KartSummonMixinHandler {
      * - Vanilla가 [entity]를 client level에 추가한 뒤 호출된다.
      *
      * ENSURES:
-     * - [entity]가 KartSaddleEntity이면 해당 ID가 pending 상태가 된다.
+     * - [entity]가 KartSaddle이면 해당 ID가 pending 상태가 된다.
      * - 같은 ID의 이전 추적 상태가 있으면 무효화되고 새 수명 주기로 대체된다.
      *
      * @see io.github.oni0nfr1.skid.client.internal.mixin.ClientPacketListenerMixin.onHandleAddEntityPacket
      */
     @JvmStatic
     fun onAddEntityPacket(entity: Entity, @Suppress("UNUSED") ci: CallbackInfo) {
-        if (entity !is KartSaddleEntity) return
+        if (entity !is KartSaddle) return
 
         if (entity.id in KartManager.getTrackedSaddleIds()) {
             SkidClient.LOGGER.warn(
@@ -54,7 +54,7 @@ internal object KartSummonMixinHandler {
      */
     @JvmStatic
     fun afterUpdateAttributes(entity: Entity) {
-        if (entity !is KartSaddleEntity) return
+        if (entity !is KartSaddle) return
         val kart = KartManager.prepareKart(entity) ?: return
         KartSummonEvents.SUMMON.invoker().onSummon(kart)
     }
@@ -77,7 +77,7 @@ internal object KartSummonMixinHandler {
     @JvmStatic
     fun beforeRemoveEntityByPacket(entityId: Int, @Suppress("UNUSED") ci: CallbackInfo) {
         val entity = client.level?.getEntity(entityId)
-        if (entity is KartSaddleEntity) {
+        if (entity is KartSaddle) {
             removeTrackedKart(entity)
         } else if (entityId in KartManager.getTrackedSaddleIds()) {
             discardTrackedKart(entityId, "entity removal")
@@ -94,7 +94,7 @@ internal object KartSummonMixinHandler {
      * FAILURE:
      * - REMOVE 콜백이 예외를 던져도 추적 상태를 제거한다.
      */
-    fun removeTrackedKart(saddle: KartSaddleEntity) {
+    fun removeTrackedKart(saddle: KartSaddle) {
         val kart = KartManager.getBySaddleId(saddle.id)
         try {
             if (kart != null) KartSummonEvents.REMOVE.invoker().onRemove(kart)

@@ -17,4 +17,12 @@ interface SkidApiProvider {
      * 카트가 제거되었거나 아직 API 객체가 준비되지 않았으면 빈 [Optional]을 반환합니다.
      */
     fun getKart(saddleId: Int): Optional<Kart<*>>
+
+    /**
+     * [riderId]에 대응하는 현재 유효한 카트를 반환합니다.
+     *
+     * 플레이어가 카트에 탑승하지 않았거나 카트 API 객체가 아직 준비되지 않았으면 빈
+     * [Optional]을 반환합니다.
+     */
+    fun getKartByRiderId(riderId: Int): Optional<Kart<*>>
 }

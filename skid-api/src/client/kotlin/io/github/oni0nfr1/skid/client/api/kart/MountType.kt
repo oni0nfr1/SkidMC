@@ -6,8 +6,10 @@ import net.minecraft.world.entity.Entity
 sealed interface MountType {
     /** 카트에 탑승하지 않았고 카트 탑승자를 관전하지도 않는 상태입니다. */
     class Dismounted : MountType
+
     /** 로컬 플레이어가 카트에 직접 탑승한 상태입니다. */
     class Mounted : MountType
+
     /**
      * 카트에 탑승한 다른 플레이어를 관전하는 상태입니다.
      *

@@ -3,7 +3,7 @@ package io.github.oni0nfr1.skid.client.internal.events
 import io.github.oni0nfr1.skid.client.api.attr.AttrModifierSnapshot
 import io.github.oni0nfr1.skid.client.api.events.KartAttrEvents
 import io.github.oni0nfr1.skid.client.api.events.KartAttrEvents.KART_META_ATTR
-import io.github.oni0nfr1.skid.client.api.kart.KartSaddleEntity
+import io.github.oni0nfr1.skid.client.api.kart.KartSaddle
 import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket
 import net.minecraft.world.entity.Entity
 import kotlin.collections.component1
@@ -19,7 +19,7 @@ internal object KartAttrMixinHandler {
      */
     @JvmStatic
     fun onUpdateAttrPacket(entity: Entity, snapshot: ClientboundUpdateAttributesPacket.AttributeSnapshot) {
-        if (entity !is KartSaddleEntity) return
+        if (entity !is KartSaddle) return
         if (snapshot.attribute != KartAttrEvents.KART_META_ATTR_KEY) return
         val attrInstance = entity.attributes.getInstance(KartAttrEvents.KART_META_ATTR_KEY) ?: return
 

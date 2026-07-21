@@ -4,6 +4,9 @@ import io.github.oni0nfr1.skid.client.api.engine.XEngine;
 import io.github.oni0nfr1.skid.client.api.tachometer.XTachometer;
 import io.github.oni0nfr1.skid.client.api.utils.KartType;
 import io.github.oni0nfr1.skid.client.api.utils.Ref;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.animal.Cod;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,5 +23,11 @@ final class JavaApiTypeTest {
         specified.get().ifPresent(value -> {
             XTachometer tachometer = value.getEngine().getTachometer();
         });
+    }
+
+    static void accessors(Cod saddle, Player rider, LocalPlayer localPlayer) {
+        KartRef kart = KartUtils.getKart(saddle);
+        KartRef ridingKart = KartUtils.getRidingKart(rider);
+        MountType mountStatus = KartUtils.getMountStatus(localPlayer);
     }
 }

@@ -12,6 +12,7 @@ plugins {
 version = project.property("mod_version") as String
 group = project.property("maven_group") as String
 val enableSourcesJar = providers.gradleProperty("release").isPresent
+evaluationDependsOn(":skid-api")
 
 base {
     archivesName.set(project.property("archives_base_name") as String)
@@ -19,6 +20,7 @@ base {
 
 val targetJavaVersion = 21
 val skidSourceSets = project(":skid").extensions.getByType<SourceSetContainer>()
+val skidApiSourceSets = project(":skid-api").extensions.getByType<SourceSetContainer>()
 
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
@@ -69,6 +71,7 @@ dependencies {
 
     compileOnly(project(path = ":skid", configuration = "namedElements"))
     implementation(project(path = ":skid-api", configuration = "namedElements"))
+    add("clientImplementation", skidApiSourceSets.named("client").get().output)
 }
 
 tasks.processResources {

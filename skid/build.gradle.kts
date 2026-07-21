@@ -1,5 +1,6 @@
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.SourcesJar
+import org.gradle.api.tasks.SourceSetContainer
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier
@@ -17,6 +18,8 @@ plugins {
 version = project.property("mod_version") as String
 group = project.property("maven_group") as String
 val enableSourcesJar = providers.gradleProperty("release").isPresent
+evaluationDependsOn(":skid-api")
+val skidApiSourceSets = project(":skid-api").extensions.getByType<SourceSetContainer>()
 
 base {
     archivesName.set(project.property("archives_base_name") as String)
@@ -60,7 +63,8 @@ dependencies {
 
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_version")}")
 
-    modImplementation(project(path = ":skid-api", configuration = "namedElements"))
+    implementation(project(path = ":skid-api", configuration = "namedElements"))
+    add("clientImplementation", skidApiSourceSets.named("client").get().output)
     include(project(":skid-api"))
 }
 

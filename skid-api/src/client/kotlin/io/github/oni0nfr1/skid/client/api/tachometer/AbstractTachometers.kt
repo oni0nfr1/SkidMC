@@ -22,7 +22,7 @@ sealed interface NitroTachometer : SpeedTachometer {
 }
 
 /** RPM 게이지와 기어 단수가 표시되는 기어 계열 엔진의 타코미터입니다. */
-sealed interface GearlikeTachometer : SpeedTachometer {
+sealed interface GearLikeTachometer : SpeedTachometer {
 
     /** RPM 게이지 진행도입니다. 값의 범위는 `0.0..1.0`입니다. */
     val rpm: Double

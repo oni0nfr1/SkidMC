@@ -2,7 +2,7 @@ package io.github.oni0nfr1.skidTest.client.units
 
 import io.github.oni0nfr1.skid.client.api.tachometer.BoatTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.F1Tachometer
-import io.github.oni0nfr1.skid.client.api.tachometer.GearlikeTachometer
+import io.github.oni0nfr1.skid.client.api.tachometer.GearLikeTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.MKLikeTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.NitroTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.RushPlusTachometer
@@ -47,7 +47,7 @@ object TachometerTest: TestUnit() {
                 append(
                     when (currentTachometer) {
                         is NitroTachometer -> nitroEngineInfo(currentTachometer)
-                        is GearlikeTachometer -> gearlikeEngineInfo(currentTachometer)
+                        is GearLikeTachometer -> gearLikeEngineInfo(currentTachometer)
                         is MKLikeTachometer -> mkLikeEngineInfo(currentTachometer)
                         is BoatTachometer -> boatEngineInfo(currentTachometer)
                     }
@@ -67,7 +67,7 @@ object TachometerTest: TestUnit() {
         return info
     }
 
-    private fun gearlikeEngineInfo(tachometer: GearlikeTachometer): String {
+    private fun gearLikeEngineInfo(tachometer: GearLikeTachometer): String {
         var info = ""
         info += "speed: ${tachometer.speed}\n"
         info += "gear: ${tachometer.gear}\n"

@@ -81,7 +81,7 @@
 
 - [x] 공통 엔진 기능 인터페이스 이동
   - `DriftEngine`, `SpeedEngine`
-  - `NitroEngine`, `GearlikeEngine`
+  - `NitroEngine`, `GearLikeEngine`
   - `InstantBoostEngine`, `DualBoostEngine`
   - `DraftEngine`, `ExceedEngine`
 - [x] 모든 구체 엔진 인터페이스 이동
@@ -89,7 +89,7 @@
   - 비공식 엔진: N1, RX, KEY, GEAR, RALLY, F1, MK, BOAT
 - [x] 공통 타코미터 인터페이스 이동
   - `SpeedTachometer`, `NitroTachometer`
-  - `GearlikeTachometer`, `ExceedTachometer`
+  - `GearLikeTachometer`, `ExceedTachometer`
 - [x] 모든 구체 타코미터 인터페이스 이동
 - [x] 각 엔진 인터페이스가 보장 가능한 가장 구체적인 카트 타입을 반환하도록 변경
 

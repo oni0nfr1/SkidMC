@@ -9,7 +9,7 @@ import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
 import java.util.Optional
 
-internal abstract class GearlikeTachometerImpl(
+internal abstract class GearLikeTachometerImpl(
     engine: KartEngine,
 ) : KartTachometerImpl(engine) {
 

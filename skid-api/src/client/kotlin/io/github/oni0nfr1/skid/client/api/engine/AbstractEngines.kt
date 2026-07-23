@@ -2,7 +2,7 @@ package io.github.oni0nfr1.skid.client.api.engine
 
 import io.github.oni0nfr1.skid.client.api.kart.Kart
 import io.github.oni0nfr1.skid.client.api.tachometer.ExceedTachometer
-import io.github.oni0nfr1.skid.client.api.tachometer.GearlikeTachometer
+import io.github.oni0nfr1.skid.client.api.tachometer.GearLikeTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.MKLikeTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.NitroTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.SpeedTachometer
@@ -37,9 +37,9 @@ sealed interface NitroEngine : DriftEngine, SpeedEngine {
 }
 
 /** RPM과 기어 단수를 제공하는 엔진입니다. */
-sealed interface GearlikeEngine : DriftEngine, SpeedEngine {
-    override val kart: Kart<GearlikeEngine>
-    override val tachometer: GearlikeTachometer?
+sealed interface GearLikeEngine : DriftEngine, SpeedEngine {
+    override val kart: Kart<GearLikeEngine>
+    override val tachometer: GearLikeTachometer?
 }
 
 /** 순간 부스터 상태를 제공하는 니트로 엔진입니다. */

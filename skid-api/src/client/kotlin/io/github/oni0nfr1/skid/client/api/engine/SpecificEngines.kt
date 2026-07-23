@@ -114,19 +114,19 @@ interface KeyEngine : NitroEngine {
 }
 
 /** GEAR 더미 엔진의 기능과 타코미터 타입을 제공합니다. */
-interface GearEngine : GearlikeEngine, DraftEngine {
+interface GearEngine : GearLikeEngine, DraftEngine {
     override val kart: Kart<GearEngine>
     override val tachometer: GearTachometer?
 }
 
 /** RALLY 더미 엔진의 기능과 타코미터 타입을 제공합니다. */
-interface RallyEngine : GearlikeEngine, DraftEngine {
+interface RallyEngine : GearLikeEngine, DraftEngine {
     override val kart: Kart<RallyEngine>
     override val tachometer: RallyTachometer?
 }
 
 /** F1 더미 엔진의 기능과 타코미터 타입을 제공합니다. */
-interface F1Engine : GearlikeEngine, DraftEngine {
+interface F1Engine : GearLikeEngine, DraftEngine {
     override val kart: Kart<F1Engine>
     override val tachometer: F1Tachometer?
 }

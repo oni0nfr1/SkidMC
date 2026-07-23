@@ -52,13 +52,13 @@ interface RXTachometer : NitroTachometer
 interface KeyTachometer : NitroTachometer
 
 /** GEAR 더미 엔진의 타코미터입니다. */
-interface GearTachometer : GearlikeTachometer
+interface GearTachometer : GearLikeTachometer
 
 /** RALLY 더미 엔진의 타코미터입니다. */
-interface RallyTachometer : GearlikeTachometer
+interface RallyTachometer : GearLikeTachometer
 
 /** F1 더미 엔진의 타코미터입니다. */
-interface F1Tachometer : GearlikeTachometer {
+interface F1Tachometer : GearLikeTachometer {
     /** 액션바에 표시된 ERS 충전량입니다. */
     val ers: Int
 }

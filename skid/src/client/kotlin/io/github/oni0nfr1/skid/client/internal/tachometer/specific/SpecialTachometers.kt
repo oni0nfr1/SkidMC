@@ -106,15 +106,12 @@ internal class DSTachometerImpl(
 internal class BoatTachometerImpl(
     engine: KartEngine,
 ) : KartTachometerImpl(engine), BoatTachometer {
-    override fun update(actionBar: Component): TachometerUpdateResult {
-        commit(actionBar)
-        return TachometerUpdateResult.matched(KartTachometerEvents.Result.SHOW)
-    }
+    override fun update(actionBar: Component): TachometerUpdateResult =
+        TachometerUpdateResult.notMatched()
 
     override fun update(
         additionalMatched: Boolean,
         actionBar: Component
-    ): TachometerUpdateResult {
-        return update(actionBar)
-    }
+    ): TachometerUpdateResult =
+        TachometerUpdateResult.notMatched()
 }

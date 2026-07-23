@@ -9,5 +9,5 @@ private fun tachometerEventsCanBeRegistered() {
     KartTachometerEvents.RPM.register { _, _ -> KartTachometerEvents.Result.SHOW }
     KartTachometerEvents.GEAR.register { _, _ -> KartTachometerEvents.Result.SHOW }
     KartTachometerEvents.ERS.register { _, _ -> KartTachometerEvents.Result.SHOW }
-    KartTachometerEvents.MK_GAUGE.register { _, _ -> KartTachometerEvents.Result.SHOW }
+    KartTachometerEvents.TURBO_GAUGE.register { _, _ -> KartTachometerEvents.Result.SHOW }
 }

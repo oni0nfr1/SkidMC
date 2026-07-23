@@ -1,9 +1,13 @@
 package io.github.oni0nfr1.skid.client.api.kart
 
+import io.github.oni0nfr1.skid.client.api.engine.DSEngine
+import io.github.oni0nfr1.skid.client.api.engine.MKLikeEngine
 import io.github.oni0nfr1.skid.client.api.engine.NitroEngine
 import io.github.oni0nfr1.skid.client.api.engine.XEngine
 import io.github.oni0nfr1.skid.client.api.kart.unstable.currentLap
 import io.github.oni0nfr1.skid.client.api.kart.unstable.maxLap
+import io.github.oni0nfr1.skid.client.api.tachometer.DSTachometer
+import io.github.oni0nfr1.skid.client.api.tachometer.MKLikeTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.NitroTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.XTachometer
 import io.github.oni0nfr1.skid.client.api.utils.KartType
@@ -23,6 +27,16 @@ private fun specifiedKartTypeIsInferred(ref: KartRef) {
 }
 
 @Suppress("unused", "UNUSED_VARIABLE")
+private fun specifiedDSKartTypeIsInferred(ref: KartRef) {
+    val specified: Ref<Kart<DSEngine>> = ref.specify(KartType.DS)
+
+    specified.access {
+        val typedEngine: DSEngine = engine
+        val typedTachometer: DSTachometer? = engine.tachometer
+    }
+}
+
+@Suppress("unused", "UNUSED_VARIABLE")
 private fun kartEngineTypeIsCovariant(kart: Kart<XEngine>) {
     val nitroKart: Kart<NitroEngine> = kart
     val currentLap: Int = kart.currentLap
@@ -33,6 +47,12 @@ private fun kartEngineTypeIsCovariant(kart: Kart<XEngine>) {
 private fun intermediateEngineRetainsItsTachometerType(engine: NitroEngine) {
     val kart: Kart<NitroEngine> = engine.kart
     val tachometer: NitroTachometer? = engine.tachometer
+}
+
+@Suppress("unused", "UNUSED_VARIABLE")
+private fun mkLikeEngineRetainsItsTachometerType(engine: MKLikeEngine) {
+    val kart: Kart<MKLikeEngine> = engine.kart
+    val tachometer: MKLikeTachometer? = engine.tachometer
 }
 
 @Suppress("unused", "UNUSED_VARIABLE")

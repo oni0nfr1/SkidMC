@@ -25,6 +25,7 @@ internal object KartFactory {
         KartType.RX -> create(saddle, KartType.RX, ::RXEngineImpl)
         KartType.KEY -> create(saddle, KartType.KEY, ::KeyEngineImpl)
         KartType.MK -> create(saddle, KartType.MK, ::MKEngineImpl)
+        KartType.DS -> create(saddle, KartType.DS, ::DSEngineImpl)
         KartType.BOAT -> create(saddle, KartType.BOAT, ::BoatEngineImpl)
         KartType.GEAR -> create(saddle, KartType.GEAR, ::GearEngineImpl)
         KartType.F1 -> create(saddle, KartType.F1, ::F1EngineImpl)

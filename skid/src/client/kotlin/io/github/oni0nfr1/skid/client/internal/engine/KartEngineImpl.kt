@@ -10,16 +10,34 @@ import io.github.oni0nfr1.skid.client.internal.tachometer.TachometerManager
 import net.minecraft.world.entity.Display
 
 internal abstract class KartEngineImpl<ENGINE, TACHOMETER>(
-    override val kart: Kart<ENGINE>,
-) : KartEngine
+    val kart: Kart<ENGINE>,
+)
     where
         ENGINE : KartEngine,
         TACHOMETER : KartTachometer
 {
-    override val tachometer: TACHOMETER?
+    /**
+     * INVARIANT:
+     * - 모든 구체 하위 클래스는 [ENGINE]에 대응하는 공개 엔진 인터페이스를 구현하므로
+     *   이 객체와 공개 엔진 view는 항상 동일한 인스턴스다.
+     */
+    private val engineView: KartEngine
+        get() {
+            check(this is KartEngine) {
+                "Concrete kart engine implementations must implement their public engine interface"
+            }
+            return this
+        }
+
+    /**
+     * INVARIANT:
+     * - [TachometerManager]는 [engineView]와 동일한 엔진 인스턴스로 생성된 타코미터만
+     *   반환하며, 구체 엔진 factory는 [ENGINE]과 [TACHOMETER]의 올바른 조합만 생성한다.
+     */
+    val tachometer: TACHOMETER?
         get() {
             @Suppress("UNCHECKED_CAST")
-            return TachometerManager.getForEngine(this) as? TACHOMETER
+            return TachometerManager.getForEngine(engineView) as? TACHOMETER
         }
 
     // implementation of RegularEngine

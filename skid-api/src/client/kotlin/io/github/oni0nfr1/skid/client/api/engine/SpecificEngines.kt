@@ -4,6 +4,7 @@ import io.github.oni0nfr1.skid.client.api.kart.Kart
 import io.github.oni0nfr1.skid.client.api.tachometer.A2Tachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.BoatTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.ChargeTachometer
+import io.github.oni0nfr1.skid.client.api.tachometer.DSTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.EXTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.F1Tachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.GearTachometer
@@ -131,9 +132,15 @@ interface F1Engine : GearlikeEngine, DraftEngine {
 }
 
 /** MK 더미 엔진의 기능과 타코미터 타입을 제공합니다. */
-interface MKEngine : DriftEngine, DraftEngine {
+interface MKEngine : MKLikeEngine {
     override val kart: Kart<MKEngine>
     override val tachometer: MKTachometer?
+}
+
+/** DS 더미 엔진의 기능과 타코미터 타입을 제공합니다. */
+interface DSEngine : MKLikeEngine {
+    override val kart: Kart<DSEngine>
+    override val tachometer: DSTachometer?
 }
 
 /** BOAT 더미 엔진의 기능과 타코미터 타입을 제공합니다. */

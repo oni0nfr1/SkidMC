@@ -64,10 +64,10 @@ interface F1Tachometer : GearlikeTachometer {
 }
 
 /** MK 더미 엔진의 타코미터입니다. */
-interface MKTachometer : KartTachometer {
-    /** 터보 게이지 진행도입니다. 값의 범위는 `0.0..1.0`입니다. */
-    val turboGauge: Double
-}
+interface MKTachometer : MKLikeTachometer
+
+/** DS 더미 엔진의 타코미터입니다. */
+interface DSTachometer : MKLikeTachometer
 
 /** BOAT 더미 엔진의 타코미터입니다. */
 interface BoatTachometer : KartTachometer

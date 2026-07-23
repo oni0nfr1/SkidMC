@@ -164,6 +164,13 @@ sealed class KartType<out ENGINE>(
         engineKind = EngineKind.DUMMY,
     )
 
+    data object DS : KartType<DSEngine>(
+        engineCode = 1008,
+        attrEngineCode = 1008,
+        engineName = "ds",
+        engineKind = EngineKind.DUMMY,
+    )
+
     companion object {
         /** SkidMC가 지원하는 모든 카트 타입입니다. */
         @JvmField
@@ -188,6 +195,7 @@ sealed class KartType<out ENGINE>(
             GEAR,
             F1,
             RALLY,
+            DS,
         )
 
         private val byEngineCode = entries.associateBy(KartType<*>::engineCode)

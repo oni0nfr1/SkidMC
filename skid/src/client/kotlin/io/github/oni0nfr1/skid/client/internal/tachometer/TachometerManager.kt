@@ -20,18 +20,19 @@ internal object TachometerManager {
      * 마지막으로 현재 탑승·관전 대상에서 정상 파싱된 타코미터입니다.
      *
      * INVARIANT:
-     * - 저장된 타코미터는 생성 당시의 정확한 KartEngine 인스턴스를 참조한다.
+     * - 저장된 두 view는 동일한 타코미터 구현체이며 생성 당시의 정확한 KartEngine
+     *   인스턴스를 참조한다.
      *
      * THREADING:
      * - 렌더 스레드에서만 접근하고 변경한다.
      */
-    private var currentTachometer: TachometerInternal? = null
+    private var currentTachometer: ManagedTachometer<*>? = null
 
     fun init() {
         currentTachometer = null
         ClientTickEvents.END_CLIENT_TICK.register {
             clearIfInvalid()
-            currentTachometer?.tick()
+            currentTachometer?.internal?.tick()
         }
     }
 
@@ -52,7 +53,7 @@ internal object TachometerManager {
             "Cannot update a tachometer with a stale or mismatched kart engine"
         }
 
-        val current = currentTachometer
+        val current = currentTachometer?.internal
         val match: TachometerUpdateResult
 
         if (current != null && current.matches(kart, engine)) {
@@ -61,7 +62,7 @@ internal object TachometerManager {
             clear()
 
             val tachometer = createTachometer(engine)
-            match = tachometer.update(actionBar)
+            match = tachometer.internal.update(actionBar)
             if (match.matched) currentTachometer = tachometer
         }
 
@@ -75,7 +76,7 @@ internal object TachometerManager {
     }
 
     private fun clearIfInvalid() {
-        val current = currentTachometer ?: return
+        val current = currentTachometer?.internal ?: return
         val kart = currentSubjectKart() ?: run {
             clear()
             return
@@ -93,13 +94,14 @@ internal object TachometerManager {
 
     /**
      * ENSURES:
-     * - [engine]이 현재 탑승·관전 대상의 정확한 alive 엔진이면 그 엔진에 바인딩된 타코미터를 반환한다.
-     * - 현재 타코미터가 없거나 대상·카트·엔진 중 하나라도 달라졌으면 `null`을 반환한다.
+     * - null이 아닌 반환값은 현재 탑승·관전 대상의 alive 카트와 정확히 같은 [engine]
+     *   인스턴스에 바인딩된 타코미터다.
+     * - 현재 타코미터가 없거나 대상·카트·엔진 중 하나라도 다르면 `null`이다.
      */
     fun getForEngine(engine: KartEngine): KartTachometer? {
         val current = currentTachometer ?: return null
         val kart = currentSubjectKart() ?: return null
-        return current.takeIf { it.matches(kart, engine) }
+        return current.publicView.takeIf { current.internal.matches(kart, engine) }
     }
 
     private fun currentSubjectKart(): Kart<*>? {
@@ -107,28 +109,44 @@ internal object TachometerManager {
         return KartManager.getByRiderId(subject.id)
     }
 
-    private fun createTachometer(engine: KartEngine): TachometerInternal {
+    private fun createTachometer(engine: KartEngine): ManagedTachometer<*> {
         return when (engine.kart.type) {
-            KartType.X -> XTachometerImpl(engine)
-            KartType.EX -> EXTachometerImpl(engine)
-            KartType.JIU -> JiuTachometerImpl(engine)
-            KartType.NEW -> NewTachometerImpl(engine)
-            KartType.Z7 -> Z7TachometerImpl(engine)
-            KartType.V1 -> V1TachometerImpl(engine)
-            KartType.A2 -> A2TachometerImpl(engine)
-            KartType.LEGACY -> LegacyTachometerImpl(engine)
-            KartType.PRO -> ProTachometerImpl(engine)
-            KartType.RUSHPLUS -> RushPlusTachometerImpl(engine)
-            KartType.CHARGE -> ChargeTachometerImpl(engine)
-            KartType.SR -> SRTachometerImpl(engine)
-            KartType.N1 -> N1TachometerImpl(engine)
-            KartType.RX -> RXTachometerImpl(engine)
-            KartType.KEY -> KeyTachometerImpl(engine)
-            KartType.GEAR -> GearTachometerImpl(engine)
-            KartType.F1 -> F1TachometerImpl(engine)
-            KartType.RALLY -> RallyTachometerImpl(engine)
-            KartType.MK -> MKTachometerImpl(engine)
-            KartType.BOAT -> BoatTachometerImpl(engine)
+            KartType.X -> ManagedTachometer(XTachometerImpl(engine))
+            KartType.EX -> ManagedTachometer(EXTachometerImpl(engine))
+            KartType.JIU -> ManagedTachometer(JiuTachometerImpl(engine))
+            KartType.NEW -> ManagedTachometer(NewTachometerImpl(engine))
+            KartType.Z7 -> ManagedTachometer(Z7TachometerImpl(engine))
+            KartType.V1 -> ManagedTachometer(V1TachometerImpl(engine))
+            KartType.A2 -> ManagedTachometer(A2TachometerImpl(engine))
+            KartType.LEGACY -> ManagedTachometer(LegacyTachometerImpl(engine))
+            KartType.PRO -> ManagedTachometer(ProTachometerImpl(engine))
+            KartType.RUSHPLUS -> ManagedTachometer(RushPlusTachometerImpl(engine))
+            KartType.CHARGE -> ManagedTachometer(ChargeTachometerImpl(engine))
+            KartType.SR -> ManagedTachometer(SRTachometerImpl(engine))
+            KartType.N1 -> ManagedTachometer(N1TachometerImpl(engine))
+            KartType.RX -> ManagedTachometer(RXTachometerImpl(engine))
+            KartType.KEY -> ManagedTachometer(KeyTachometerImpl(engine))
+            KartType.GEAR -> ManagedTachometer(GearTachometerImpl(engine))
+            KartType.F1 -> ManagedTachometer(F1TachometerImpl(engine))
+            KartType.RALLY -> ManagedTachometer(RallyTachometerImpl(engine))
+            KartType.MK -> ManagedTachometer(MKTachometerImpl(engine))
+            KartType.DS -> ManagedTachometer(DSTachometerImpl(engine))
+            KartType.BOAT -> ManagedTachometer(BoatTachometerImpl(engine))
         }
+    }
+
+    /** 하나의 타코미터 구현체를 내부 갱신 계약과 공개 API 계약으로 함께 보관합니다. */
+    private class ManagedTachometer<T>(
+        private val value: T,
+    )
+        where
+            T : TachometerInternal,
+            T : KartTachometer
+    {
+        val internal: TachometerInternal
+            get() = value
+
+        val publicView: KartTachometer
+            get() = value
     }
 }

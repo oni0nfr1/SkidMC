@@ -9,8 +9,11 @@ import io.github.oni0nfr1.skid.client.api.tachometer.KartTachometer
  * 엔진 객체는 카트의 메타데이터가 준비된 시점에 생성되며 카트가 유효한 동안 유지됩니다.
  * 이 객체의 프로퍼티는 독립적인 엔진 소유 상태가 아니라 연결된 [Kart]의 상태 중 엔진
  * 종류에 따라 달라지는 값을 나타냅니다.
+ *
+ * 직접 하위 타입 계층은 SkidMC가 정의합니다. API 소비자는 이 인터페이스를 직접
+ * 구현하지 않고 [Kart.engine]으로 구현체 모드가 제공하는 typed view를 사용합니다.
  */
-interface KartEngine {
+sealed interface KartEngine {
 
     /**
      * 이 엔진이 연결된 카트입니다.

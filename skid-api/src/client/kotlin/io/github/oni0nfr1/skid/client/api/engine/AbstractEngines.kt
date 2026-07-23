@@ -3,6 +3,7 @@ package io.github.oni0nfr1.skid.client.api.engine
 import io.github.oni0nfr1.skid.client.api.kart.Kart
 import io.github.oni0nfr1.skid.client.api.tachometer.ExceedTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.GearlikeTachometer
+import io.github.oni0nfr1.skid.client.api.tachometer.MKLikeTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.NitroTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.SpeedTachometer
 
@@ -78,4 +79,15 @@ sealed interface DraftEngine : KartEngine {
 sealed interface ExceedEngine : KartEngine {
     override val kart: Kart<ExceedEngine>
     override val tachometer: ExceedTachometer?
+}
+
+/**
+ * 터보 게이지를 사용하는 MK 계열 엔진입니다.
+ *
+ * [MKEngine]과 [DSEngine]이 공유하는 기능 계약이며, 각 엔진은 자신의 구체적인 카트와
+ * 타코미터 타입으로 프로퍼티를 좁힙니다.
+ */
+sealed interface MKLikeEngine : DriftEngine, DraftEngine {
+    override val kart: Kart<MKLikeEngine>
+    override val tachometer: MKLikeTachometer?
 }

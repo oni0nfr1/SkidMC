@@ -37,3 +37,13 @@ sealed interface ExceedTachometer : KartTachometer {
     /** 익시드 게이지 진행도입니다. 값의 범위는 `0.0f..1.0f`입니다. */
     val exceedGauge: Float
 }
+
+/**
+ * MK 계열 더미 엔진의 공통 타코미터입니다.
+ *
+ * [MKTachometer]와 [DSTachometer]가 공유하는 주행 정보 계약입니다.
+ */
+sealed interface MKLikeTachometer : KartTachometer {
+    /** 터보 게이지 진행도입니다. 값의 범위는 `0.0..1.0`입니다. */
+    val turboGauge: Double
+}

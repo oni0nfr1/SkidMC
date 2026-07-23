@@ -12,6 +12,6 @@ final class JavaKartTachometerEventTypeTest {
         KartTachometerEvents.RPM.register((kart, rpm) -> KartTachometerEvents.Result.SHOW);
         KartTachometerEvents.GEAR.register((kart, gear) -> KartTachometerEvents.Result.SHOW);
         KartTachometerEvents.ERS.register((kart, ers) -> KartTachometerEvents.Result.SHOW);
-        KartTachometerEvents.MK_GAUGE.register((kart, gauge) -> KartTachometerEvents.Result.SHOW);
+        KartTachometerEvents.TURBO_GAUGE.register((kart, gauge) -> KartTachometerEvents.Result.SHOW);
     }
 }

@@ -2,6 +2,7 @@ package io.github.oni0nfr1.skid.client.api.events
 
 import io.github.oni0nfr1.skid.client.api.kart.Kart
 import io.github.oni0nfr1.skid.client.api.kart.KartRef
+import io.github.oni0nfr1.skid.client.api.tachometer.MKLikeTachometer
 import net.minecraft.network.chat.Component
 
 /**
@@ -140,13 +141,14 @@ object KartTachometerEvents {
     }
 
     /**
-     * 클라이언트가 마크라이더 타코미터 텍스트를 수신하고, 그곳에서 마리오카트 엔진의 터보 게이지 충전량이 파싱될 경우 호출됩니다.
+     * 클라이언트가 마크라이더 타코미터 텍스트를 수신하고, 그곳에서 MK 또는 DS 엔진의
+     * [MKLikeTachometer.turboGauge] 값이 파싱될 경우 호출됩니다.
      *
      * 렌더 스레드에서 호출됩니다.
      */
     @JvmField
-    val MK_GAUGE = createEvent { listeners ->
-        MarioKartGaugeCallback { kart, gauge ->
+    val TURBO_GAUGE = createEvent { listeners ->
+        KartTurboGaugeCallback { kart, gauge ->
             var result = Result.SHOW
             for (listener in listeners) {
                 val listenerResult = listener.onGaugeUpdate(kart, gauge)
@@ -196,8 +198,8 @@ object KartTachometerEvents {
         fun onGaugeUpdate(kart: KartRef, gauge: Double): Result
     }
 
-    /** 파싱된 MK 터보 게이지를 처리합니다. */
-    fun interface MarioKartGaugeCallback {
+    /** 파싱된 MK 계열 엔진의 터보 게이지를 처리합니다. */
+    fun interface KartTurboGaugeCallback {
         /**
          * @param kart 값이 파싱된 현재 카트
          * @param gauge `0.0..1.0` 범위의 터보 게이지 진행도

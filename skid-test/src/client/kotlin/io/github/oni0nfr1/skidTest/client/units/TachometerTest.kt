@@ -3,7 +3,7 @@ package io.github.oni0nfr1.skidTest.client.units
 import io.github.oni0nfr1.skid.client.api.tachometer.BoatTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.F1Tachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.GearlikeTachometer
-import io.github.oni0nfr1.skid.client.api.tachometer.MKTachometer
+import io.github.oni0nfr1.skid.client.api.tachometer.MKLikeTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.NitroTachometer
 import io.github.oni0nfr1.skid.client.api.tachometer.RushPlusTachometer
 import io.github.oni0nfr1.skid.client.api.kart.ridingKart
@@ -48,9 +48,8 @@ object TachometerTest: TestUnit() {
                     when (currentTachometer) {
                         is NitroTachometer -> nitroEngineInfo(currentTachometer)
                         is GearlikeTachometer -> gearlikeEngineInfo(currentTachometer)
-                        is MKTachometer -> marioEngineInfo(currentTachometer)
+                        is MKLikeTachometer -> mkLikeEngineInfo(currentTachometer)
                         is BoatTachometer -> boatEngineInfo(currentTachometer)
-                        else -> "unknown tachometer\n"
                     }
                 )
             }
@@ -77,7 +76,7 @@ object TachometerTest: TestUnit() {
         return info
     }
 
-    private fun marioEngineInfo(tachometer: MKTachometer): String {
+    private fun mkLikeEngineInfo(tachometer: MKLikeTachometer): String {
         var info = ""
         info += "turbo-gauge: ${tachometer.turboGauge}\n"
         return info

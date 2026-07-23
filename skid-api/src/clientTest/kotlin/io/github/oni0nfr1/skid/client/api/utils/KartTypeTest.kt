@@ -9,7 +9,7 @@ class KartTypeTest {
 
     @Test
     fun `all kart types have unique codes`() {
-        assertEquals(20, KartType.entries.size)
+        assertEquals(21, KartType.entries.size)
         assertEquals(KartType.entries.size, KartType.entries.map { it.engineCode }.toSet().size)
         assertEquals(KartType.entries.size, KartType.entries.map { it.attrEngineCode }.toSet().size)
     }
@@ -20,6 +20,12 @@ class KartTypeTest {
             assertSame(type, KartType.fromEngineCode(type.engineCode))
             assertSame(type, KartType.fromAttrEngineCode(type.attrEngineCode))
         }
+    }
+
+    @Test
+    fun `DS uses the next dummy engine code`() {
+        assertEquals(1008, KartType.DS.engineCode)
+        assertEquals(1008, KartType.DS.attrEngineCode)
     }
 
     @Test

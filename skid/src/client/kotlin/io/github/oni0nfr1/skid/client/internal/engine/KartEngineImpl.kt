@@ -46,8 +46,8 @@ internal abstract class KartEngineImpl<ENGINE, TACHOMETER>(
     val accurateDriftState: Boolean
         get() {
             val internalKart = kart as? KartImpl<*> ?: return false
-            return internalKart.internalModelOrNull?.passengers?.flatMap { it.passengers }?.any {
-                it.customName?.string == "mcrider-drift-effect" && it is Display && it.viewRange > 0
+            return internalKart.internalModelOrNull?.passengers?.any {
+                it.customName?.string == "mcrider-drift-effect" && it is Display && it.viewRange > 0f
             } ?: false
         }
 

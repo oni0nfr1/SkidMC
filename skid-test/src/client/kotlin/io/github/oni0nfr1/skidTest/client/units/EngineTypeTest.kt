@@ -2,7 +2,7 @@ package io.github.oni0nfr1.skidTest.client.units
 
 import io.github.oni0nfr1.skid.client.api.engine.BoatEngine
 import io.github.oni0nfr1.skid.client.api.engine.GearLikeEngine
-import io.github.oni0nfr1.skid.client.api.engine.MKEngine
+import io.github.oni0nfr1.skid.client.api.engine.MKLikeEngine
 import io.github.oni0nfr1.skid.client.api.engine.NitroEngine
 import io.github.oni0nfr1.skid.client.api.events.KartMountEvents
 import io.github.oni0nfr1.skid.client.api.kart.KartRef
@@ -32,9 +32,8 @@ object EngineTypeTest: TestUnit() {
             val engineCategoryName = when (engine) {
                 is NitroEngine -> "kartrider-like"
                 is GearLikeEngine -> "gear-like"
-                is MKEngine -> "mariokart"
+                is MKLikeEngine -> "mariokart-like"
                 is BoatEngine -> "boat"
-                else -> "unknown"
             }
 
             client.sendChat("detected engine: ${type.engineName}")
